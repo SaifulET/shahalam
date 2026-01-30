@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 
 
@@ -12,10 +13,11 @@ export default function LoginPage() {
   const [rememberPassword, setRememberPassword] = useState<boolean>(true);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
+
+  const route= useRouter()
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log({ email, password, rememberPassword });
+    route.push("/")
   };
 
   return (

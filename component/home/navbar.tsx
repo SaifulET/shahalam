@@ -65,7 +65,9 @@ export default function Navbar() {
               Dashboard
             </Link>
           </div>
-            <div className="h-[32px] w-[32px] rounded-full overflow-hidden border-1 border-gray-200">
+          <Link  href="/company-profile">
+          
+          <div className="h-[32px] w-[32px] rounded-full overflow-hidden border-1 border-gray-200">
               <Image
                 src="/profile.jpg"
                 alt="Profile"
@@ -74,6 +76,8 @@ export default function Navbar() {
                 className="h-full w-full object-cover"
               />
             </div>
+          </Link>
+            
           </div>
 
           {/* Mobile menu button */}
