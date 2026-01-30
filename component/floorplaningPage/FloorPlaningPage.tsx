@@ -98,34 +98,50 @@ const floorPlans: Record<string, FloorPlan> = {
       {
         units: [
           { label: "A", tone: "available", wide: true },
-          { label: "B", tone: "available", wide: true },
+          { label: "B", tone: "reserved", wide: true },
+        ],
+      },
+      {
+        units: [
           { label: "C", tone: "sold", wide: true },
+          { label: "D", tone: "available", wide: true },
         ],
       },
       {
         units: [
-          { label: "D", tone: "reserved", wide: true },
-          { label: "E", tone: "available", wide: true },
+          { label: "A", tone: "available" },
+          { label: "B", tone: "reserved" },
+          { label: "C", tone: "available" },
+          { label: "D", tone: "sold" },
         ],
       },
       {
         units: [
-          { label: "F", tone: "available" },
-          { label: "G", tone: "available" },
-          { label: "H", tone: "sold" },
-          { label: "I", tone: "reserved" },
+          { label: "A", tone: "reserved", wide: true },
+          { label: "B", tone: "available" },
+          { label: "C", tone: "available" },
+        ],
+      },
+      {
+        units: [
+          { label: "A", tone: "available" },
+          { label: "B", tone: "available" },
+          { label: "C", tone: "sold" },
+          { label: "D", tone: "available" },
         ],
       },
     ],
-    floorLabels: ["Penthouse", "3rd Floor", "2nd Floor", "1st Floor"],
+    floorLabels: ["Annex", "4th Floor", "3rd Floor", "2nd Floor", "1st Floor"],
     models: [
-      { name: "River View", size: "95 sqm", note: "View" },
-      { name: "Garden View", size: "110 sqm", note: "View" },
-      { name: "City View", size: "85 sqm", note: "View" },
+      { name: "Model A", size: "95 sqm", note: "River" },
+      { name: "Model B", size: "110 sqm", note: "Garden" },
+      { name: "Model C", size: "85 sqm", note: "City" },
+      { name: "Model D", size: "120 sqm", note: "Lake" },
+      { name: "Model E", size: "90 sqm", note: "Park" },
     ],
     annexInfo: [
-      { name: "Annex East", size: "180 sqm", details: ["140 sqm Living Area", "40 sqm Terrace"] },
-      { name: "Annex West", size: "175 sqm", details: ["135 sqm Living Area", "40 sqm Terrace"] },
+      { name: "Annex A", size: "220 sqm", details: ["180 sqm Living Area", "40 sqm Balcony"] },
+      { name: "Annex B", size: "210 sqm", details: ["170 sqm Living Area", "40 sqm Terrace"] },
     ],
   },
   "Tech Hub Campus": {
@@ -140,35 +156,45 @@ const floorPlans: Record<string, FloorPlan> = {
       },
       {
         units: [
-          { label: "201", tone: "sold", wide: true },
-          { label: "202", tone: "available", wide: true },
-          { label: "203", tone: "available", wide: true },
-          { label: "204", tone: "reserved", wide: true },
+          { label: "103", tone: "sold", wide: true },
+          { label: "104", tone: "available", wide: true },
         ],
       },
       {
         units: [
-          { label: "301", tone: "available", wide: true },
-          { label: "302", tone: "sold", wide: true },
+          { label: "201", tone: "available" },
+          { label: "202", tone: "reserved" },
+          { label: "203", tone: "available" },
+          { label: "204", tone: "sold" },
         ],
       },
       {
         units: [
-          { label: "401", tone: "available", wide: true },
-          { label: "402", tone: "reserved", wide: true },
-          { label: "403", tone: "available", wide: true },
+          { label: "301", tone: "reserved", wide: true },
+          { label: "302", tone: "available" },
+          { label: "303", tone: "available" },
+        ],
+      },
+      {
+        units: [
+          { label: "401", tone: "available" },
+          { label: "402", tone: "available" },
+          { label: "403", tone: "sold" },
+          { label: "404", tone: "available" },
         ],
       },
     ],
-    floorLabels: ["Roof Terrace", "4th Floor", "3rd Floor", "2nd Floor", "Ground Floor"],
+    floorLabels: ["Annex", "4th Floor", "3rd Floor", "2nd Floor", "1st Floor"],
     models: [
-      { name: "Studio", size: "45 sqm", note: "Tech" },
-      { name: "1-Bedroom", size: "65 sqm", note: "Tech" },
-      { name: "2-Bedroom", size: "90 sqm", note: "Tech" },
-      { name: "3-Bedroom", size: "120 sqm", note: "Tech" },
+      { name: "Model A", size: "45 sqm", note: "Tech" },
+      { name: "Model B", size: "65 sqm", note: "Tech" },
+      { name: "Model C", size: "90 sqm", note: "Tech" },
+      { name: "Model D", size: "120 sqm", note: "Tech" },
+      { name: "Model E", size: "150 sqm", note: "Tech" },
     ],
     annexInfo: [
-      { name: "Tech Annex", size: "250 sqm", details: ["200 sqm Workspace", "50 sqm Common Area"] },
+      { name: "Annex A", size: "280 sqm", details: ["230 sqm Workspace", "50 sqm Lab"] },
+      { name: "Annex B", size: "260 sqm", details: ["210 sqm Office", "50 sqm Meeting"] },
     ],
   },
   "Metro Shopping Center": {
@@ -178,36 +204,156 @@ const floorPlans: Record<string, FloorPlan> = {
       {
         units: [
           { label: "S1", tone: "available", wide: true },
+          { label: "S2", tone: "reserved", wide: true },
         ],
       },
       {
         units: [
-          { label: "M1", tone: "available", wide: true },
-          { label: "M2", tone: "sold", wide: true },
+          { label: "M1", tone: "sold", wide: true },
+          { label: "M2", tone: "available", wide: true },
         ],
       },
       {
         units: [
-          { label: "L1", tone: "reserved", wide: true },
-          { label: "L2", tone: "available", wide: true },
+          { label: "L1", tone: "available" },
+          { label: "L2", tone: "reserved" },
+          { label: "L3", tone: "available" },
+          { label: "L4", tone: "sold" },
         ],
       },
       {
         units: [
-          { label: "K1", tone: "available", wide: true },
-          { label: "K2", tone: "sold", wide: true },
-          { label: "K3", tone: "available", wide: true },
+          { label: "K1", tone: "reserved", wide: true },
+          { label: "K2", tone: "available" },
+          { label: "K3", tone: "available" },
+        ],
+      },
+      {
+        units: [
+          { label: "P1", tone: "available" },
+          { label: "P2", tone: "available" },
+          { label: "P3", tone: "sold" },
+          { label: "P4", tone: "available" },
         ],
       },
     ],
-    floorLabels: ["Food Court", "Upper Level", "Main Level", "Lower Level"],
+    floorLabels: ["Annex", "4th Floor", "3rd Floor", "2nd Floor", "1st Floor"],
     models: [
-      { name: "Small Shop", size: "50 sqm", note: "Retail" },
-      { name: "Medium Shop", size: "100 sqm", note: "Retail" },
-      { name: "Large Shop", size: "200 sqm", note: "Retail" },
+      { name: "Model A", size: "50 sqm", note: "Retail" },
+      { name: "Model B", size: "100 sqm", note: "Retail" },
+      { name: "Model C", size: "150 sqm", note: "Retail" },
+      { name: "Model D", size: "200 sqm", note: "Retail" },
+      { name: "Model E", size: "250 sqm", note: "Retail" },
     ],
     annexInfo: [
-      { name: "Storage Annex", size: "300 sqm", details: ["250 sqm Storage", "50 sqm Office"] },
+      { name: "Annex A", size: "350 sqm", details: ["300 sqm Storage", "50 sqm Office"] },
+      { name: "Annex B", size: "320 sqm", details: ["270 sqm Service", "50 sqm Utility"] },
+    ],
+  },
+  "Grand Hotel Renovation": {
+    id: "grand-hotel-renovation",
+    name: "Grand Hotel Renovation",
+    unitRows: [
+      {
+        units: [
+          { label: "Suite A", tone: "available", wide: true },
+          { label: "Suite B", tone: "reserved", wide: true },
+        ],
+      },
+      {
+        units: [
+          { label: "Suite C", tone: "sold", wide: true },
+          { label: "Suite D", tone: "available", wide: true },
+        ],
+      },
+      {
+        units: [
+          { label: "Room 301", tone: "available" },
+          { label: "Room 302", tone: "reserved" },
+          { label: "Room 303", tone: "available" },
+          { label: "Room 304", tone: "sold" },
+        ],
+      },
+      {
+        units: [
+          { label: "Suite E", tone: "reserved", wide: true },
+          { label: "Room 401", tone: "available" },
+          { label: "Room 402", tone: "available" },
+        ],
+      },
+      {
+        units: [
+          { label: "Room 501", tone: "available" },
+          { label: "Room 502", tone: "available" },
+          { label: "Room 503", tone: "sold" },
+          { label: "Room 504", tone: "available" },
+        ],
+      },
+    ],
+    floorLabels: ["Annex", "4th Floor", "3rd Floor", "2nd Floor", "1st Floor"],
+    models: [
+      { name: "Model A", size: "40 sqm", note: "Hotel" },
+      { name: "Model B", size: "60 sqm", note: "Hotel" },
+      { name: "Model C", size: "80 sqm", note: "Hotel" },
+      { name: "Model D", size: "100 sqm", note: "Hotel" },
+      { name: "Model E", size: "150 sqm", note: "Hotel" },
+    ],
+    annexInfo: [
+      { name: "Annex A", size: "280 sqm", details: ["230 sqm Service", "50 sqm Staff"] },
+      { name: "Annex B", size: "300 sqm", details: ["250 sqm Meeting", "50 sqm Lounge"] },
+    ],
+  },
+  "Innovation Academy": {
+    id: "innovation-academy",
+    name: "Innovation Academy",
+    unitRows: [
+      {
+        units: [
+          { label: "Lab A", tone: "available", wide: true },
+          { label: "Lab B", tone: "reserved", wide: true },
+        ],
+      },
+      {
+        units: [
+          { label: "Studio A", tone: "sold", wide: true },
+          { label: "Studio B", tone: "available", wide: true },
+        ],
+      },
+      {
+        units: [
+          { label: "Class 101", tone: "available" },
+          { label: "Class 102", tone: "reserved" },
+          { label: "Class 103", tone: "available" },
+          { label: "Class 104", tone: "sold" },
+        ],
+      },
+      {
+        units: [
+          { label: "Library", tone: "reserved", wide: true },
+          { label: "Lab C", tone: "available" },
+          { label: "Lab D", tone: "available" },
+        ],
+      },
+      {
+        units: [
+          { label: "Office 201", tone: "available" },
+          { label: "Office 202", tone: "available" },
+          { label: "Office 203", tone: "sold" },
+          { label: "Office 204", tone: "available" },
+        ],
+      },
+    ],
+    floorLabels: ["Annex", "4th Floor", "3rd Floor", "2nd Floor", "1st Floor"],
+    models: [
+      { name: "Model A", size: "80 sqm", note: "Academy" },
+      { name: "Model B", size: "100 sqm", note: "Academy" },
+      { name: "Model C", size: "120 sqm", note: "Academy" },
+      { name: "Model D", size: "50 sqm", note: "Academy" },
+      { name: "Model E", size: "150 sqm", note: "Academy" },
+    ],
+    annexInfo: [
+      { name: "Annex A", size: "320 sqm", details: ["270 sqm Research", "50 sqm Storage"] },
+      { name: "Annex B", size: "290 sqm", details: ["240 sqm Study", "50 sqm Common"] },
     ],
   },
 };
