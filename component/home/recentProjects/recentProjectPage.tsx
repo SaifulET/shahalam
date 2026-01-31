@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ProjectCard from "./projectCard";
 
 interface Project {
@@ -21,6 +22,8 @@ export default function RecentProjects({ projects, onProjectMoved }: RecentProje
       </h2>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[28px]">
         {projects.map((project) => (
+          <Link href="/dashboard" key={project.id} >
+          
           <ProjectCard
             key={project.id}
             id={project.id}
@@ -30,6 +33,9 @@ export default function RecentProjects({ projects, onProjectMoved }: RecentProje
             status={project.status}
             onProjectMoved={onProjectMoved}
           />
+          
+          </Link>
+          
         ))}
       </div>
     </div>
