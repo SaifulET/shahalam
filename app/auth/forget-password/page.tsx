@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
 
           {/* Title */}
           <h1 className="text-white text-2xl sm:text-3xl font-semibold text-center mb-4">
-            Forgot Password
+            Forget Password
           </h1>
 
           {/* Description */}

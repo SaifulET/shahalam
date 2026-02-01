@@ -102,23 +102,7 @@ export default function CompanyProfile() {
               <p className="text-[#6B7280] font-inter font-normal text-xs leading-4 tracking-[-0.2px]">Active Projects</p>
             </div>
 
-            {/* YoY Growth */}
-            <div className="border border-[#F3F4F6] dark:bg-[#28272A]  rounded-lg p-6 h-[166px]">
-              <div className="w-12  h-12 bg-[#F3E8FF] rounded-lg flex items-center justify-center ">
-                <TrendingUp className="w-6 h-6 text-[#9333EA]" />
-              </div>
-              <p className="font-inter font-semibold text-2xl dark:text-[#FFFFFF] leading-8 tracking-[-0.5px] mb-1">+23%</p>
-              <p className="text-[#6B7280] font-inter font-normal text-xs leading-4 tracking-[-0.2px]">YoY Growth</p>
-            </div>
-
-            {/* Total Clients */}
-            <div className="border border-[#F3F4F6] dark:bg-[#28272A]  rounded-lg p-6 h-[166px]">
-              <div className="w-12 h-12 bg-[#CCFBF1] rounded-lg flex items-center justify-center ">
-                <UserCheck className="w-6 h-6 text-[#0D9488]" />
-              </div>
-              <p className="font-inter font-semibold text-2xl dark:text-[#FFFFFF] leading-8 tracking-[-0.5px] mb-1">342</p>
-              <p className="text-[#6B7280] font-inter font-normal text-xs leading-4 tracking-[-0.2px]">Total Clients</p>
-            </div>
+          
           </div>
         </div>
       </div>

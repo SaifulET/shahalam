@@ -5,7 +5,7 @@ import React from 'react'
 
 function page() {
   return (
-    <div><Navbar></Navbar><div className="absolute right-0 m-[10px]  ">
+    <div><Navbar></Navbar><div className="absolute right-1 top-3  ">
         <ThemeToggle />
       </div><PropertyUnitForm></PropertyUnitForm></div>
   )

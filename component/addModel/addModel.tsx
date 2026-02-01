@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 interface AreaBreakdownItem {
@@ -15,13 +16,13 @@ export default function AddModel() {
     { id: '1', label: '', value: '' },
     { id: '2', label: '', value: '' },
   ]);
-
+const route= useRouter()
   const handleSave = () => {
-   
+   route.push('/dashboard')
   };
 
   const handleCancel = () => {
-   
+   route.push("/dashboard")
   };
 
   const updateAreaBreakdown = (id: string, field: 'label' | 'value', newValue: string) => {

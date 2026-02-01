@@ -87,8 +87,16 @@ const floorPlans: Record<string, FloorPlan> = {
       { name: "Model E", size: "83 sqm", note: "Front" },
     ],
     annexInfo: [
-      { name: "Annex A", size: "194 sqm", details: ["155 sqm Financial Area", "39 sqm Roof"] },
-      { name: "Annex B", size: "201 sqm", details: ["162 sqm Built-up Area", "39 sqm Roof"] },
+      {
+        name: "Annex A",
+        size: "194 sqm",
+        details: ["155 sqm Financial Area", "39 sqm Roof"],
+      },
+      {
+        name: "Annex B",
+        size: "201 sqm",
+        details: ["162 sqm Built-up Area", "39 sqm Roof"],
+      },
     ],
   },
   "Riverside Residences": {
@@ -140,8 +148,16 @@ const floorPlans: Record<string, FloorPlan> = {
       { name: "Model E", size: "90 sqm", note: "Park" },
     ],
     annexInfo: [
-      { name: "Annex A", size: "220 sqm", details: ["180 sqm Living Area", "40 sqm Balcony"] },
-      { name: "Annex B", size: "210 sqm", details: ["170 sqm Living Area", "40 sqm Terrace"] },
+      {
+        name: "Annex A",
+        size: "220 sqm",
+        details: ["180 sqm Living Area", "40 sqm Balcony"],
+      },
+      {
+        name: "Annex B",
+        size: "210 sqm",
+        details: ["170 sqm Living Area", "40 sqm Terrace"],
+      },
     ],
   },
   "Tech Hub Campus": {
@@ -193,8 +209,16 @@ const floorPlans: Record<string, FloorPlan> = {
       { name: "Model E", size: "150 sqm", note: "Tech" },
     ],
     annexInfo: [
-      { name: "Annex A", size: "280 sqm", details: ["230 sqm Workspace", "50 sqm Lab"] },
-      { name: "Annex B", size: "260 sqm", details: ["210 sqm Office", "50 sqm Meeting"] },
+      {
+        name: "Annex A",
+        size: "280 sqm",
+        details: ["230 sqm Workspace", "50 sqm Lab"],
+      },
+      {
+        name: "Annex B",
+        size: "260 sqm",
+        details: ["210 sqm Office", "50 sqm Meeting"],
+      },
     ],
   },
   "Metro Shopping Center": {
@@ -246,8 +270,16 @@ const floorPlans: Record<string, FloorPlan> = {
       { name: "Model E", size: "250 sqm", note: "Retail" },
     ],
     annexInfo: [
-      { name: "Annex A", size: "350 sqm", details: ["300 sqm Storage", "50 sqm Office"] },
-      { name: "Annex B", size: "320 sqm", details: ["270 sqm Service", "50 sqm Utility"] },
+      {
+        name: "Annex A",
+        size: "350 sqm",
+        details: ["300 sqm Storage", "50 sqm Office"],
+      },
+      {
+        name: "Annex B",
+        size: "320 sqm",
+        details: ["270 sqm Service", "50 sqm Utility"],
+      },
     ],
   },
   "Grand Hotel Renovation": {
@@ -299,8 +331,16 @@ const floorPlans: Record<string, FloorPlan> = {
       { name: "Model E", size: "150 sqm", note: "Hotel" },
     ],
     annexInfo: [
-      { name: "Annex A", size: "280 sqm", details: ["230 sqm Service", "50 sqm Staff"] },
-      { name: "Annex B", size: "300 sqm", details: ["250 sqm Meeting", "50 sqm Lounge"] },
+      {
+        name: "Annex A",
+        size: "280 sqm",
+        details: ["230 sqm Service", "50 sqm Staff"],
+      },
+      {
+        name: "Annex B",
+        size: "300 sqm",
+        details: ["250 sqm Meeting", "50 sqm Lounge"],
+      },
     ],
   },
   "Innovation Academy": {
@@ -352,8 +392,16 @@ const floorPlans: Record<string, FloorPlan> = {
       { name: "Model E", size: "150 sqm", note: "Academy" },
     ],
     annexInfo: [
-      { name: "Annex A", size: "320 sqm", details: ["270 sqm Research", "50 sqm Storage"] },
-      { name: "Annex B", size: "290 sqm", details: ["240 sqm Study", "50 sqm Common"] },
+      {
+        name: "Annex A",
+        size: "320 sqm",
+        details: ["270 sqm Research", "50 sqm Storage"],
+      },
+      {
+        name: "Annex B",
+        size: "290 sqm",
+        details: ["240 sqm Study", "50 sqm Common"],
+      },
     ],
   },
 };
@@ -362,9 +410,12 @@ const projects = Object.keys(floorPlans);
 
 export default function RealEstateProject() {
   const [lang, setLang] = useState<"en" | "ar">("en");
-  const [selectedProject, setSelectedProject] = useState<string>("Downtown Plaza");
+  const [selectedProject, setSelectedProject] =
+    useState<string>("Downtown Plaza");
   const [showAddPopup, setShowAddPopup] = useState(false);
-  const [selectedUnitType, setSelectedUnitType] = useState<"apartment" | "annex" | null>(null);
+  const [selectedUnitType, setSelectedUnitType] = useState<
+    "apartment" | "annex" | null
+  >(null);
   const isArabic = lang === "ar";
   const exportRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
@@ -372,12 +423,12 @@ export default function RealEstateProject() {
   const currentFloorPlan = floorPlans[selectedProject];
 
   const floorLabelsLocalized = isArabic
-    ? currentFloorPlan.floorLabels.map(label => `الدور ${label}`)
+    ? currentFloorPlan.floorLabels.map((label) => `الدور ${label}`)
     : currentFloorPlan.floorLabels;
 
   const floorsPanel = (
     <div
-      className="flex h-full min-h-[260px] flex-col items-center justify-between rounded-3xl border border-white/10 bg-[#1a221f]/30 px-4 py-6 text-center text-sm uppercase tracking-[0.2em] text-emerald-100 "
+      className="flex h-full min-h-[260px] flex-col items-center justify-between rounded-3xl border border-white/10 bg-[#1a221f]/30 px-4 py-6 text-center text-sm uppercase tracking-[0.2em] text-[#F2DFA7] sf-pro"
       dir={isArabic ? "rtl" : "ltr"}
     >
       {floorLabelsLocalized.map((label) => (
@@ -394,7 +445,7 @@ export default function RealEstateProject() {
         // Calculate the appropriate width for each unit based on the number of units in the row
         const unitCount = row.units.length;
         let gridCols = "grid-cols-4"; // Default for 4 units
-        
+
         if (unitCount === 1) {
           gridCols = "grid-cols-1";
         } else if (unitCount === 2) {
@@ -404,11 +455,15 @@ export default function RealEstateProject() {
         } else if (unitCount === 5) {
           gridCols = "grid-cols-5";
         }
-        
+
         return (
           <div key={`row-${index}`} className={`grid ${gridCols} gap-3`}>
             {row.units.map((unit, idx) => (
-              <UnitPill key={`${unit.label}-${idx}`} unit={unit} unitCount={unitCount} />
+              <UnitPill
+                key={`${unit.label}-${idx}`}
+                unit={unit}
+                unitCount={unitCount}
+              />
             ))}
           </div>
         );
@@ -427,7 +482,7 @@ export default function RealEstateProject() {
 
   const handleContinue = () => {
     if (!selectedUnitType) return;
-    
+
     setShowAddPopup(false);
     if (selectedUnitType === "annex") {
       router.push(`/addmodel`);
@@ -459,6 +514,18 @@ export default function RealEstateProject() {
     >
       <style jsx global>{`
         @media print {
+          @page {
+            size: A4 portrait;
+            margin: 0;
+          }
+          html,
+          body {
+            width: 210mm !important;
+            height: 297mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+          }
           body * {
             visibility: hidden !important;
           }
@@ -466,13 +533,24 @@ export default function RealEstateProject() {
           .print-export * {
             visibility: visible !important;
           }
+          .print-export,
+          .print-export * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
           .print-export {
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
-            width: 100% !important;
-            max-width: 100% !important;
+            width: 210mm !important;
+            height: 297mm !important;
+            max-width: 210mm !important;
             margin: 0 !important;
+            overflow: visible !important;
+            box-sizing: border-box !important;
+            padding: 12mm !important;
+            page-break-after: avoid !important;
+            break-after: avoid-page !important;
           }
           .print-export .print-floor-layout {
             display: grid !important;
@@ -480,15 +558,28 @@ export default function RealEstateProject() {
             align-items: center !important;
             gap: 24px !important;
           }
+          .print-export .print-scale {
+            transform: scale(0.86) !important;
+            transform-origin: top left !important;
+            width: calc((210mm - 24mm) / 0.86) !important;
+          }
           .print-export .print-models,
           .print-export .print-models *,
           .print-export .print-annex,
           .print-export .print-annex * {
-            color: #1f2937 !important;
+            color: #ffffff !important;
             text-shadow: none !important;
           }
+          .print-export .print-pill {
+            display: inline-flex !important;
+            padding: 0.25rem 0.75rem !important;
+            color: #374151 !important;
+          }
           .print-export .print-white-overlay {
-            background-color: rgba(255, 255, 255, 0.35) !important;
+            background-color: rgba(0, 0, 0, 0.05) !important;
+          }
+          .print-export .print-bg {
+            opacity: 0.9 !important;
           }
         }
       `}</style>
@@ -512,13 +603,15 @@ export default function RealEstateProject() {
                       type="radio"
                       name="unitType"
                       value="apartment"
-                      checked={selectedUnitType === 'apartment'}
-                      onChange={() => setSelectedUnitType('apartment')}
+                      checked={selectedUnitType === "apartment"}
+                      onChange={() => setSelectedUnitType("apartment")}
                       className="sr-only peer"
                     />
                     <div className="w-6 h-6 rounded-full border-2 border-gray-400 dark:border-gray-500 peer-checked:border-blue-500 peer-checked:border-[6px] transition-all"></div>
                   </div>
-                  <span className="text-lg text-gray-900 dark:text-white">Apartment</span>
+                  <span className="text-lg text-gray-900 dark:text-white">
+                    Apartment
+                  </span>
                 </label>
 
                 {/* Annex Option */}
@@ -528,13 +621,15 @@ export default function RealEstateProject() {
                       type="radio"
                       name="unitType"
                       value="annex"
-                      checked={selectedUnitType === 'annex'}
-                      onChange={() => setSelectedUnitType('annex')}
+                      checked={selectedUnitType === "annex"}
+                      onChange={() => setSelectedUnitType("annex")}
                       className="sr-only peer"
                     />
                     <div className="w-6 h-6 rounded-full border-2 border-gray-400 dark:border-gray-500 peer-checked:border-blue-500 peer-checked:border-[6px] transition-all"></div>
                   </div>
-                  <span className="text-lg text-gray-900 dark:text-white">Annex</span>
+                  <span className="text-lg text-gray-900 dark:text-white">
+                    Annex
+                  </span>
                 </label>
               </div>
 
@@ -614,7 +709,7 @@ export default function RealEstateProject() {
               data-export="true"
               data-lang={lang}
             >
-              <div className="absolute inset-0 opacity-60">
+              <div className="print-bg absolute inset-0 opacity-60">
                 <Image
                   src="/bg.jpg"
                   alt="Building background"
@@ -624,7 +719,7 @@ export default function RealEstateProject() {
               </div>
               <div className="print-white-overlay absolute inset-0 bg-black/15" />
 
-              <div className="relative flex min-h-[720px] flex-col px-8 py-10 lg:px-16">
+              <div className="print-scale relative flex min-h-[720px] flex-col px-8 py-10 lg:px-16">
                 <header className="flex flex-col items-center text-center">
                   <div className="mb-4 flex h-40 w-40 items-center justify-center rounded-[32px]">
                     <Image
@@ -635,31 +730,27 @@ export default function RealEstateProject() {
                       className="h-[160px] w-[160px]"
                     />
                   </div>
-                  <h1 className={`${display.className} text-3xl font-bold text-emerald-100 mb-2`}>
-                    {currentFloorPlan.name}
-                  </h1>
+                 
                 </header>
 
                 <div
-                  className={`print-floor-layout mt-10 grid flex-1 items-center gap-6 ${
-                    "md:grid-cols-[1fr_220px]"
-                  }`}
+                  className={`print-floor-layout mt-10 grid flex-1 items-center gap-6 ${"md:grid-cols-[1fr_220px]"}`}
                 >
                   {unitsPanel}
                   {floorsPanel}
                 </div>
 
-                <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-white/80">
-                  <LegendPill colorClass="bg-emerald-600" label="Available" />
-                  <LegendPill colorClass="bg-yellow-500" label="Reserved" />
-                  <LegendPill colorClass="bg-red-600" label="Sold" />
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-[#F2DFA7]">
+                  <LegendPill colorClass="bg-[#006400]" label="Available" />
+                  <LegendPill colorClass="bg-[#D5B60A]" label="Reserved" />
+                  <LegendPill colorClass="bg-[#6F0000]" label="Sold" />
                 </div>
 
                 <div className="print-models mt-8 border-t border-white/10 pt-6">
                   <div className="grid grid-cols-2 gap-4 text-center text-sm uppercase tracking-[0.16em] text-white/60 sm:grid-cols-5">
                     {currentFloorPlan.models.map((model) => (
                       <div key={model.name} className="space-y-2">
-                        <div className="text-base text-emerald-100">
+                        <div className="print-pill inline-flex px-3 py-1 text-base bg-amber-100/70 rounded-full text-[#1B1B1F] sf-pro">
                           {model.name}
                         </div>
                         <div className="text-white/70">{model.size}</div>
@@ -673,7 +764,9 @@ export default function RealEstateProject() {
                   <div className="grid grid-cols-2 gap-4 text-center text-sm uppercase tracking-[0.16em] text-white/60 sm:grid-cols-2">
                     {currentFloorPlan.annexInfo.map((annex) => (
                       <div key={annex.name} className="space-y-2">
-                        <div className="text-base text-emerald-100">{annex.name}</div>
+                        <div className="print-pill inline-flex px-3 py-1 text-base bg-amber-100/70 rounded-full text-gray-700 sf-pro">
+                          {annex.name}
+                        </div>
                         <div className="text-white/70">{annex.size}</div>
                         {annex.details.map((detail, index) => (
                           <div key={index} className="text-white/40">
@@ -685,14 +778,14 @@ export default function RealEstateProject() {
                   </div>
                 </div>
 
-                <div className="mt-8 flex flex-wrap items-center justify-between gap-4 text-xs text-white/60">
-                  <div className="flex items-center gap-2">
-                    <span className="h-9 w-9 rounded-full bg-gradient-to-br from-[#feda75] via-[#fa7e1e] to-[#d62976]" />
+                <div className="mt-[70px] flex flex-wrap items-center justify-between gap-4 text-xs text-white sf-pro"  >
+                  <div className="flex items-center gap-2  font-bold text-[32px] leading-none tracking-normal text-center">
+                    <div><Image src="/instagram.svg" alt="instagram" width={60} height={60}/></div>
+                    <div><Image src="/alart.svg" alt="instagram" width={60} height={60}/></div>
+                    
                     wsl.realestate
                   </div>
-                  <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">
-                    2026
-                  </div>
+                  
                 </div>
               </div>
             </div>
@@ -706,10 +799,10 @@ export default function RealEstateProject() {
 function UnitPill({ unit, unitCount = 4 }: { unit: Unit; unitCount?: number }) {
   const toneClass =
     unit.tone === "available"
-      ? "bg-emerald-700"
+      ? "bg-[#006400]"
       : unit.tone === "reserved"
-        ? "bg-yellow-500 text-black"
-        : "bg-red-700";
+        ? "bg-[#D5B60A] text-black"
+        : "bg-[#6F0000]";
 
   // Calculate column span based on number of units in the row
   let colSpan = "col-span-1";

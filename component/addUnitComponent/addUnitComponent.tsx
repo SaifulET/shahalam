@@ -3,6 +3,8 @@
 import { useState, useRef } from 'react';
 import { Plus, X, Upload } from 'lucide-react';
 import ThemeToggle from '@/component/ThemeToggle/ThemeToggle';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface Floor {
   id: string;
@@ -153,7 +155,10 @@ export default function PropertyUnitForm() {
   const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
-
+const route= useRouter()
+const handleSave=()=>{
+  route.push("/dashboard")
+}
   return (
     <div className="min-h-screen px-[24px] md:px-[268px] pt-[35px] pb-[40px] bg-white  dark:bg-black">
       {/* Theme Toggle in Top Right Corner */}
@@ -165,10 +170,10 @@ export default function PropertyUnitForm() {
           <div className="px-4 sm:px-6 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h1 className="font-inter font-semibold text-[24px] leading-[32px] tracking-[-0.5px] dark:text-white">Unit Type</h1>
             <div className="flex gap-2 sm:gap-3">
-              <button className="px-[32px] py-[12px] font-inter font-medium text-[14px] leading-[14px] tracking-[-0.5px] text-center border rounded-lg border-[#D1D5DB] text-[#374151] hover:bg-gray-50 dark:text-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <Link href="/dashboard"><button className="px-[32px] py-[12px] font-inter font-medium text-[14px] leading-[14px] tracking-[-0.5px] text-center border rounded-lg border-[#D1D5DB] text-[#374151] hover:bg-gray-50 dark:text-gray-50 dark:hover:bg-gray-700 transition-colors">
                 Cancel
-              </button>
-              <button className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors">
+              </button></Link>
+              <button onClick={handleSave} className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors">
                 Save Property
               </button>
             </div>

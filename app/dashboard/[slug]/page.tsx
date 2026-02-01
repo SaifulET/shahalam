@@ -2,6 +2,10 @@
 
 import Navbar from '@/component/home/navbar';
 import ThemeToggle from '@/component/ThemeToggle/ThemeToggle';
+import { Add01FreeIcons } from '@hugeicons/core-free-icons';
+import { ArrowDownToDot } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 type UnitStatus = 'available' | 'reserved' | 'sold';
@@ -103,6 +107,8 @@ export default function Home() {
   const [showAddUnitModal, setShowAddUnitModal] = useState(false);
   const [activeFloorForAdd, setActiveFloorForAdd] = useState<string>('');
   const [newUnitName, setNewUnitName] = useState('');
+  const [showAddFloorModal, setShowAddFloorModal] = useState(false);
+  const [newFloorName, setNewFloorName] = useState('');
 
   const selectedProperty = properties.find(p => p.id === selectedPropertyId);
   
@@ -182,6 +188,40 @@ export default function Home() {
     setActiveFloorForAdd(floorId);
     setNewUnitName('');
     setShowAddUnitModal(true);
+  };
+
+  const route = useRouter();
+  
+  const handleSave = () => {
+    route.push("/dashboard");
+  };
+
+  const addFloor = () => {
+    setNewFloorName('');
+    setShowAddFloorModal(true);
+  };
+
+  const confirmAddFloor = () => {
+    if (!newFloorName.trim()) return;
+    
+    setProperties(properties.map(property => {
+      if (property.id === selectedPropertyId) {
+        const newFloor: Floor = {
+          id: `f${Date.now()}`,
+          name: newFloorName,
+          units: []
+        };
+        
+        return {
+          ...property,
+          floors: [...property.floors, newFloor]
+        };
+      }
+      return property;
+    }));
+    
+    setShowAddFloorModal(false);
+    setNewFloorName('');
   };
 
   const confirmAddUnit = () => {
@@ -311,10 +351,11 @@ export default function Home() {
           
           {/* Action buttons on the right */}
           <div className="flex gap-3">
-            <button className="px-4 py-2 text-sm text-gray-700 dark:text-gray-50 dark:border-1 dark:border-gray-500 rounded-lg dark:hover:text-gray-300 hover:text-gray-900">
+
+            <Link href="/dashboard"><button className="px-4 py-2 text-sm text-gray-700 dark:text-gray-50 dark:border-1 dark:border-gray-500 rounded-lg dark:hover:text-gray-300 hover:text-gray-900">
               Cancel
-            </button>
-            <button className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            </button></Link>
+            <button onClick={handleSave} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               Save Changes
             </button>
              <div className="flex items-center">
@@ -325,7 +366,15 @@ export default function Home() {
 
         {/* Live Preview - Table Style Layout */}
         <div className="flex-1 overflow-auto px-[52px]">
-          <h1 className="text-lg font-semibold dark:text-[#E5E7EB] text-gray-900 pb-[32px]">Live Preview</h1>
+          <div className='flex justify-between '>
+            <h1 className="text-lg font-semibold dark:text-[#E5E7EB] text-gray-900 pb-[32px]">Live Preview</h1>
+            <div>
+              <button onClick={addFloor} className='text-[#0088FF] bg-[#E1EFFB] p-[12px] rounded-lg hover:bg-[#e0e3e6]'>
+                   
+                   + Add Floor
+                  </button></div>
+          </div>
+          
           <div className="border border-gray-200  rounded-lg overflow-hidden bg-white dark:bg-[#1A1A1A] p-[16px] md:p-[32px] ">
             {selectedProperty?.floors.map((floor, index) => (
               <div 
@@ -415,9 +464,49 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Add Floor Modal */}
+      {showAddFloorModal && (
+        <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+              Name of your Floor
+            </h3>
+            
+            <input
+              type="text"
+              value={newFloorName}
+              onChange={(e) => setNewFloorName(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && confirmAddFloor()}
+              placeholder="Enter the Floor Name"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-base focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              autoFocus
+            />
+            
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowAddFloorModal(false);
+                  setNewFloorName('');
+                }}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmAddFloor}
+                disabled={!newFloorName.trim()}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add Unit Modal */}
       {showAddUnitModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0  backdrop-blur-xl flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
               Name of your Unit
@@ -428,7 +517,7 @@ export default function Home() {
               value={newUnitName}
               onChange={(e) => setNewUnitName(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && confirmAddUnit()}
-              placeholder="810"
+              placeholder="Enter the new unit name"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-base focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
               autoFocus
             />

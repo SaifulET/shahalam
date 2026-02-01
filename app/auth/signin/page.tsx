@@ -134,7 +134,7 @@ export default function LoginPage() {
                 href="/auth/forget-password"
                 className="text-[#F2DFA7] hover:underline transition-all"
               >
-                Forgot password?
+                Forget password?
               </Link>
             </div>
 
