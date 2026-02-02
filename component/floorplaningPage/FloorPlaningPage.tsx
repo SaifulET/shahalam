@@ -724,7 +724,7 @@ export default function RealEstateProject() {
               data-export="true"
               data-lang={lang}
             >
-              <div className="print-bg absolute inset-0 opacity-60">
+              <div className="print-bg absolute inset-0 opacity-40">
                 <Image
                   src="/bg.jpg"
                   alt="Building background"
@@ -825,7 +825,7 @@ export default function RealEstateProject() {
 function UnitPill({ unit, unitCount = 4 }: { unit: Unit; unitCount?: number }) {
   const toneClass =
     unit.tone === "available"
-      ? "bg-[#006400]"
+      ? "bg-[#014d01]"
       : unit.tone === "reserved"
         ? "bg-[#D5B60A] text-black"
         : "bg-[#6F0000]";

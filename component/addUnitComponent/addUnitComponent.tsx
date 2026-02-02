@@ -220,6 +220,8 @@ const handleSave=()=>{
                 className="w-full px-3 py-2 border text-gray-600 dark:text-[#D4D4D4] border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               />
             </div>
+
+            <Link href="/addmodel"><div className=" gap-1 px-3 py-3 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-100 transition-colors text-center mt-2">Add Model</div></Link>
           </div>
         </div>
 

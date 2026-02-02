@@ -3,7 +3,7 @@
 import Navbar from '@/component/home/navbar';
 import ThemeToggle from '@/component/ThemeToggle/ThemeToggle';
 import { Add01FreeIcons } from '@hugeicons/core-free-icons';
-import { ArrowDownToDot } from 'lucide-react';
+import { ArrowDownToDot, Edit, Trash2, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -109,6 +109,11 @@ export default function Home() {
   const [newUnitName, setNewUnitName] = useState('');
   const [showAddFloorModal, setShowAddFloorModal] = useState(false);
   const [newFloorName, setNewFloorName] = useState('');
+  const [showEditFloorModal, setShowEditFloorModal] = useState(false);
+  const [editingFloorData, setEditingFloorData] = useState<Floor | null>(null);
+  const [tempFloorName, setTempFloorName] = useState('');
+  const [tempUnits, setTempUnits] = useState<Unit[]>([]);
+  const [newUnitInEdit, setNewUnitInEdit] = useState('');
 
   const selectedProperty = properties.find(p => p.id === selectedPropertyId);
   
@@ -279,6 +284,71 @@ export default function Home() {
     setSelectedFloorId(floorId);
   };
 
+  const openEditFloorModal = (floorId: string) => {
+    const floorToEdit = selectedProperty?.floors.find(f => f.id === floorId);
+    if (floorToEdit) {
+      setEditingFloorData(floorToEdit);
+      setTempFloorName(floorToEdit.name);
+      setTempUnits([...floorToEdit.units]);
+      setShowEditFloorModal(true);
+    }
+  };
+
+  const saveEditedFloor = () => {
+    if (!editingFloorData || !tempFloorName.trim()) return;
+
+    setProperties(properties.map(property => {
+      if (property.id === selectedPropertyId) {
+        return {
+          ...property,
+          floors: property.floors.map(floor => {
+            if (floor.id === editingFloorData.id) {
+              return {
+                ...floor,
+                name: tempFloorName,
+                units: tempUnits
+              };
+            }
+            return floor;
+          })
+        };
+      }
+      return property;
+    }));
+
+    setShowEditFloorModal(false);
+    setEditingFloorData(null);
+    setTempFloorName('');
+    setTempUnits([]);
+  };
+
+  const updateTempUnitName = (unitId: string, newName: string) => {
+    setTempUnits(tempUnits.map(unit => 
+      unit.id === unitId ? { ...unit, number: newName } : unit
+    ));
+  };
+
+  const updateTempUnitStatus = (unitId: string, newStatus: UnitStatus) => {
+    setTempUnits(tempUnits.map(unit => 
+      unit.id === unitId ? { ...unit, status: newStatus } : unit
+    ));
+  };
+
+  const addTempUnit = () => {
+    if (!newUnitInEdit.trim()) return;
+    const newUnit: Unit = {
+      id: `u${Date.now()}`,
+      number: newUnitInEdit,
+      status: 'available'
+    };
+    setTempUnits([...tempUnits, newUnit]);
+    setNewUnitInEdit('');
+  };
+
+  const removeTempUnit = (unitId: string) => {
+    setTempUnits(tempUnits.filter(unit => unit.id !== unitId));
+  };
+
   return (
     <div>
        <Navbar></Navbar>
@@ -325,7 +395,7 @@ export default function Home() {
                   <select
                     value={unit.status}
                     onChange={(e) => updateUnitStatus(unit.floorId, unit.id, e.target.value as UnitStatus)}
-                    className="flex-1 px-3 py-1.5 text-sm border text-gray-600  border-gray-300 rounded bg-white dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-1.5 text-sm border text-gray-600 dark:text-white border-gray-300 rounded bg-white dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="available">Available</option>
                     <option value="reserved">Reserved</option>
@@ -346,9 +416,6 @@ export default function Home() {
       <div className="flex-1 flex flex-col dark:bg-black bg-white">
         {/* Header with Theme Toggle */}
         <div className="px-8 py-[38px] flex items-center justify-end">
-          {/* Theme Toggle on the left */}
-         
-          
           {/* Action buttons on the right */}
           <div className="flex gap-3">
 
@@ -370,19 +437,18 @@ export default function Home() {
             <h1 className="text-lg font-semibold dark:text-[#E5E7EB] text-gray-900 pb-[32px]">Live Preview</h1>
             <div>
               <button onClick={addFloor} className='text-[#0088FF] bg-[#E1EFFB] p-[12px] rounded-lg hover:bg-[#e0e3e6]'>
-                   
                    + Add Floor
                   </button></div>
           </div>
           
-          <div className="border border-gray-200  rounded-lg overflow-hidden bg-white dark:bg-[#1A1A1A] p-[16px] md:p-[32px] ">
+          <div className="border border-gray-200 rounded-lg overflow-hidden bg-white dark:bg-[#1A1A1A] p-[16px] md:p-[32px] ">
             {selectedProperty?.floors.map((floor, index) => (
               <div 
                 key={floor.id} 
                 onClick={() => handleFloorClick(floor.id)}
                 className={`flex items-center px-6 py-4 my-2 border-1 border-[#E5E7EB] dark:border-none last:border-b-0 cursor-pointer transition-all rounded-lg ${
                   selectedFloorId === floor.id 
-                    ? 'bg-blue-50  dark:bg-gray-900' 
+                    ? 'bg-blue-50 dark:bg-gray-900' 
                     : 'bg-white hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-800' 
                 }`}
               >
@@ -394,14 +460,14 @@ export default function Home() {
                 {/* Units */}
                 <div className="flex items-center my-2 gap-2 flex-1 flex-wrap">
                   {floor.units.map((unit) => (
-                    <div key={unit.id} className="relative rounded-lg  border-1 border-[#E5E7EB] dark:border-none">
+                    <div key={unit.id} className="relative rounded-lg border-1 border-[#E5E7EB] dark:border-none">
                       {/* Delete X button on unit */}
                       <button
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent floor selection when deleting unit
                           deleteUnit(floor.id, unit.id);
                         }}
-                        className="absolute -top-2 -right-2 w-4 h-4 bg-white border border-red-400 rounded-full flex items-center justify-center z-10 hover:bg-red-50 "
+                        className="absolute -top-2 -right-2 w-4 h-4 bg-white border border-red-400 rounded-full flex items-center justify-center z-10 hover:bg-red-50"
                       >
                         <svg className="w-2.5 h-2.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
@@ -430,18 +496,36 @@ export default function Home() {
                   </button>
                 </div>
 
-                {/* Delete Floor Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent floor selection when deleting floor
-                    deleteFloor(floor.id);
-                  }}
-                  className="ml-4 text-red-500 hover:text-red-700 flex-shrink-0"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                {/* Action Buttons - Edit and Delete */}
+                <div className="ml-4 flex items-center gap-2 flex-shrink-0">
+                  {/* Edit Button - More Prominent */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent floor selection when editing
+                      openEditFloorModal(floor.id);
+                    }}
+                    className="px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 rounded-lg flex items-center gap-1.5 transition-colors"
+                    title="Edit floor and units"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                    Edit
+                  </button>
+                  
+                  {/* Delete Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent floor selection when deleting
+                      deleteFloor(floor.id);
+                    }}
+                    className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 rounded-lg flex items-center gap-1.5 transition-colors"
+                    title="Delete floor"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -506,7 +590,7 @@ export default function Home() {
 
       {/* Add Unit Modal */}
       {showAddUnitModal && (
-        <div className="fixed inset-0  backdrop-blur-xl flex items-center justify-center z-50">
+        <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
               Name of your Unit
@@ -539,6 +623,118 @@ export default function Home() {
               >
                 Add
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Floor Modal */}
+      {showEditFloorModal && editingFloorData && (
+        <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 text-center">
+                Edit Floor & Units
+              </h3>
+              
+              {/* Floor Name */}
+              <div className="mb-8">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Floor Name
+                </label>
+                <input
+                  type="text"
+                  value={tempFloorName}
+                  onChange={(e) => setTempFloorName(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter floor name"
+                />
+              </div>
+
+              {/* Units Section */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-white">
+                    Units ({tempUnits.length})
+                  </h4>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={newUnitInEdit}
+                      onChange={(e) => setNewUnitInEdit(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && addTempUnit()}
+                      className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+                      placeholder="New unit name"
+                    />
+                    <button
+                      onClick={addTempUnit}
+                      disabled={!newUnitInEdit.trim()}
+                      className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
+                    >
+                      Add Unit
+                    </button>
+                  </div>
+                </div>
+
+                {/* Units List */}
+                {tempUnits.length > 0 ? (
+                  <div className="space-y-3">
+                    {tempUnits.map((unit) => (
+                      <div key={unit.id} className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={unit.number}
+                            onChange={(e) => updateTempUnitName(unit.id, e.target.value)}
+                            className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          />
+                        </div>
+                        <select
+                          value={unit.status}
+                          onChange={(e) => updateTempUnitStatus(unit.id, e.target.value as UnitStatus)}
+                          className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        >
+                          <option value="available">Available</option>
+                          <option value="reserved">Reserved</option>
+                          <option value="sold">Sold</option>
+                        </select>
+                        <button
+                          onClick={() => removeTempUnit(unit.id)}
+                          className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+                    <p className="text-gray-500 dark:text-gray-400">No units in this floor</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => {
+                    setShowEditFloorModal(false);
+                    setEditingFloorData(null);
+                    setTempFloorName('');
+                    setTempUnits([]);
+                  }}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveEditedFloor}
+                  disabled={!tempFloorName.trim()}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
+                >
+                  Save Changes
+                </button>
+              </div>
             </div>
           </div>
         </div>
