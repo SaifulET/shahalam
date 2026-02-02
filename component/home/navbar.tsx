@@ -22,8 +22,8 @@ export default function Navbar() {
   };
 
   return (
-    <nav className='pr-[32px] dark:bg-[#28272A] border-b border-[#D1D5DB]'>
-      <div className="px-[32px]  md:px-[80px]  dark:bg-[#28272A]">
+    <nav className='pr-[32px] dark:bg-[#28272A] bg-white border-b border-[#D1D5DB]'>
+      <div className="px-[32px]  md:px-[80px]  dark:bg-[#28272A] bg-white">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
@@ -49,7 +49,7 @@ export default function Navbar() {
               className={`font-inter font-medium text-sm leading-[14px] tracking-[-0.5px] transition-colors ${
                 isActive('/')
                   ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-700 dark:text-[#FFFFFF] hover:text-blue-600'
+                  : 'text-[#1F2937] dark:text-[#FFFFFF] hover:text-blue-600'
               }`}
             >
               Home
@@ -59,7 +59,7 @@ export default function Navbar() {
               className={` font-inter font-medium text-sm leading-[14px] tracking-[-0.5px] transition-colors ${
                 isActive('/dashboard')
                   ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-700 dark:text-[#FFFFFF]  hover:text-blue-600'
+                  : 'text-[#1F2937] dark:text-[#FFFFFF]  hover:text-blue-600'
               }`}
             >
               Dashboard

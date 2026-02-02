@@ -65,7 +65,7 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
       <div className="px-4 sm:px-6 md:px-8 lg:px-[79px]">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 lg:mb-8">
-          <h2 className="font-inter font-semibold text-xl leading-7 tracking-[-0.5px] dark:text-[#F9FAFB]">
+          <h2 className="font-inter font-semibold text-xl leading-7 tracking-[-0.5px] dark:text-[#F9FAFB] text-[#1F2937]">
             Folders
           </h2>
           <button onClick={handlePlus}
@@ -88,7 +88,7 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
             >
               <Image src="/folder.svg" alt="folder" width={24} height={21}/>
               
-              <h3 className="text-sm dark:text-[#FFFFFF] lg:text-base font-medium text-[#1F2937] mb-1 mt-[24px]">
+              <h3 className="text-sm text-[#1F2937] dark:text-[#FFFFFF] lg:text-base font-medium text-[#1F2937] mb-1 mt-[24px]">
                 {folder.name}
               </h3>
               <p className="text-xs lg:text-sm text-gray-500">

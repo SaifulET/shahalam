@@ -17,7 +17,7 @@ interface RecentProjectsProps {
 export default function RecentProjects({ projects, onProjectMoved }: RecentProjectsProps) {
   return (
     <div className="px-[79px] py-8">
-      <h2 className="font-inter font-semibold text-xl leading-7 tracking-[-0.5px] mb-6 dark:text-[#F9FAFB]" >
+      <h2 className="font-inter font-semibold text-xl leading-7 tracking-[-0.5px] mb-6 dark:text-[#F9FAFB] text-[#1F2937]" >
         Recent Projects
       </h2>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[28px]">

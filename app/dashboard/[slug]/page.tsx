@@ -297,7 +297,7 @@ export default function Home() {
               <button
                 key={property.id}
                 onClick={() => setSelectedPropertyId(property.id)}
-                className={`w-full dark:text-[#FFFFFF] text-left px-3 py-2.5 rounded text-sm flex items-center gap-2 transition-colors ${
+                className={`w-full dark:text-[#FFFFFF] text-[#000000] text-left px-3 py-2.5 rounded text-sm flex items-center gap-2 transition-colors ${
                   selectedPropertyId === property.id
                     ? 'dark:bg-[#0088FF33] bg-blue-100 text-gray-900'
                     : 'text-gray-700 dark:hover:bg-gray-600 hover:bg-gray-50'
