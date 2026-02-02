@@ -7,7 +7,7 @@ export default function CompanyProfile() {
   return (
     <div className="min-h-screen bg-white dark:bg-black p-[36px] md:px-[80px]">
       <div className="">
-        <h1 className="font-inter font-semibold text-2xl leading-8 tracking-[-0.5px] mb-[62px] dark:text-[#FFFFFF]">Company Profile</h1>
+        <h1 className="font-inter font-semibold text-2xl leading-8 text-gray-600 tracking-[-0.5px] mb-[62px] dark:text-[#FFFFFF]">Company Profile</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-[145px]">
           {/* Left Section */}
@@ -20,7 +20,7 @@ export default function CompanyProfile() {
                 </svg>
               </div>
               <div>
-                <h2 className="text-xl md:text-2xl font-bold dark:text-[#FFFFFF]">TechFlow Solutions</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-gray-600 dark:text-[#FFFFFF]">TechFlow Solutions</h2>
                 <p className="text-gray-600 text-sm md:text-base dark:text-[#FFFFFF]">Enterprise Software Solutions</p>
               </div>
             </div>
@@ -30,7 +30,7 @@ export default function CompanyProfile() {
               <div className="flex items-center gap-4 p-3 ">
                 <div className='bg-[#E5E7EB] p-[10px] rounded-lg'><Phone className="w-5 h-5 text-gray-600 flex-shrink-0" /></div>
                 <div>
-                  <p className="font-medium dark:text-[#FFFFFF]">+1 (555) 123-4567</p>
+                  <p className="font-medium text-gray-600 dark:text-[#FFFFFF]">+1 (555) 123-4567</p>
                   <p className="text-sm text-gray-600 dark:text-[#FFFFFF]">Primary Contact</p>
                 </div>
               </div>
@@ -38,7 +38,7 @@ export default function CompanyProfile() {
               <div className="flex items-center gap-4 p-3 ">
                 <div className='bg-[#E5E7EB] p-[10px] rounded-lg'><Mail className="w-5 h-5 text-gray-600 flex-shrink-0" /></div>
                 <div>
-                  <p className="font-medium dark:text-[#FFFFFF]">contact@techflow.com</p>
+                  <p className="font-medium text-gray-600 dark:text-[#FFFFFF]">contact@techflow.com</p>
                   <p className="text-sm text-gray-600 dark:text-[#FFFFFF]">Business Email</p>
                 </div>
               </div>
@@ -46,7 +46,7 @@ export default function CompanyProfile() {
               <div className="flex items-center gap-4 p-3 ">
                 <div className='bg-[#E5E7EB] p-[10px] rounded-lg'><MapPin className="w-5 h-5 text-gray-600 flex-shrink-0" /></div>
                 <div>
-                  <p className="font-medium dark:text-[#FFFFFF]">San Francisco, CA</p>
+                  <p className="font-medium text-gray-600 dark:text-[#FFFFFF]">San Francisco, CA</p>
                   <p className="text-sm text-gray-600 dark:text-[#FFFFFF]">Headquarters</p>
                 </div>
               </div>
@@ -54,7 +54,7 @@ export default function CompanyProfile() {
               <div className="flex items-center gap-4 p-3 ">
                 <div className='bg-[#E5E7EB] p-[10px] rounded-lg'><Globe className="w-5 h-5 text-gray-600 flex-shrink-0" /></div>
                 <div>
-                  <p className="font-medium dark:text-[#FFFFFF]">www.techflow.com</p>
+                  <p className="font-medium text-gray-600 dark:text-[#FFFFFF]">www.techflow.com</p>
                   <p className="text-sm text-gray-600 dark:text-[#FFFFFF]">Website</p>
                 </div>
               </div>
@@ -66,15 +66,15 @@ export default function CompanyProfile() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium dark:text-[#FFFFFF]">wsl.realestate</p>
+                  <p className="font-medium text-gray-600 dark:text-[#FFFFFF]">wsl.realestate</p>
                 </div>
               </div>
             </div>
 
             {/* About Company */}
             <div className="mt-8">
-              <h3 className="text-lg font-bold mb-3 dark:text-[#FFFFFF]">About Company</h3>
-              <p className="text-gray-700 leading-relaxed text-sm md:text-base dark:text-[#FFFFFF]">
+              <h3 className="text-lg font-bold mb-3 text-gray-600 dark:text-[#FFFFFF]">About Company</h3>
+              <p className="text-gray-700 leading-relaxed text-sm md:text-base  dark:text-[#FFFFFF]">
                 TechFlow Solutions is a leading provider of enterprise software solutions, specializing in 
                 workflow automation and digital transformation. Founded in 2018, we help businesses 
                 streamline their operations through innovative technology.
@@ -85,20 +85,20 @@ export default function CompanyProfile() {
           {/* Right Section - Stats */}
           <div className="grid grid-cols-2 gap-4 lg:gap-6  mb-[300px]">
             {/* Employees */}
-            <div className="border border-[#F3F4F6] dark:bg-[#28272A] rounded-lg p-6 h-[166px]">
+            <div className="border border-[#F3F4F6] dark:bg-[#28272A] bg-white rounded-lg p-6 h-[166px]">
               <div className="w-12 h-12 bg-[#DBEAFE] dark:bg-[#E5E7EB] rounded-lg flex items-center justify-center ">
                 <Users className="w-6 h-6 text-[#2563EB]" />
               </div>
-              <p className="font-inter dark:text-[#FFFFFF] font-semibold text-2xl leading-8 tracking-[-0.5px] mb-1">127</p>
+              <p className="font-inter text-gray-600 dark:text-[#FFFFFF] font-semibold text-2xl leading-8 tracking-[-0.5px] mb-1">127</p>
               <p className="text-[#6B7280] font-inter font-normal text-xs leading-4 tracking-[-0.2px]">Employees</p>
             </div>
 
             {/* Active Projects */}
-            <div className="border border-[#F3F4F6]  dark:bg-[#28272A] rounded-lg p-6 h-[166px]">
+            <div className="border border-[#F3F4F6] bg-white dark:bg-[#28272A] rounded-lg p-6 h-[166px]">
               <div className="w-12 h-12 bg-[#FFEDD5] rounded-lg flex items-center justify-center ">
                 <Briefcase className="w-6 h-6 text-[#EA580C]" />
               </div>
-              <p className="font-inter font-semibold dark:text-[#FFFFFF] text-2xl leading-8 tracking-[-0.5px] mb-1">89</p>
+              <p className="font-inter font-semibold text-gray-600 dark:text-[#FFFFFF] text-2xl leading-8 tracking-[-0.5px] mb-1">89</p>
               <p className="text-[#6B7280] font-inter font-normal text-xs leading-4 tracking-[-0.2px]">Active Projects</p>
             </div>
 

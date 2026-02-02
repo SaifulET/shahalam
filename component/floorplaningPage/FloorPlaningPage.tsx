@@ -472,8 +472,9 @@ export default function RealEstateProject() {
   );
 
   const handleAdd = () => {
-    setShowAddPopup(true);
-    setSelectedUnitType(null);
+    // setShowAddPopup(true);
+    // setSelectedUnitType(null);
+    router.push("/addunit")
   };
 
   const handleEdit = () => {
@@ -546,9 +547,9 @@ export default function RealEstateProject() {
             height: 297mm !important;
             max-width: 210mm !important;
             margin: 0 !important;
-            overflow: visible !important;
+            overflow: hidden !important;
             box-sizing: border-box !important;
-            padding: 12mm !important;
+            padding: 8mm !important;
             page-break-after: avoid !important;
             break-after: avoid-page !important;
           }
@@ -557,11 +558,25 @@ export default function RealEstateProject() {
             grid-template-columns: 1fr 220px !important;
             align-items: center !important;
             gap: 24px !important;
+            margin-top: 16px !important;
           }
           .print-export .print-scale {
-            transform: scale(0.86) !important;
+            transform: scale(0.9) !important;
             transform-origin: top left !important;
-            width: calc((210mm - 24mm) / 0.86) !important;
+            width: calc((210mm - 16mm) / 0.86) !important;
+            min-height: 0 !important;
+            height: 100% !important;
+          }
+          .print-export .print-models {
+            margin-top: 10px !important;
+            padding-top: 12px !important;
+          }
+          .print-export .print-annex {
+            margin-top: 10px !important;
+            padding-top: 12px !important;
+          }
+          .print-export .print-footer {
+            margin-top: 12px !important;
           }
           .print-export .print-models,
           .print-export .print-models *,
@@ -730,7 +745,6 @@ export default function RealEstateProject() {
                       className="h-[160px] w-[160px]"
                     />
                   </div>
-                 
                 </header>
 
                 <div
@@ -778,14 +792,26 @@ export default function RealEstateProject() {
                   </div>
                 </div>
 
-                <div className="mt-[70px] flex flex-wrap items-center justify-between gap-4 text-xs text-white sf-pro"  >
+                <div className="mt-[70px] flex flex-wrap items-center justify-between gap-4 text-xs text-white sf-pro">
                   <div className="flex items-center gap-2  font-bold text-[32px] leading-none tracking-normal text-center">
-                    <div><Image src="/instagram.svg" alt="instagram" width={60} height={60}/></div>
-                    <div><Image src="/alart.svg" alt="instagram" width={60} height={60}/></div>
-                    
+                    <div>
+                      <Image
+                        src="/instagram.svg"
+                        alt="instagram"
+                        width={60}
+                        height={60}
+                      />
+                    </div>
+                    <div>
+                      <Image
+                        src="/alart.svg"
+                        alt="instagram"
+                        width={60}
+                        height={60}
+                      />
+                    </div>
                     wsl.realestate
                   </div>
-                  
                 </div>
               </div>
             </div>

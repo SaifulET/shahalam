@@ -325,7 +325,7 @@ export default function Home() {
                   <select
                     value={unit.status}
                     onChange={(e) => updateUnitStatus(unit.floorId, unit.id, e.target.value as UnitStatus)}
-                    className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded bg-white dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="available">Available</option>
                     <option value="reserved">Reserved</option>
