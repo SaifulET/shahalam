@@ -168,7 +168,7 @@ const handleSave=()=>{
         {/* Header */}
         <div className=" mb-6 ">
           <div className="px-4 sm:px-6 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <h1 className="font-inter font-semibold text-[24px] leading-[32px] tracking-[-0.5px] dark:text-white">Unit Type</h1>
+            <h1 className="font-inter font-semibold text-[24px] leading-[32px] tracking-[-0.5px] text-black dark:text-white">Unit Type</h1>
             <div className="flex gap-2 sm:gap-3">
               <Link href="/dashboard"><button className="px-[32px] py-[12px] font-inter font-medium text-[14px] leading-[14px] tracking-[-0.5px] text-center border rounded-lg border-[#D1D5DB] text-[#374151] hover:bg-gray-50 dark:text-gray-50 dark:hover:bg-gray-700 transition-colors">
                 Cancel
@@ -180,11 +180,11 @@ const handleSave=()=>{
           </div>
 
           {/* Property Information */}
-          <div className="p-4 sm:p-6 border rounded-lg border-[#E5E7EB] dark:bg-[#1A1A1A]">
+          <div className="p-4 sm:p-6 border rounded-lg border-[#E5E7EB] bg-white dark:bg-[#1A1A1A]">
             <h2 className="font-inter font-medium text-[18px] leading-[28px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF] mb-4">Property Information</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-[#FFFFFF]  mb-2">
+                <label className="block text-sm font-medium text-gray-700  dark:text-[#FFFFFF]  mb-2">
                   Property Name
                 </label>
                 <input
@@ -192,7 +192,7 @@ const handleSave=()=>{
                   placeholder="Enter property name"
                   value={propertyName}
                   onChange={(e) => setPropertyName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-[#D4D4D4]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600 dark:text-[#D4D4D4]"
                 />
               </div>
               <div>
@@ -204,7 +204,7 @@ const handleSave=()=>{
                   placeholder="City, Area"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:text-[#D4D4D4] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 text-gray-600 dark:text-[#D4D4D4] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -217,7 +217,7 @@ const handleSave=()=>{
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 border dark:text-[#D4D4D4] border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full px-3 py-2 border text-gray-600 dark:text-[#D4D4D4] border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               />
             </div>
           </div>
