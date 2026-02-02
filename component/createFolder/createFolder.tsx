@@ -41,7 +41,7 @@ const CreateFolderPage = () => {
             value={folderName}
             onChange={(e) => setFolderName(e.target.value)}
             placeholder="e.g. Residential Projects"
-            className="w-full dark:bg-[#28272A] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-gray-900 dark:text-[#FFFFFF]"
+            className="w-full bg-white dark:bg-[#28272A] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-gray-900 dark:text-[#FFFFFF]"
           />
         </div>
 
@@ -55,7 +55,7 @@ const CreateFolderPage = () => {
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add a description for this folder..."
             rows={4}
-            className="w-full dark:bg-[#28272A] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-gray-900 dark:text-[#FFFFFF] resize-none"
+            className="w-full bg-white dark:bg-[#28272A] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-gray-900 dark:text-[#FFFFFF] resize-none"
           />
         </div>
         <p className="text-xs text-gray-500 mb-6">
@@ -86,7 +86,7 @@ const CreateFolderPage = () => {
           </div>
 
           {/* Preview Box */}
-          <div className="border border-[#D1D5DB] rounded-lg p-[17px] dark:bg-[#28272A]" >
+          <div className="border border-[#D1D5DB] rounded-lg p-[17px] bg-white dark:bg-[#28272A]" >
             <div className="flex items-center gap-3">
               <div
                 className="w-12 h-12 rounded-lg flex items-center justify-center"

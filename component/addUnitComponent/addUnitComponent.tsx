@@ -256,7 +256,7 @@ const handleSave=()=>{
                           type="text"
                           value={unit}
                           placeholder={`Unit ${index + 1}`}
-                          className="w-full px-3 py-2 pr-8 text-sm border dark:text-[#E5E7EB] border-gray-300 rounded-md bg-white dark:bg-[#28272A] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 pr-8 text-sm border text-[#000000] dark:text-[#E5E7EB] border-gray-300 rounded-md bg-white dark:bg-[#28272A] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           onChange={(e) => updateUnit(floor.id, index, e.target.value)}
                         />
                         <button
