@@ -32,7 +32,7 @@ const route= useRouter()
   };
 
   return (
-    <div className="min-h-screen  px-[24px] md:px-[289px] py-[40px] dark:bg-black">
+    <div className="min-h-screen  px-[24px] md:px-[289px] py-[40px] text-white dark:bg-black">
       <div>
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
