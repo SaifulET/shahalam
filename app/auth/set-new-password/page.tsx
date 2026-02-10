@@ -4,6 +4,8 @@ import { useState, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useForgotPasswordStore } from '@/store/forgotPasswordStore';
+import api from '@/lib/api';
 
 export default function SetNewPasswordPage() {
   const [newPassword, setNewPassword] = useState<string>('');
@@ -12,7 +14,7 @@ export default function SetNewPasswordPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
+ const { email, reset } = useForgotPasswordStore();
   const router= useRouter()
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,9 +35,20 @@ export default function SetNewPasswordPage() {
       setError('Passwords do not match');
       return;
     }
-
+try {
+  console.log(email, newPassword);
+   await api.post("/auth/set-new-password", {
+      email,
+      newPassword: newPassword,
+    });
+    reset();
     setIsSubmitting(true);
     router.push("/auth/signin")
+} catch (error:unknown) {
+  setError('Failed to update password. Please try again.');
+  
+}
+   
   };
 
   return (

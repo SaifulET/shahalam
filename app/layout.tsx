@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { ThemeProvider } from "next-themes"; // new
 import "./globals.css";
+import AuthInit from "@/component/Provider/AuthInit";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body>
         {/* ThemeProvider wraps the app */}
         <ThemeProvider attribute="class" defaultTheme="system">
+          <AuthInit />
           {children}
         </ThemeProvider>
       </body>

@@ -4,11 +4,13 @@ import { useState, useRef, KeyboardEvent, ClipboardEvent, FormEvent } from 'reac
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
+import api from '@/lib/api';
+import { useForgotPasswordStore } from "@/store/forgotPasswordStore";
 export default function VerifyOTPPage() {
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const { email, setOtpVerified } = useForgotPasswordStore();
 
   const handleChange = (index: number, value: string) => {
     // Only allow single digit
@@ -82,8 +84,17 @@ const router= useRouter()
       return;
     }
 
+    try {
+      const res = await api.post("/auth/verify-otp", { email,otp: otpValue }); 
+      setOtpVerified(true);
     setIsSubmitting(true);
-router.push("/auth/set-new-password")
+    router.push("/auth/set-new-password")
+    } catch (error) {
+      setIsSubmitting(false);
+      alert('Invalid OTP. Please try again.');
+    }
+
+   
     
   };
 

@@ -4,6 +4,8 @@ import { useState, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/authStore';
+import api from '@/lib/api';
 
 
 
@@ -12,13 +14,28 @@ export default function LoginPage() {
   const [password, setPassword] = useState<string>('');
   const [rememberPassword, setRememberPassword] = useState<boolean>(true);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-
+  const [error, setError] = useState<string>('');
 
   const route= useRouter()
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    route.push("/")
-  };
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  try {
+    const res = await api.post("/auth/login", { email, password });
+    console.log(res.data); // log the response for debugging
+    // Get accessToken and user from response
+    const { accessToken, user } = res.data;
+
+    // Update Zustand store
+    useAuthStore.getState().login(user, accessToken);
+
+    // Redirect to dashboard or home
+    route.push("/"); // or "/"
+  } catch (err: unknown) {
+    setError(err instanceof Error ? err.message : "An error occurred");
+  }
+};
+
 
   return (
     <div className="min-h-screen w-full relative flex items-center justify-center p-4">
@@ -145,7 +162,7 @@ export default function LoginPage() {
             >
               Sign In
             </button>
-
+                {error && <p className="text-red-500 text-center mt-4">{error}</p>}
            
           </form>
         </div>

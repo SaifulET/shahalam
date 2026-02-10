@@ -4,12 +4,14 @@ import { useState, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useForgotPasswordStore } from '@/store/forgotPasswordStore';
+import api from '@/lib/api';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
+ const setStoreEmail = useForgotPasswordStore((s) => s.setEmail);
   const router= useRouter()
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,7 +31,25 @@ export default function ForgotPasswordPage() {
     }
 
     setIsSubmitting(true);
-    router.push("/auth/otp")
+
+   try {
+    const res= await api.post("/auth/forgot-password", { email });
+     // log the response for debugging
+     
+     if(res.status === 200){
+    setStoreEmail(email);
+
+    
+    router.push("/auth/otp")}
+    else{
+      setIsSubmitting(false);
+      setError(res.data.message || "Failed to send OTP");
+    }
+   } catch (error:unknown) {
+    setIsSubmitting(false);
+      setError( "Failed to send OTP");
+    
+   } 
    
   };
 
@@ -102,6 +122,7 @@ export default function ForgotPasswordPage() {
             >
               {isSubmitting ? 'Sending...' : 'Send Code'}
             </button>
+           
 
             {/* Back to Login Link */}
             <div className="text-center text-sm sm:text-base">
