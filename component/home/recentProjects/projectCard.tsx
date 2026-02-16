@@ -7,6 +7,7 @@ interface ProjectCardProps {
   image: string;
   title: string;
   location: string;
+  recentid: string;
   status: 'Active' | 'Inactive';
   onProjectMoved: (projectId: string) => void;
 }
@@ -17,7 +18,8 @@ export default function ProjectCard({
   title, 
   location, 
   status, 
-  onProjectMoved 
+  onProjectMoved ,
+  recentid
 }: ProjectCardProps) {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -28,6 +30,7 @@ export default function ProjectCard({
     e.dataTransfer.setData('project/id', id);
     e.dataTransfer.setData('project/title', title);
     e.dataTransfer.setData('project/location', location);
+    e.dataTransfer.setData('project/recentid', recentid);
     
     // Visual feedback
     e.dataTransfer.effectAllowed = 'move';

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
-
+import { useAuthStore } from '@/store/authStore';
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -20,7 +20,7 @@ export default function Navbar() {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
+const user = useAuthStore.getState().user;
   return (
     <nav className='pr-[32px] dark:bg-[#28272A] bg-white border-b border-[#D1D5DB]'>
       <div className="px-[32px]  md:px-[80px]  dark:bg-[#28272A] bg-white">
@@ -69,13 +69,15 @@ export default function Navbar() {
           
           <div className="h-[32px] w-[32px] rounded-full overflow-hidden border-1 border-gray-200">
               <Image
-                src="/profile.jpg"
-                alt="Profile"
+                src={user?.profileImage || "/profile.jpg"}
+                alt={`${user?.name}'s Profile`}
                 width={32}
                 height={32}
                 className="h-full w-full object-cover"
               />
+             
             </div>
+           
           </Link>
             
           </div>

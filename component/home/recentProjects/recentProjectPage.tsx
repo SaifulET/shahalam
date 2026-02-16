@@ -6,6 +6,7 @@ interface Project {
   image: string;
   title: string;
   location: string;
+  recentid: string;
   status: 'Active' | 'Inactive';
 }
 
@@ -31,12 +32,18 @@ export default function RecentProjects({ projects, onProjectMoved }: RecentProje
             title={project.title}
             location={project.location}
             status={project.status}
+            recentid={project.recentid}
             onProjectMoved={onProjectMoved}
           />
           
           </Link>
           
         ))}
+        {
+          projects.length === 0 && (
+            <p className="text-gray-500">No recent projects found.</p>
+          )
+        }
       </div>
     </div>
   );
