@@ -1,10 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Playfair_Display, Poppins } from "next/font/google";
 import { Download } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import { useProjectStore } from "@/store/projectStore";
 
 const display = Playfair_Display({
   subsets: ["latin"],
@@ -17,401 +19,34 @@ const body = Poppins({
 
 type UnitTone = "available" | "reserved" | "sold";
 
-type Unit = {
-  label: string;
-  tone: UnitTone;
-  wide?: boolean;
-};
+interface UnitPillProps {
+  unit: {
+    label: string;
+    tone: UnitTone;
+    wide?: boolean;
+  };
+  unitCount: number;
+}
 
-type UnitRow = {
-  units: Unit[];
-};
-
-type FloorPlan = {
-  id: string;
+interface FloorData {
+  _id: string;
   name: string;
-  unitRows: UnitRow[];
-  floorLabels: string[];
-  models: Array<{ name: string; size: string; note: string }>;
-  annexInfo: Array<{ name: string; size: string; details: string[] }>;
-};
+  units: Array<{
+    _id: string;
+    name: string;
+    status: UnitTone;
+  }>;
+}
 
-// Different floor plans for each project
-const floorPlans: Record<string, FloorPlan> = {
-  "Downtown Plaza": {
-    id: "downtown-plaza",
-    name: "Downtown Plaza",
-    unitRows: [
-      {
-        units: [
-          { label: "B", tone: "available", wide: true },
-          { label: "A", tone: "reserved", wide: true },
-        ],
-      },
-      {
-        units: [
-          { label: "E", tone: "sold", wide: true },
-          { label: "D", tone: "available", wide: true },
-        ],
-      },
-      {
-        units: [
-          { label: "A", tone: "available" },
-          { label: "C", tone: "reserved" },
-          { label: "E", tone: "available" },
-          { label: "A", tone: "sold" },
-        ],
-      },
-      {
-        units: [
-          { label: "B", tone: "reserved", wide: true },
-          { label: "C", tone: "available" },
-          { label: "D", tone: "available" },
-        ],
-      },
-      {
-        units: [
-          { label: "A", tone: "available" },
-          { label: "C", tone: "available" },
-          { label: "B", tone: "sold" },
-          { label: "D", tone: "available" },
-        ],
-      },
-    ],
-    floorLabels: ["Annex", "4th Floor", "3rd Floor", "2nd Floor", "1st Floor"],
-    models: [
-      { name: "Model A", size: "88 sqm", note: "Front" },
-      { name: "Model B", size: "83 sqm", note: "Front" },
-      { name: "Model C", size: "102 sqm", note: "Front" },
-      { name: "Model D", size: "80.8 sqm", note: "Front" },
-      { name: "Model E", size: "83 sqm", note: "Front" },
-    ],
-    annexInfo: [
-      {
-        name: "Annex A",
-        size: "194 sqm",
-        details: ["155 sqm Financial Area", "39 sqm Roof"],
-      },
-      {
-        name: "Annex B",
-        size: "201 sqm",
-        details: ["162 sqm Built-up Area", "39 sqm Roof"],
-      },
-    ],
-  },
-  "Riverside Residences": {
-    id: "riverside-residences",
-    name: "Riverside Residences",
-    unitRows: [
-      {
-        units: [
-          { label: "A", tone: "available", wide: true },
-          { label: "B", tone: "reserved", wide: true },
-        ],
-      },
-      {
-        units: [
-          { label: "C", tone: "sold", wide: true },
-          { label: "D", tone: "available", wide: true },
-        ],
-      },
-      {
-        units: [
-          { label: "A", tone: "available" },
-          { label: "B", tone: "reserved" },
-          { label: "C", tone: "available" },
-          { label: "D", tone: "sold" },
-        ],
-      },
-      {
-        units: [
-          { label: "A", tone: "reserved", wide: true },
-          { label: "B", tone: "available" },
-          { label: "C", tone: "available" },
-        ],
-      },
-      {
-        units: [
-          { label: "A", tone: "available" },
-          { label: "B", tone: "available" },
-          { label: "C", tone: "sold" },
-          { label: "D", tone: "available" },
-        ],
-      },
-    ],
-    floorLabels: ["Annex", "4th Floor", "3rd Floor", "2nd Floor", "1st Floor"],
-    models: [
-      { name: "Model A", size: "95 sqm", note: "River" },
-      { name: "Model B", size: "110 sqm", note: "Garden" },
-      { name: "Model C", size: "85 sqm", note: "City" },
-      { name: "Model D", size: "120 sqm", note: "Lake" },
-      { name: "Model E", size: "90 sqm", note: "Park" },
-    ],
-    annexInfo: [
-      {
-        name: "Annex A",
-        size: "220 sqm",
-        details: ["180 sqm Living Area", "40 sqm Balcony"],
-      },
-      {
-        name: "Annex B",
-        size: "210 sqm",
-        details: ["170 sqm Living Area", "40 sqm Terrace"],
-      },
-    ],
-  },
-  "Tech Hub Campus": {
-    id: "tech-hub-campus",
-    name: "Tech Hub Campus",
-    unitRows: [
-      {
-        units: [
-          { label: "101", tone: "available", wide: true },
-          { label: "102", tone: "reserved", wide: true },
-        ],
-      },
-      {
-        units: [
-          { label: "103", tone: "sold", wide: true },
-          { label: "104", tone: "available", wide: true },
-        ],
-      },
-      {
-        units: [
-          { label: "201", tone: "available" },
-          { label: "202", tone: "reserved" },
-          { label: "203", tone: "available" },
-          { label: "204", tone: "sold" },
-        ],
-      },
-      {
-        units: [
-          { label: "301", tone: "reserved", wide: true },
-          { label: "302", tone: "available" },
-          { label: "303", tone: "available" },
-        ],
-      },
-      {
-        units: [
-          { label: "401", tone: "available" },
-          { label: "402", tone: "available" },
-          { label: "403", tone: "sold" },
-          { label: "404", tone: "available" },
-        ],
-      },
-    ],
-    floorLabels: ["Annex", "4th Floor", "3rd Floor", "2nd Floor", "1st Floor"],
-    models: [
-      { name: "Model A", size: "45 sqm", note: "Tech" },
-      { name: "Model B", size: "65 sqm", note: "Tech" },
-      { name: "Model C", size: "90 sqm", note: "Tech" },
-      { name: "Model D", size: "120 sqm", note: "Tech" },
-      { name: "Model E", size: "150 sqm", note: "Tech" },
-    ],
-    annexInfo: [
-      {
-        name: "Annex A",
-        size: "280 sqm",
-        details: ["230 sqm Workspace", "50 sqm Lab"],
-      },
-      {
-        name: "Annex B",
-        size: "260 sqm",
-        details: ["210 sqm Office", "50 sqm Meeting"],
-      },
-    ],
-  },
-  "Metro Shopping Center": {
-    id: "metro-shopping-center",
-    name: "Metro Shopping Center",
-    unitRows: [
-      {
-        units: [
-          { label: "S1", tone: "available", wide: true },
-          { label: "S2", tone: "reserved", wide: true },
-        ],
-      },
-      {
-        units: [
-          { label: "M1", tone: "sold", wide: true },
-          { label: "M2", tone: "available", wide: true },
-        ],
-      },
-      {
-        units: [
-          { label: "L1", tone: "available" },
-          { label: "L2", tone: "reserved" },
-          { label: "L3", tone: "available" },
-          { label: "L4", tone: "sold" },
-        ],
-      },
-      {
-        units: [
-          { label: "K1", tone: "reserved", wide: true },
-          { label: "K2", tone: "available" },
-          { label: "K3", tone: "available" },
-        ],
-      },
-      {
-        units: [
-          { label: "P1", tone: "available" },
-          { label: "P2", tone: "available" },
-          { label: "P3", tone: "sold" },
-          { label: "P4", tone: "available" },
-        ],
-      },
-    ],
-    floorLabels: ["Annex", "4th Floor", "3rd Floor", "2nd Floor", "1st Floor"],
-    models: [
-      { name: "Model A", size: "50 sqm", note: "Retail" },
-      { name: "Model B", size: "100 sqm", note: "Retail" },
-      { name: "Model C", size: "150 sqm", note: "Retail" },
-      { name: "Model D", size: "200 sqm", note: "Retail" },
-      { name: "Model E", size: "250 sqm", note: "Retail" },
-    ],
-    annexInfo: [
-      {
-        name: "Annex A",
-        size: "350 sqm",
-        details: ["300 sqm Storage", "50 sqm Office"],
-      },
-      {
-        name: "Annex B",
-        size: "320 sqm",
-        details: ["270 sqm Service", "50 sqm Utility"],
-      },
-    ],
-  },
-  "Grand Hotel Renovation": {
-    id: "grand-hotel-renovation",
-    name: "Grand Hotel Renovation",
-    unitRows: [
-      {
-        units: [
-          { label: "Suite A", tone: "available", wide: true },
-          { label: "Suite B", tone: "reserved", wide: true },
-        ],
-      },
-      {
-        units: [
-          { label: "Suite C", tone: "sold", wide: true },
-          { label: "Suite D", tone: "available", wide: true },
-        ],
-      },
-      {
-        units: [
-          { label: "Room 301", tone: "available" },
-          { label: "Room 302", tone: "reserved" },
-          { label: "Room 303", tone: "available" },
-          { label: "Room 304", tone: "sold" },
-        ],
-      },
-      {
-        units: [
-          { label: "Suite E", tone: "reserved", wide: true },
-          { label: "Room 401", tone: "available" },
-          { label: "Room 402", tone: "available" },
-        ],
-      },
-      {
-        units: [
-          { label: "Room 501", tone: "available" },
-          { label: "Room 502", tone: "available" },
-          { label: "Room 503", tone: "sold" },
-          { label: "Room 504", tone: "available" },
-        ],
-      },
-    ],
-    floorLabels: ["Annex", "4th Floor", "3rd Floor", "2nd Floor", "1st Floor"],
-    models: [
-      { name: "Model A", size: "40 sqm", note: "Hotel" },
-      { name: "Model B", size: "60 sqm", note: "Hotel" },
-      { name: "Model C", size: "80 sqm", note: "Hotel" },
-      { name: "Model D", size: "100 sqm", note: "Hotel" },
-      { name: "Model E", size: "150 sqm", note: "Hotel" },
-    ],
-    annexInfo: [
-      {
-        name: "Annex A",
-        size: "280 sqm",
-        details: ["230 sqm Service", "50 sqm Staff"],
-      },
-      {
-        name: "Annex B",
-        size: "300 sqm",
-        details: ["250 sqm Meeting", "50 sqm Lounge"],
-      },
-    ],
-  },
-  "Innovation Academy": {
-    id: "innovation-academy",
-    name: "Innovation Academy",
-    unitRows: [
-      {
-        units: [
-          { label: "Lab A", tone: "available", wide: true },
-          { label: "Lab B", tone: "reserved", wide: true },
-        ],
-      },
-      {
-        units: [
-          { label: "Studio A", tone: "sold", wide: true },
-          { label: "Studio B", tone: "available", wide: true },
-        ],
-      },
-      {
-        units: [
-          { label: "Class 101", tone: "available" },
-          { label: "Class 102", tone: "reserved" },
-          { label: "Class 103", tone: "available" },
-          { label: "Class 104", tone: "sold" },
-        ],
-      },
-      {
-        units: [
-          { label: "Library", tone: "reserved", wide: true },
-          { label: "Lab C", tone: "available" },
-          { label: "Lab D", tone: "available" },
-        ],
-      },
-      {
-        units: [
-          { label: "Office 201", tone: "available" },
-          { label: "Office 202", tone: "available" },
-          { label: "Office 203", tone: "sold" },
-          { label: "Office 204", tone: "available" },
-        ],
-      },
-    ],
-    floorLabels: ["Annex", "4th Floor", "3rd Floor", "2nd Floor", "1st Floor"],
-    models: [
-      { name: "Model A", size: "80 sqm", note: "Academy" },
-      { name: "Model B", size: "100 sqm", note: "Academy" },
-      { name: "Model C", size: "120 sqm", note: "Academy" },
-      { name: "Model D", size: "50 sqm", note: "Academy" },
-      { name: "Model E", size: "150 sqm", note: "Academy" },
-    ],
-    annexInfo: [
-      {
-        name: "Annex A",
-        size: "320 sqm",
-        details: ["270 sqm Research", "50 sqm Storage"],
-      },
-      {
-        name: "Annex B",
-        size: "290 sqm",
-        details: ["240 sqm Study", "50 sqm Common"],
-      },
-    ],
-  },
-};
-
-const projects = Object.keys(floorPlans);
+interface ModelData {
+  _id: string;
+  name: string;
+  area: string;
+  face: string;
+}
 
 export default function RealEstateProject() {
   const [lang, setLang] = useState<"en" | "ar">("en");
-  const [selectedProject, setSelectedProject] =
-    useState<string>("Downtown Plaza");
   const [showAddPopup, setShowAddPopup] = useState(false);
   const [selectedUnitType, setSelectedUnitType] = useState<
     "apartment" | "annex" | null
@@ -420,65 +55,111 @@ export default function RealEstateProject() {
   const exportRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
-  const currentFloorPlan = floorPlans[selectedProject];
+  const user = useAuthStore().user;
+  const {
+    projects,
+    floors,
+    models,
+    selectedProjectId,
+    fetchProjects,
+    fetchFloors,
+    fetchModels,
+    setSelectedProject,
+  } = useProjectStore();
 
-  const floorLabelsLocalized = isArabic
-    ? currentFloorPlan.floorLabels.map((label) => `الدور ${label}`)
-    : currentFloorPlan.floorLabels;
+  // Fetch projects
+  useEffect(() => {
+    if (user?.id) {
+      fetchProjects(user.id);
+    }
+  }, [user]);
 
-  const floorsPanel = (
-    <div
-      className="flex h-full min-h-[260px] flex-col items-center justify-between rounded-3xl border border-white/10 bg-[#1a221f]/30 px-4 py-6 text-center text-sm uppercase tracking-[0.2em] text-[#F2DFA7] sf-pro"
-      dir={isArabic ? "rtl" : "ltr"}
-    >
-      {floorLabelsLocalized.map((label) => (
-        <span key={label} className="leading-6">
-          {label}
-        </span>
-      ))}
-    </div>
-  );
+  // Auto select first project
+  useEffect(() => {
+    if (projects.length > 0 && !selectedProjectId) {
+      setSelectedProject(projects[0]._id);
+    }
+  }, [projects]);
 
-  const unitsPanel = (
-    <div className="space-y-5">
-      {currentFloorPlan.unitRows.map((row, index) => {
-        // Calculate the appropriate width for each unit based on the number of units in the row
-        const unitCount = row.units.length;
-        let gridCols = "grid-cols-4"; // Default for 4 units
+  // Fetch floors & models when project changes
+  useEffect(() => {
+    if (selectedProjectId) {
+      fetchFloors(selectedProjectId);
+      fetchModels(selectedProjectId);
+    }
+  }, [selectedProjectId]);
 
-        if (unitCount === 1) {
-          gridCols = "grid-cols-1";
-        } else if (unitCount === 2) {
-          gridCols = "grid-cols-2";
-        } else if (unitCount === 3) {
-          gridCols = "grid-cols-3";
-        } else if (unitCount === 5) {
-          gridCols = "grid-cols-5";
-        }
+  // Transform floors data to match the unitRows structure
+  const unitRows = floors.map((floor: FloorData) => ({
+    units: floor.units.map((unit) => ({
+      label: unit.name,
+      tone: unit.status,
+      wide: false, // You might want to add a `wide` field to your unit schema if needed
+    })),
+  }));
 
-        return (
-          <div key={`row-${index}`} className={`grid ${gridCols} gap-3`}>
-            {row.units.map((unit, idx) => (
-              <UnitPill
-                key={`${unit.label}-${idx}`}
-                unit={unit}
-                unitCount={unitCount}
-              />
-            ))}
-          </div>
-        );
-      })}
-    </div>
-  );
+  // Transform floor names for the floor labels panel
+ // Transform floor names for the floor labels panel - REVERSE THE ORDER to match the visual layout
+const floorLabels = [...floors.map((floor: FloorData) => floor.name)];
+
+const floorLabelsLocalized = isArabic
+  ? floorLabels.map((label) => `الدور ${label}`)
+  : floorLabels;
+
+const floorsPanel = (
+  <div
+    className="flex h-full min-h-[260px] flex-col items-center justify-between rounded-3xl border border-white/10 bg-[#1a221f]/30 px-4 py-6 text-center text-sm uppercase tracking-[0.2em] text-[#F2DFA7] sf-pro"
+    dir={isArabic ? "rtl" : "ltr"}
+  >
+    {/* Map in reverse order so first floor (1st) appears at bottom */}
+    {floorLabelsLocalized.slice().reverse().map((label) => (
+      <span key={label} className="leading-6">
+        {label}
+      </span>
+    ))}
+  </div>
+);
+
+const unitsPanel = (
+  <div className="space-y-5">
+    {unitRows.map((row, index) => {
+      const unitCount = row.units.length;
+      let gridCols = "grid-cols-4";
+
+      if (unitCount === 1) {
+        gridCols = "grid-cols-1";
+      } else if (unitCount === 2) {
+        gridCols = "grid-cols-2";
+      } else if (unitCount === 3) {
+        gridCols = "grid-cols-3";
+      } else if (unitCount === 5) {
+        gridCols = "grid-cols-5";
+      }
+
+      return (
+        <div key={`row-${index}`} className={`grid ${gridCols} gap-3`}>
+          {row.units.map((unit, idx) => (
+            <UnitPill
+              key={`${unit.label}-${idx}`}
+              unit={unit}
+              unitCount={unitCount}
+            />
+          ))}
+        </div>
+      );
+    })}
+  </div>
+);
 
   const handleAdd = () => {
-    // setShowAddPopup(true);
-    // setSelectedUnitType(null);
-    router.push("/addunit")
+    router.push("/addunit");
   };
 
   const handleEdit = () => {
-    router.push(`/dashboard/${currentFloorPlan.id}`);
+    const selectedProject = projects.find(p => p._id === selectedProjectId);
+    if (selectedProject) {
+      router.push(`/dashboard/${selectedProjectId}`);
+    }
   };
 
   const handleContinue = () => {
@@ -507,6 +188,8 @@ export default function RealEstateProject() {
     window.addEventListener("afterprint", cleanup);
     window.print();
   };
+
+  const currentProjectName = projects.find(p => p._id === selectedProjectId)?.name || "Select a project";
 
   return (
     <main
@@ -681,16 +364,16 @@ export default function RealEstateProject() {
             <nav className="space-y-2 text-sm">
               {projects.map((project) => (
                 <button
-                  key={project}
-                  onClick={() => setSelectedProject(project)}
+                  key={project._id}
+                  onClick={() => setSelectedProject(project._id)}
                   className={[
                     "w-full rounded-xl px-3 py-2 text-left text-[#1F2937] dark:text-white/70 transition",
-                    project === selectedProject
+                    project._id === selectedProjectId
                       ? "darK:bg-emerald-500/20 bg-[#0088FF33] text-[#1F2937] dark:text-white ring-1 ring-emerald-500/40"
                       : "dark:hover:bg-white/10 hover:bg-[#1F2937] hover:text-white dark:hover:text-white",
                   ].join(" ")}
                 >
-                  {project}
+                  {project.name}
                 </button>
               ))}
             </nav>
@@ -745,10 +428,13 @@ export default function RealEstateProject() {
                       className="h-[160px] w-[160px]"
                     />
                   </div>
+                  <h1 className="text-2xl font-bold text-white/90">
+                    {currentProjectName}
+                  </h1>
                 </header>
 
                 <div
-                  className={`print-floor-layout mt-10 grid flex-1 items-center gap-6 ${"md:grid-cols-[1fr_220px]"}`}
+                  className={`print-floor-layout mt-10 grid flex-1 items-stretch gap-6 ${"md:grid-cols-[1fr_220px]"}`}
                 >
                   {unitsPanel}
                   {floorsPanel}
@@ -762,35 +448,19 @@ export default function RealEstateProject() {
 
                 <div className="print-models mt-8 border-t border-white/10 pt-6">
                   <div className="grid grid-cols-2 gap-4 text-center text-sm uppercase tracking-[0.16em] text-white/60 sm:grid-cols-5">
-                    {currentFloorPlan.models.map((model) => (
-                      <div key={model.name} className="space-y-2">
+                    {models.map((model: ModelData) => (
+                      <div key={model._id} className="space-y-2">
                         <div className="print-pill inline-flex px-3 py-1 text-base bg-amber-100/70 rounded-full text-[#1B1B1F] sf-pro">
                           {model.name}
                         </div>
-                        <div className="text-white/70">{model.size}</div>
-                        <div className="text-white/40">{model.note}</div>
+                        <div className="text-white/70">{model.area}</div>
+                        <div className="text-white/40">{model.face}</div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="print-annex mt-6 border-t border-white/10 pt-6">
-                  <div className="grid grid-cols-2 gap-4 text-center text-sm uppercase tracking-[0.16em] text-white/60 sm:grid-cols-2">
-                    {currentFloorPlan.annexInfo.map((annex) => (
-                      <div key={annex.name} className="space-y-2">
-                        <div className="print-pill inline-flex px-3 py-1 text-base bg-amber-100/70 rounded-full text-gray-700 sf-pro">
-                          {annex.name}
-                        </div>
-                        <div className="text-white/70">{annex.size}</div>
-                        {annex.details.map((detail, index) => (
-                          <div key={index} className="text-white/40">
-                            {detail}
-                          </div>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+               
 
                 <div className="mt-[70px] flex flex-wrap items-center justify-between gap-4 text-xs text-white sf-pro">
                   <div className="flex items-center gap-2  font-bold text-[32px] leading-none tracking-normal text-center">
@@ -822,7 +492,7 @@ export default function RealEstateProject() {
   );
 }
 
-function UnitPill({ unit, unitCount = 4 }: { unit: Unit; unitCount?: number }) {
+function UnitPill({ unit, unitCount = 4 }: { unit: UnitPillProps['unit']; unitCount?: number }) {
   const toneClass =
     unit.tone === "available"
       ? "bg-[#014d01]"
@@ -830,18 +500,9 @@ function UnitPill({ unit, unitCount = 4 }: { unit: Unit; unitCount?: number }) {
         ? "bg-[#D5B60A] text-black"
         : "bg-[#6F0000]";
 
-  // Calculate column span based on number of units in the row
   let colSpan = "col-span-1";
-  if (unitCount === 1) {
-    colSpan = "col-span-1";
-  } else if (unitCount === 2) {
-    colSpan = unit.wide ? "col-span-1" : "col-span-1";
-  } else if (unitCount === 3) {
-    colSpan = "col-span-1";
-  } else if (unitCount === 4) {
-    colSpan = unit.wide ? "col-span-2" : "col-span-1";
-  } else if (unitCount === 5) {
-    colSpan = "col-span-1";
+  if (unitCount === 4 && unit.wide) {
+    colSpan = "col-span-2";
   }
 
   return (

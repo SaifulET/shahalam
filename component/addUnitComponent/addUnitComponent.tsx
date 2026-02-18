@@ -1,10 +1,15 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Plus, X, Upload } from 'lucide-react';
+import { Plus, X, Upload, Home } from 'lucide-react';
 import ThemeToggle from '@/component/ThemeToggle/ThemeToggle';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useCreatProjectStore } from '@/store/creatProjectStore';
+import { useAuthStore } from '@/store/authStore';
+import { useModelStore } from '@/store/useModelStore';
+import AddModelModal from '../addModel/addModel';
+
 
 interface Floor {
   id: string;
@@ -12,20 +17,32 @@ interface Floor {
   units: string[];
 }
 
+interface Model {
+  id: string;
+  name: string;
+  area: number;
+  face: string;
+}
+
 export default function PropertyUnitForm() {
+  const { createFullProject, loading } = useCreatProjectStore();
+  const user = useAuthStore().user;
   const [propertyName, setPropertyName] = useState('');
   const [location, setLocation] = useState('');
   const [address, setAddress] = useState('');
-  const [floors, setFloors] = useState<Floor[]>([
-    { id: '1', name: 'First Floor', units: ['802', '803', '804', '805', '806'] },
-    { id: '2', name: '2nd Floor', units: ['702', '703', '704', '705', '706'] }
-  ]);
+  const [floors, setFloors] = useState<Floor[]>([]);
   const [showUnitModal, setShowUnitModal] = useState(false);
+  const [showModelModal, setShowModelModal] = useState(false);
   const [currentFloorId, setCurrentFloorId] = useState<string>('');
   const [newUnitName, setNewUnitName] = useState('');
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Get models from store
+  const models = useModelStore((state) => state.models);
+  const removeModel = useModelStore((state) => state.removeModel);
+  const route = useRouter();
 
   const addFloor = () => {
     const newFloor: Floor = {
@@ -50,6 +67,14 @@ export default function PropertyUnitForm() {
     setShowUnitModal(false);
     setCurrentFloorId('');
     setNewUnitName('');
+  };
+
+  const openModelModal = () => {
+    setShowModelModal(true);
+  };
+
+  const closeModelModal = () => {
+    setShowModelModal(false);
   };
 
   const saveNewUnit = () => {
@@ -111,6 +136,13 @@ export default function PropertyUnitForm() {
     }));
   };
 
+  const removeModelHandler = (modelId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent any parent click events
+    if (window.confirm('Are you sure you want to remove this model?')) {
+      removeModel(modelId);
+    }
+  };
+
   const getOrdinalSuffix = (num: number) => {
     const j = num % 10;
     const k = num % 100;
@@ -155,25 +187,51 @@ export default function PropertyUnitForm() {
   const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
-const route= useRouter()
-const handleSave=()=>{
-  route.push("/dashboard")
-}
+
+  const handleSave = async () => {
+    if (!propertyName || !location) {
+      alert("Please fill property name and location");
+      return;
+    }
+
+    await createFullProject(
+      {
+        userId: user?.id || "",
+        name: propertyName,
+        location: location,
+        image: coverImageFile,
+      },
+      floors.map((floor) => ({
+        name: floor.name,
+        units: floor.units,
+      })),
+      models.map((model) => ({
+        name: model.name,
+        area: model.area,
+        face: model.face,
+      }))
+    );
+
+    route.push("/dashboard");
+  };
+
   return (
-    <div className="min-h-screen px-[24px] md:px-[268px] pt-[35px] pb-[40px] bg-white  dark:bg-black">
-      {/* Theme Toggle in Top Right Corner */}
-      
-      
+    <div className="min-h-screen px-[24px] md:px-[268px] pt-[35px] pb-[40px] bg-white dark:bg-black">
       <div>
         {/* Header */}
-        <div className=" mb-6 ">
+        <div className="mb-6">
           <div className="px-4 sm:px-6 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h1 className="font-inter font-semibold text-[24px] leading-[32px] tracking-[-0.5px] text-black dark:text-white">Unit Type</h1>
             <div className="flex gap-2 sm:gap-3">
-              <Link href="/dashboard"><button className="px-[32px] py-[12px] font-inter font-medium text-[14px] leading-[14px] tracking-[-0.5px] text-center border rounded-lg border-[#D1D5DB] text-[#374151] hover:bg-gray-50 dark:text-gray-50 dark:hover:bg-gray-700 transition-colors">
-                Cancel
-              </button></Link>
-              <button onClick={handleSave} className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors">
+              <Link href="/dashboard">
+                <button className="px-[32px] py-[12px] font-inter font-medium text-[14px] leading-[14px] tracking-[-0.5px] text-center border rounded-lg border-[#D1D5DB] text-[#374151] hover:bg-gray-50 dark:text-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  Cancel
+                </button>
+              </Link>
+              <button 
+                onClick={handleSave} 
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
+              >
                 Save Property
               </button>
             </div>
@@ -184,7 +242,7 @@ const handleSave=()=>{
             <h2 className="font-inter font-medium text-[18px] leading-[28px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF] mb-4">Property Information</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700  dark:text-[#FFFFFF]  mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-[#FFFFFF] mb-2">
                   Property Name
                 </label>
                 <input
@@ -196,7 +254,7 @@ const handleSave=()=>{
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700  dark:text-[#FFFFFF]  mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-[#FFFFFF] mb-2">
                   Location
                 </label>
                 <input
@@ -209,7 +267,7 @@ const handleSave=()=>{
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium dark:text-[#FFFFFF]  text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark:text-[#FFFFFF] text-gray-700 mb-2">
                 Address
               </label>
               <textarea
@@ -221,13 +279,65 @@ const handleSave=()=>{
               />
             </div>
 
-            <Link href="/addmodel"><div className=" gap-1 px-3 py-3 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-100 transition-colors text-center mt-2">Add Model</div></Link>
+            <button 
+              onClick={openModelModal}
+              className="w-full gap-1 px-3 py-3 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-100 transition-colors text-center mt-2"
+            >
+              Add Model
+            </button>
           </div>
         </div>
 
+        {/* Models Section - New section to display added models */}
+        {models.length > 0 && (
+          <div className="bg-white dark:bg-[#1A1A1A] rounded-lg border border-[#E5E7EB] mb-6">
+            <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
+              <h2 className="font-inter font-medium text-[18px] leading-[28px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF]">Models</h2>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{models.length} model{models.length !== 1 ? 's' : ''} added</span>
+            </div>
+
+            <div className="p-4 sm:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {models.map((model) => (
+                  <div key={model.id} className="relative group">
+                    {/* Remove button - always visible on hover, with high z-index */}
+                    <button
+                      onClick={(e) => removeModelHandler(model.id, e)}
+                      className="absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-20 opacity-0 group-hover:opacity-100 shadow-lg"
+                      title="Remove model"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                    
+                    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-[#28272A] hover:shadow-md transition-shadow relative z-10">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <Home className="w-5 h-5 text-blue-500" />
+                          <h3 className="font-medium text-gray-900 dark:text-[#FFFFFF]">{model.name}</h3>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-500 dark:text-gray-400">Area:</span>
+                          <span className="text-gray-900 dark:text-[#FFFFFF] font-medium">{model.area} sq m</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-500 dark:text-gray-400">Face:</span>
+                          <span className="text-gray-900 dark:text-[#FFFFFF] font-medium">{model.face}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Floors Section */}
         <div className="bg-white dark:bg-[#1A1A1A] rounded-lg border border-[#E5E7EB] mb-6">
-          <div className="px-4 sm:px-6 py-4 flex items-center justify-between">
+          <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
             <h2 className="font-inter font-medium text-[18px] leading-[28px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF]">Floors</h2>
             <button
               onClick={addFloor}
@@ -239,54 +349,62 @@ const handleSave=()=>{
           </div>
 
           <div className="p-4 sm:p-6 space-y-4">
-            {floors.map((floor) => (
-              <div key={floor.id} className="relative">
-                <button
-                  onClick={() => removeFloor(floor.id)}
-                  className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10 "
-                >
-                  <X className="w-3 h-3" />
-                </button>
-                
-                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 dark:bg-[#28272A] ">
-                  <h3 className="text-sm font-medium text-gray-900 mb-3 dark:text-[#FFFFFF]">{floor.name}</h3>
-                  
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mb-3">
-                    {floor.units.map((unit, index) => (
-                      <div key={index} className="relative group">
-                        <input
-                          type="text"
-                          value={unit}
-                          placeholder={`Unit ${index + 1}`}
-                          className="w-full px-3 py-2 pr-8 text-sm border text-[#000000] dark:text-[#E5E7EB] border-gray-300 rounded-md bg-white dark:bg-[#28272A] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          onChange={(e) => updateUnit(floor.id, index, e.target.value)}
-                        />
-                        <button
-                          onClick={() => removeUnit(floor.id, index)}
-                          className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center bg-red-100 text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-200"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <button
-                    onClick={() => openUnitModal(floor.id)}
-                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 bg-white border border-blue-200 rounded-md hover:bg-blue-50 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Unit
-                  </button>
-                </div>
+            {floors.length === 0 ? (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                No floors added yet. Click Add Floor to get started.
               </div>
-            ))}
+            ) : (
+              floors.map((floor) => (
+                <div key={floor.id} className="relative group">
+                  <button
+                    onClick={() => removeFloor(floor.id)}
+                    className="absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-20 opacity-0 group-hover:opacity-100 shadow-lg"
+                    title="Remove floor"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                  
+                  <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 dark:bg-[#28272A] relative z-10">
+                    <h3 className="text-sm font-medium text-gray-900 mb-3 dark:text-[#FFFFFF]">{floor.name}</h3>
+                    
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mb-3">
+                      {floor.units.map((unit, index) => (
+                        <div key={index} className="relative group/unit">
+                          <input
+                            type="text"
+                            value={unit}
+                            placeholder={`Unit ${index + 1}`}
+                            className="w-full px-3 py-2 pr-8 text-sm border text-[#000000] dark:text-[#E5E7EB] border-gray-300 rounded-md bg-white dark:bg-[#28272A] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            onChange={(e) => updateUnit(floor.id, index, e.target.value)}
+                          />
+                          <button
+                            onClick={() => removeUnit(floor.id, index)}
+                            className="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center bg-red-100 text-red-600 rounded-full opacity-0 group-hover/unit:opacity-100 transition-opacity hover:bg-red-200"
+                            title="Remove unit"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <button
+                      onClick={() => openUnitModal(floor.id)}
+                      className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 bg-white border border-blue-200 rounded-md hover:bg-blue-50 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Unit
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
         {/* Cover Image */}
         <div className="bg-white rounded-lg border border-[#E5E7EB] dark:bg-[#111827]">
-          <div className="px-4 sm:px-6 py-4">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="font-inter font-medium text-[18px] leading-[28px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF]">Cover Image</h2>
           </div>
           
@@ -300,7 +418,7 @@ const handleSave=()=>{
             />
             
             {coverImage ? (
-              <div className="relative border-2 border-gray-300 rounded-lg overflow-hidden">
+              <div className="relative border-2 border-gray-300 rounded-lg overflow-hidden group">
                 <img 
                   src={coverImage} 
                   alt="Cover preview" 
@@ -308,7 +426,8 @@ const handleSave=()=>{
                 />
                 <button
                   onClick={removeCoverImage}
-                  className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                  className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 shadow-lg z-20"
+                  title="Remove image"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -386,6 +505,15 @@ const handleSave=()=>{
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Model Modal */}
+      {showModelModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-black rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <AddModelModal onClose={closeModelModal} />
           </div>
         </div>
       )}

@@ -5,122 +5,50 @@ import ThemeToggle from '@/component/ThemeToggle/ThemeToggle';
 import { Add01FreeIcons } from '@hugeicons/core-free-icons';
 import { ArrowDownToDot, Edit, Trash2, Pencil, X } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-
-type UnitStatus = 'available' | 'reserved' | 'sold';
-
-interface Model {
-  id: string;
-  name: string;
-  totalArea: string;
-}
-
-interface Unit {
-  id: string;
-  number: string;
-  status: UnitStatus;
-  modelId?: string;
-}
-
-interface Floor {
-  id: string;
-  name: string;
-  units: Unit[];
-}
-
-interface Property {
-  id: string;
-  name: string;
-  floors: Floor[];
-  models: Model[];
-}
-
-const initialProperties: Property[] = [
-  {
-    id: '1',
-    name: 'Downtown Plaza',
-    floors: [],
-    models: []
-  },
-  {
-    id: '2',
-    name: 'Riverside Residences',
-    floors: [],
-    models: []
-  },
-  {
-    id: '3',
-    name: 'Tech Hub Campus',
-    floors: [
-      { id: 'f1', name: '1F', units: [
-        { id: 'u1', number: '801', status: 'available', modelId: 'm1' },
-        { id: 'u2', number: '802', status: 'reserved', modelId: 'm2' },
-        { id: 'u3', number: '803', status: 'sold', modelId: 'm1' },
-        { id: 'u4', number: '804', status: 'sold', modelId: 'm3' },
-        { id: 'u5', number: '805', status: 'available', modelId: 'm2' },
-      ]},
-      { id: 'f2', name: '2F', units: [
-        { id: 'u6', number: '901', status: 'reserved', modelId: 'm1' },
-        { id: 'u7', number: '902', status: 'available', modelId: 'm3' },
-        { id: 'u8', number: '903', status: 'sold', modelId: 'm2' },
-        { id: 'u9', number: '904', status: 'sold', modelId: 'm1' },
-        { id: 'u10', number: '905', status: 'sold', modelId: 'm3' },
-      ]},
-      { id: 'f3', name: '3F', units: [
-        { id: 'u11', number: '801', status: 'reserved' },
-        { id: 'u12', number: '802', status: 'sold' },
-        { id: 'u13', number: '803', status: 'available' },
-        { id: 'u14', number: '804', status: 'sold' },
-      ]},
-      { id: 'f4', name: '4F', units: [
-        { id: 'u15', number: '701', status: 'available' },
-        { id: 'u16', number: '702', status: 'reserved' },
-        { id: 'u17', number: '703', status: 'available' },
-        { id: 'u18', number: '704', status: 'sold' },
-      ]},
-      { id: 'f5', name: '5F', units: [
-        { id: 'u19', number: '801', status: 'reserved' },
-        { id: 'u20', number: '602', status: 'available' },
-        { id: 'u21', number: '603', status: 'sold' },
-        { id: 'u22', number: '604', status: 'reserved' },
-      ]},
-      { id: 'f6', name: '6F', units: [
-        { id: 'u23', number: '501', status: 'sold' },
-        { id: 'u24', number: '502', status: 'available' },
-        { id: 'u25', number: '503', status: 'available' },
-        { id: 'u26', number: '504', status: 'reserved' },
-      ]},
-    ],
-    models: [
-      { id: 'm1', name: 'Model A', totalArea: '1200 sqft' },
-      { id: 'm2', name: 'Model B', totalArea: '1500 sqft' },
-      { id: 'm3', name: 'Model C', totalArea: '1800 sqft' },
-    ]
-  },
-  {
-    id: '4',
-    name: 'Metro Shopping Center',
-    floors: [],
-    models: []
-  },
-  {
-    id: '5',
-    name: 'Grand Hotel Renovation',
-    floors: [],
-    models: []
-  },
-  {
-    id: '6',
-    name: 'Innovation Academy',
-    floors: [],
-    models: []
-  },
-];
+import { useApiStore, Project, Model, Floor, Unit, UnitStatus } from '@/store/editProjectStore';
+import { useAuthStore } from '@/store/authStore';
+ // Assuming you have this
 
 export default function Home() {
-  const [properties, setProperties] = useState<Property[]>(initialProperties);
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string>('3');
+  const router = useRouter();
+  const params = useParams();
+  const projectId = params?.slug as string; // Get project ID from URL slug
+  
+  // Get user from auth store
+  const { user } = useAuthStore();
+  
+  // Get store state and actions
+  const {
+    // Projects
+    projects,
+    projectsLoading,
+    getProjects,
+    
+    // Models
+    models,
+    modelsLoading,
+    addModel,
+    getModels,
+    updateModel,
+    deleteModel,
+    
+    // Floors
+    floors,
+    floorsLoading,
+    getFloors,
+    addFloor,
+    updateFloor,
+    deleteFloor,
+    
+    // Units
+    addUnit,
+    updateUnit,
+    deleteUnit
+  } = useApiStore();
+
+  // Local UI state
   const [selectedFloorId, setSelectedFloorId] = useState<string>('');
   const [showAddUnitModal, setShowAddUnitModal] = useState(false);
   const [activeFloorForAdd, setActiveFloorForAdd] = useState<string>('');
@@ -135,31 +63,117 @@ export default function Home() {
   const [showAddModelModal, setShowAddModelModal] = useState(false);
   const [newModelName, setNewModelName] = useState('');
   const [newModelArea, setNewModelArea] = useState('');
+  const [newModelFace, setNewModelFace] = useState('');
   const [showEditModelModal, setShowEditModelModal] = useState(false);
   const [editingModelData, setEditingModelData] = useState<Model | null>(null);
   const [tempModelName, setTempModelName] = useState('');
   const [tempModelArea, setTempModelArea] = useState('');
-  const [selectedModelForUnit, setSelectedModelForUnit] = useState<string>('');
+  const [tempModelFace, setTempModelFace] = useState('');
+  const [saving, setSaving] = useState(false);
 
-  const selectedProperty = properties.find(p => p.id === selectedPropertyId);
-  
-  // Auto-select first floor when property changes
+  const saveEditedFloor = async () => {
+  if (!editingFloorData || !tempFloorName.trim() || !projectId) return;
+
+  try {
+    // Show loading state (you might want to add a loading spinner)
+    setSaving(true);
+
+    // 1. Update floor name first
+    if (tempFloorName !== editingFloorData.name) {
+      await updateFloor(editingFloorData._id, { name: tempFloorName });
+    }
+
+    const originalUnits = editingFloorData.units;
+    
+    // 2. Handle deleted units (ones in original but not in temp)
+    const deletedUnits = originalUnits.filter(
+      originalUnit => !tempUnits.some(tempUnit => tempUnit._id === originalUnit._id)
+    );
+    
+    for (const unit of deletedUnits) {
+      await deleteUnit(editingFloorData._id, unit._id);
+    }
+
+    // 3. Handle new units (ones with temp IDs)
+    const newUnits = tempUnits.filter(unit => unit._id.startsWith('temp-'));
+    
+    for (const unit of newUnits) {
+      await addUnit(editingFloorData._id, { name: unit.name });
+      // Note: status defaults to 'available' from the store
+    }
+
+    // 4. Handle updated units (same ID but changed name or status)
+    const updatedUnits = tempUnits.filter(tempUnit => {
+      if (tempUnit._id.startsWith('temp-')) return false; // Skip new units
+      
+      const originalUnit = originalUnits.find(u => u._id === tempUnit._id);
+      return originalUnit && (
+        originalUnit.name !== tempUnit.name || 
+        originalUnit.status !== tempUnit.status
+      );
+    });
+
+    for (const unit of updatedUnits) {
+      await updateUnit(editingFloorData._id, unit._id, {
+        name: unit.name,
+        status: unit.status
+      });
+    }
+
+    // 5. Refresh floors data to get latest state
+    await getFloors(projectId);
+
+    // Close modal and reset state
+    setShowEditFloorModal(false);
+    setEditingFloorData(null);
+    setTempFloorName('');
+    setTempUnits([]);
+    setNewUnitInEdit('');
+    setSaving(false);
+
+    // Optional: Show success message
+    // toast.success('Floor updated successfully');
+
+  } catch (error) {
+    
+    setSaving(false);
+    // Optional: Show error message
+    // toast.error('Failed to update floor');
+  }
+};
+  // Load data when component mounts and projectId is available
   useEffect(() => {
-    if (selectedProperty && selectedProperty.floors.length > 0) {
-      // If no floor is selected or the selected floor doesn't exist in current property, select first floor
-      if (!selectedFloorId || !selectedProperty.floors.find(f => f.id === selectedFloorId)) {
-        setSelectedFloorId(selectedProperty.floors[0].id);
+    if (user?.id) {
+      getProjects(user.id);
+    }
+  }, [user, getProjects]);
+
+  useEffect(() => {
+    if (projectId) {
+      getModels(projectId);
+      getFloors(projectId);
+    }
+  }, [projectId, getModels, getFloors]);
+
+  // Auto-select first floor when floors change
+  useEffect(() => {
+    if (floors.length > 0) {
+      if (!selectedFloorId || !floors.find(f => f._id === selectedFloorId)) {
+        setSelectedFloorId(floors[0]._id);
       }
     } else {
       setSelectedFloorId('');
     }
-  }, [selectedProperty, selectedFloorId]);
+  }, [floors, selectedFloorId]);
 
-  // Get units from the selected floor only
-  const selectedFloor = selectedProperty?.floors.find(f => f.id === selectedFloorId);
+  // Get current project details
+  const selectedProject = projects.find(p => p._id === projectId);
+  
+  // Get selected floor and its units
+  const selectedFloor = floors.find(f => f._id === selectedFloorId);
   const unitsInSelectedFloor = selectedFloor?.units.map(unit => ({
     ...unit,
-    floorId: selectedFloor.id,
+    floorId: selectedFloor._id,
     floorName: selectedFloor.name
   })) || [];
 
@@ -174,139 +188,55 @@ export default function Home() {
     }
   };
 
-  const deleteUnit = (floorId: string, unitId: string) => {
-    setProperties(properties.map(property => {
-      if (property.id === selectedPropertyId) {
-        return {
-          ...property,
-          floors: property.floors.map(floor => {
-            if (floor.id === floorId) {
-              return {
-                ...floor,
-                units: floor.units.filter(unit => unit.id !== unitId)
-              };
-            }
-            return floor;
-          })
-        };
-      }
-      return property;
-    }));
+  const handleDeleteUnit = (floorId: string, unitId: string) => {
+    deleteUnit(floorId, unitId);
   };
 
-  const deleteFloor = (floorId: string) => {
-    setProperties(properties.map(property => {
-      if (property.id === selectedPropertyId) {
-        const updatedFloors = property.floors.filter(floor => floor.id !== floorId);
-        // If we're deleting the selected floor, select the next available one or clear selection
-        if (floorId === selectedFloorId) {
-          if (updatedFloors.length > 0) {
-            setSelectedFloorId(updatedFloors[0].id);
-          } else {
-            setSelectedFloorId('');
-          }
-        }
-        return {
-          ...property,
-          floors: updatedFloors
-        };
-      }
-      return property;
-    }));
+  const handleDeleteFloor = (floorId: string) => {
+    deleteFloor(floorId);
   };
 
-  const addUnit = (floorId: string) => {
+  const handleAddUnit = (floorId: string) => {
     setActiveFloorForAdd(floorId);
     setNewUnitName('');
-    setSelectedModelForUnit(selectedProperty?.models[0]?.id || '');
     setShowAddUnitModal(true);
   };
 
-  const route = useRouter();
-  
   const handleSave = () => {
-    route.push("/dashboard");
+    router.push("/dashboard");
   };
 
-  const addFloor = () => {
+  const handleAddFloor = () => {
     setNewFloorName('');
     setShowAddFloorModal(true);
   };
 
-  const confirmAddFloor = () => {
-    if (!newFloorName.trim()) return;
+  const confirmAddFloor = async () => {
+    if (!newFloorName.trim() || !projectId) return;
     
-    setProperties(properties.map(property => {
-      if (property.id === selectedPropertyId) {
-        const newFloor: Floor = {
-          id: `f${Date.now()}`,
-          name: newFloorName,
-          units: []
-        };
-        
-        return {
-          ...property,
-          floors: [...property.floors, newFloor]
-        };
-      }
-      return property;
-    }));
+    await addFloor({
+      projectId,
+      name: newFloorName
+    });
     
     setShowAddFloorModal(false);
     setNewFloorName('');
   };
 
-  const confirmAddUnit = () => {
-    if (!newUnitName.trim()) return;
+  const confirmAddUnit = async () => {
+    if (!newUnitName.trim() || !activeFloorForAdd) return;
     
-    setProperties(properties.map(property => {
-      if (property.id === selectedPropertyId) {
-        return {
-          ...property,
-          floors: property.floors.map(floor => {
-            if (floor.id === activeFloorForAdd) {
-              return {
-                ...floor,
-                units: [...floor.units, {
-                  id: `u${Date.now()}`,
-                  number: newUnitName,
-                  status: 'available' as UnitStatus,
-                  modelId: selectedModelForUnit || undefined
-                }]
-              };
-            }
-            return floor;
-          })
-        };
-      }
-      return property;
-    }));
+    await addUnit(activeFloorForAdd, { name: newUnitName });
     
     setShowAddUnitModal(false);
     setNewUnitName('');
-    setSelectedModelForUnit('');
   };
 
-  const updateUnitStatus = (floorId: string, unitId: string, newStatus: UnitStatus) => {
-    setProperties(properties.map(property => {
-      if (property.id === selectedPropertyId) {
-        return {
-          ...property,
-          floors: property.floors.map(floor => {
-            if (floor.id === floorId) {
-              return {
-                ...floor,
-                units: floor.units.map(unit =>
-                  unit.id === unitId ? { ...unit, status: newStatus } : unit
-                )
-              };
-            }
-            return floor;
-          })
-        };
-      }
-      return property;
-    }));
+  const handleUpdateUnitStatus = async (floorId: string, unitId: string, newStatus: UnitStatus) => {
+    const unit = floors.find(f => f._id === floorId)?.units.find(u => u._id === unitId);
+    if (unit) {
+      await updateUnit(floorId, unitId, { name: unit.name, status: newStatus });
+    }
   };
 
   const handleFloorClick = (floorId: string) => {
@@ -314,7 +244,7 @@ export default function Home() {
   };
 
   const openEditFloorModal = (floorId: string) => {
-    const floorToEdit = selectedProperty?.floors.find(f => f.id === floorId);
+    const floorToEdit = floors.find(f => f._id === floorId);
     if (floorToEdit) {
       setEditingFloorData(floorToEdit);
       setTempFloorName(floorToEdit.name);
@@ -323,51 +253,25 @@ export default function Home() {
     }
   };
 
-  const saveEditedFloor = () => {
-    if (!editingFloorData || !tempFloorName.trim()) return;
-
-    setProperties(properties.map(property => {
-      if (property.id === selectedPropertyId) {
-        return {
-          ...property,
-          floors: property.floors.map(floor => {
-            if (floor.id === editingFloorData.id) {
-              return {
-                ...floor,
-                name: tempFloorName,
-                units: tempUnits
-              };
-            }
-            return floor;
-          })
-        };
-      }
-      return property;
-    }));
-
-    setShowEditFloorModal(false);
-    setEditingFloorData(null);
-    setTempFloorName('');
-    setTempUnits([]);
-  };
+ 
 
   const updateTempUnitName = (unitId: string, newName: string) => {
     setTempUnits(tempUnits.map(unit => 
-      unit.id === unitId ? { ...unit, number: newName } : unit
+      unit._id === unitId ? { ...unit, name: newName } : unit
     ));
   };
 
   const updateTempUnitStatus = (unitId: string, newStatus: UnitStatus) => {
     setTempUnits(tempUnits.map(unit => 
-      unit.id === unitId ? { ...unit, status: newStatus } : unit
+      unit._id === unitId ? { ...unit, status: newStatus } : unit
     ));
   };
 
   const addTempUnit = () => {
     if (!newUnitInEdit.trim()) return;
     const newUnit: Unit = {
-      id: `u${Date.now()}`,
-      number: newUnitInEdit,
+      _id: `temp-${Date.now()}`,
+      name: newUnitInEdit,
       status: 'available'
     };
     setTempUnits([...tempUnits, newUnit]);
@@ -375,105 +279,79 @@ export default function Home() {
   };
 
   const removeTempUnit = (unitId: string) => {
-    setTempUnits(tempUnits.filter(unit => unit.id !== unitId));
+    setTempUnits(tempUnits.filter(unit => unit._id !== unitId));
   };
 
   // Model Management Functions
-  const addModel = () => {
+  const handleAddModel = () => {
     setNewModelName('');
     setNewModelArea('');
+    setNewModelFace('');
     setShowAddModelModal(true);
   };
 
-  const confirmAddModel = () => {
-    if (!newModelName.trim() || !newModelArea.trim()) return;
+  const confirmAddModel = async () => {
+    if (!newModelName.trim() || !newModelArea.trim() || !projectId) return;
     
-    setProperties(properties.map(property => {
-      if (property.id === selectedPropertyId) {
-        const newModel: Model = {
-          id: `m${Date.now()}`,
-          name: newModelName,
-          totalArea: newModelArea
-        };
-        
-        return {
-          ...property,
-          models: [...property.models, newModel]
-        };
-      }
-      return property;
-    }));
+    await addModel({
+      projectId,
+      name: newModelName,
+      area: parseFloat(newModelArea) || undefined,
+      face: newModelFace || undefined
+    });
     
     setShowAddModelModal(false);
     setNewModelName('');
     setNewModelArea('');
+    setNewModelFace('');
   };
 
   const openEditModelModal = (modelId: string) => {
-    const modelToEdit = selectedProperty?.models.find(m => m.id === modelId);
+    const modelToEdit = models.find(m => m._id === modelId);
     if (modelToEdit) {
       setEditingModelData(modelToEdit);
       setTempModelName(modelToEdit.name);
-      setTempModelArea(modelToEdit.totalArea);
+      setTempModelArea(modelToEdit.area?.toString() || '');
+      setTempModelFace(modelToEdit.face || '');
       setShowEditModelModal(true);
     }
   };
 
-  const saveEditedModel = () => {
+  const saveEditedModel = async () => {
     if (!editingModelData || !tempModelName.trim() || !tempModelArea.trim()) return;
 
-    setProperties(properties.map(property => {
-      if (property.id === selectedPropertyId) {
-        return {
-          ...property,
-          models: property.models.map(model => {
-            if (model.id === editingModelData.id) {
-              return {
-                ...model,
-                name: tempModelName,
-                totalArea: tempModelArea
-              };
-            }
-            return model;
-          })
-        };
-      }
-      return property;
-    }));
+    await updateModel(editingModelData._id, {
+      name: tempModelName,
+      area: parseFloat(tempModelArea) || undefined,
+      face: tempModelFace || undefined
+    });
 
     setShowEditModelModal(false);
     setEditingModelData(null);
     setTempModelName('');
     setTempModelArea('');
+    setTempModelFace('');
   };
 
-  const deleteModel = (modelId: string) => {
-    setProperties(properties.map(property => {
-      if (property.id === selectedPropertyId) {
-        // Remove model from property
-        const updatedModels = property.models.filter(model => model.id !== modelId);
-        
-        // Remove model reference from all units
-        const updatedFloors = property.floors.map(floor => ({
-          ...floor,
-          units: floor.units.map(unit => 
-            unit.modelId === modelId ? { ...unit, modelId: undefined } : unit
-          )
-        }));
-        
-        return {
-          ...property,
-          models: updatedModels,
-          floors: updatedFloors
-        };
-      }
-      return property;
-    }));
+  const handleDeleteModel = async (modelId: string) => {
+    await deleteModel(modelId);
   };
+
+  // Loading states
+  if (projectsLoading || modelsLoading || floorsLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading project data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <Navbar></Navbar>
+      <Navbar />
       <div className="absolute right-1 top-3">
         <ThemeToggle />
       </div>
@@ -485,12 +363,12 @@ export default function Home() {
           <div className="p-[24px] md:p-[32px] border-b border-gray-200">
             <h2 className="font-inter font-semibold text-base leading-6 tracking-[-0.5px] dark:text-[#FFFFFF] text-gray-900 mb-4">Property Structure</h2>
             <div className="space-y-1">
-              {properties.map((property) => (
+              {projects.map((project) => (
                 <button
-                  key={property.id}
-                  onClick={() => setSelectedPropertyId(property.id)}
+                  key={project._id}
+                  onClick={() => router.push(`/dashboard/${project._id}`)}
                   className={`w-full dark:text-[#FFFFFF] text-[#000000] text-left px-3 py-2.5 rounded text-sm flex items-center gap-2 transition-colors ${
-                    selectedPropertyId === property.id
+                    project._id === projectId
                       ? 'dark:bg-[#0088FF33] bg-blue-100 text-gray-900'
                       : 'text-gray-700 dark:hover:bg-gray-600 hover:bg-gray-50'
                   }`}
@@ -498,18 +376,18 @@ export default function Home() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
-                  {property.name}
+                  {project.name}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Model Management - NEW SECTION ADDED */}
+          {/* Model Management */}
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-inter font-semibold text-base leading-6 tracking-[-0.5px] dark:text-[#FFFFFF] text-gray-900">Models</h2>
               <button
-                onClick={addModel}
+                onClick={handleAddModel}
                 className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1.5"
               >
                 + Add Model
@@ -517,22 +395,25 @@ export default function Home() {
             </div>
             
             <div className="space-y-2">
-              {selectedProperty?.models.map((model) => (
-                <div key={model.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
+              {models.map((model) => (
+                <div key={model._id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white">{model.name}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300">{model.totalArea}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">{model.area} sqft</div>
+                    {model.face && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400">Face: {model.face}</div>
+                    )}
                   </div>
                   <div className="flex items-center gap-1">
                     <button
-                      onClick={() => openEditModelModal(model.id)}
+                      onClick={() => openEditModelModal(model._id)}
                       className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                       title="Edit model"
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => deleteModel(model.id)}
+                      onClick={() => handleDeleteModel(model._id)}
                       className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                       title="Delete model"
                     >
@@ -541,7 +422,7 @@ export default function Home() {
                   </div>
                 </div>
               ))}
-              {selectedProperty?.models.length === 0 && (
+              {models.length === 0 && (
                 <p className="text-sm text-gray-500 text-center py-2">No models added yet</p>
               )}
             </div>
@@ -554,11 +435,11 @@ export default function Home() {
             <div className="space-y-3">
               {unitsInSelectedFloor.length > 0 ? (
                 unitsInSelectedFloor.map((unit) => (
-                  <div key={unit.id} className="flex items-center gap-3">
-                    <span className="text-sm text-gray-700 w-24 dark:text-[#FFFFFF]">Unit {unit.number}</span>
+                  <div key={unit._id} className="flex items-center gap-3">
+                    <span className="text-sm text-gray-700 w-24 dark:text-[#FFFFFF]">Unit {unit.name}</span>
                     <select
                       value={unit.status}
-                      onChange={(e) => updateUnitStatus(unit.floorId, unit.id, e.target.value as UnitStatus)}
+                      onChange={(e) => handleUpdateUnitStatus(unit.floorId, unit._id, e.target.value as UnitStatus)}
                       className="flex-1 px-3 py-1.5 text-sm border text-gray-600 dark:text-white border-gray-300 rounded bg-white dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="available">Available</option>
@@ -576,7 +457,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Main Content - EXACTLY THE SAME AS BEFORE */}
+        {/* Main Content */}
         <div className="flex-1 flex flex-col dark:bg-black bg-white">
           {/* Header with Theme Toggle */}
           <div className="px-8 py-[38px] flex items-center justify-end">
@@ -597,19 +478,19 @@ export default function Home() {
             <div className='flex justify-between '>
               <h1 className="text-lg font-semibold dark:text-[#E5E7EB] text-gray-900 pb-[32px]">Live Preview</h1>
               <div>
-                <button onClick={addFloor} className='text-[#0088FF] bg-[#E1EFFB] p-[12px] rounded-lg hover:bg-[#e0e3e6]'>
+                <button onClick={handleAddFloor} className='text-[#0088FF] bg-[#E1EFFB] p-[12px] rounded-lg hover:bg-[#e0e3e6]'>
                   + Add Floor
                 </button>
               </div>
             </div>
             
             <div className="border border-gray-200 rounded-lg overflow-hidden bg-white dark:bg-[#1A1A1A] p-[16px] md:p-[32px] ">
-              {selectedProperty?.floors.map((floor, index) => (
+              {floors.map((floor) => (
                 <div 
-                  key={floor.id} 
-                  onClick={() => handleFloorClick(floor.id)}
+                  key={floor._id} 
+                  onClick={() => handleFloorClick(floor._id)}
                   className={`flex items-center px-6 py-4 my-2 border-1 border-[#E5E7EB] dark:border-none last:border-b-0 cursor-pointer transition-all rounded-lg ${
-                    selectedFloorId === floor.id 
+                    selectedFloorId === floor._id 
                       ? 'bg-blue-50 dark:bg-gray-900' 
                       : 'bg-white hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-800' 
                   }`}
@@ -622,13 +503,15 @@ export default function Home() {
                   {/* Units */}
                   <div className="flex items-center my-2 gap-2 flex-1 flex-wrap">
                     {floor.units.map((unit) => (
-                      <div key={unit.id} className="relative rounded-lg border-1 border-[#E5E7EB] dark:border-none">
+                      <div key={unit._id} className="relative rounded-lg border-1 border-[#E5E7EB] dark:border-none">
                         {/* Delete X button on unit */}
                         <button
                           onClick={(e) => {
-                            e.stopPropagation(); // Prevent floor selection when deleting unit
-                            deleteUnit(floor.id, unit.id);
+                            e.stopPropagation();
+                            handleDeleteUnit(floor._id, unit._id);
                           }}
+
+                          
                           className="absolute -top-2 -right-2 w-4 h-4 bg-white border border-red-400 rounded-full flex items-center justify-center z-10 hover:bg-red-50"
                         >
                           <svg className="w-2.5 h-2.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -638,7 +521,7 @@ export default function Home() {
                         
                         {/* Unit Box */}
                         <div className={`${getStatusColor(unit.status)} text-white px-5 py-2.5 rounded text-sm font-medium`}>
-                          {unit.number}
+                          {unit.name}
                         </div>
                       </div>
                     ))}
@@ -646,8 +529,8 @@ export default function Home() {
                     {/* Add Unit Button */}
                     <button
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent floor selection when adding unit
-                        addUnit(floor.id);
+                        e.stopPropagation();
+                        handleAddUnit(floor._id);
                       }}
                       className="px-4 py-2.5 bg-blue-50 text-blue-600 rounded text-sm font-medium hover:bg-blue-100 transition-colors flex items-center gap-1.5"
                     >
@@ -660,11 +543,11 @@ export default function Home() {
 
                   {/* Action Buttons - Edit and Delete */}
                   <div className="ml-4 flex items-center gap-2 flex-shrink-0">
-                    {/* Edit Button - More Prominent */}
+                    {/* Edit Button */}
                     <button
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent floor selection when editing
-                        openEditFloorModal(floor.id);
+                        e.stopPropagation();
+                        openEditFloorModal(floor._id);
                       }}
                       className="px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 rounded-lg flex items-center gap-1.5 transition-colors"
                       title="Edit floor and units"
@@ -676,8 +559,8 @@ export default function Home() {
                     {/* Delete Button */}
                     <button
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent floor selection when deleting
-                        deleteFloor(floor.id);
+                        e.stopPropagation();
+                        handleDeleteFloor(floor._id);
                       }}
                       className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 rounded-lg flex items-center gap-1.5 transition-colors"
                       title="Delete floor"
@@ -710,6 +593,7 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Modals - All modals remain the same but with store integration */}
         {/* Add Floor Modal */}
         {showAddFloorModal && (
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
@@ -750,7 +634,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* Add Unit Modal - UPDATED WITH MODEL SELECTION */}
+        {/* Add Unit Modal */}
         {showAddUnitModal && (
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
@@ -767,26 +651,6 @@ export default function Home() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                   autoFocus
                 />
-                
-                {selectedProperty && selectedProperty.models.length > 0 && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Select Model (Optional)
-                    </label>
-                    <select
-                      value={selectedModelForUnit}
-                      onChange={(e) => setSelectedModelForUnit(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">No Model</option>
-                      {selectedProperty.models.map((model) => (
-                        <option key={model.id} value={model.id}>
-                          {model.name} ({model.totalArea})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
               </div>
               
               <div className="flex gap-3 mt-6">
@@ -794,7 +658,6 @@ export default function Home() {
                   onClick={() => {
                     setShowAddUnitModal(false);
                     setNewUnitName('');
-                    setSelectedModelForUnit('');
                   }}
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
@@ -812,7 +675,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* Edit Floor Modal - EXACTLY THE SAME AS BEFORE */}
+        {/* Edit Floor Modal */}
         {showEditFloorModal && editingFloorData && (
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -864,18 +727,18 @@ export default function Home() {
                   {tempUnits.length > 0 ? (
                     <div className="space-y-3">
                       {tempUnits.map((unit) => (
-                        <div key={unit.id} className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <div key={unit._id} className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
                           <div className="flex-1">
                             <input
                               type="text"
-                              value={unit.number}
-                              onChange={(e) => updateTempUnitName(unit.id, e.target.value)}
+                              value={unit.name}
+                              onChange={(e) => updateTempUnitName(unit._id, e.target.value)}
                               className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                             />
                           </div>
                           <select
                             value={unit.status}
-                            onChange={(e) => updateTempUnitStatus(unit.id, e.target.value as UnitStatus)}
+                            onChange={(e) => updateTempUnitStatus(unit._id, e.target.value as UnitStatus)}
                             className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                           >
                             <option value="available">Available</option>
@@ -883,7 +746,7 @@ export default function Home() {
                             <option value="sold">Sold</option>
                           </select>
                           <button
-                            onClick={() => removeTempUnit(unit.id)}
+                            onClick={() => removeTempUnit(unit._id)}
                             className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -911,20 +774,27 @@ export default function Home() {
                   >
                     Cancel
                   </button>
-                  <button
-                    onClick={saveEditedFloor}
-                    disabled={!tempFloorName.trim()}
-                    className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
-                  >
-                    Save Changes
-                  </button>
+                 <button
+  onClick={saveEditedFloor}
+  disabled={!tempFloorName.trim() || saving}
+  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+>
+  {saving ? (
+    <>
+      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      Saving...
+    </>
+  ) : (
+    'Save Changes'
+  )}
+</button>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* Add Model Modal - NEW MODAL */}
+        {/* Add Model Modal */}
         {showAddModelModal && (
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
@@ -949,13 +819,26 @@ export default function Home() {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Total Area *
+                    Total Area (sqft) *
+                  </label>
+                  <input
+                    type="number"
+                    value={newModelArea}
+                    onChange={(e) => setNewModelArea(e.target.value)}
+                    placeholder="e.g., 1200"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Face (Optional)
                   </label>
                   <input
                     type="text"
-                    value={newModelArea}
-                    onChange={(e) => setNewModelArea(e.target.value)}
-                    placeholder="e.g., 1200 sqft, 150 m²"
+                    value={newModelFace}
+                    onChange={(e) => setNewModelFace(e.target.value)}
+                    placeholder="e.g., North, South, East, West"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -967,6 +850,7 @@ export default function Home() {
                     setShowAddModelModal(false);
                     setNewModelName('');
                     setNewModelArea('');
+                    setNewModelFace('');
                   }}
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
@@ -984,7 +868,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* Edit Model Modal - NEW MODAL */}
+        {/* Edit Model Modal */}
         {showEditModelModal && editingModelData && (
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
@@ -1007,12 +891,25 @@ export default function Home() {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Total Area *
+                    Total Area (sqft) *
+                  </label>
+                  <input
+                    type="number"
+                    value={tempModelArea}
+                    onChange={(e) => setTempModelArea(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Face (Optional)
                   </label>
                   <input
                     type="text"
-                    value={tempModelArea}
-                    onChange={(e) => setTempModelArea(e.target.value)}
+                    value={tempModelFace}
+                    onChange={(e) => setTempModelFace(e.target.value)}
+                    placeholder="e.g., North, South, East, West"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -1025,6 +922,7 @@ export default function Home() {
                     setEditingModelData(null);
                     setTempModelName('');
                     setTempModelArea('');
+                    setTempModelFace('');
                   }}
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
