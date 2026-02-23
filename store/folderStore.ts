@@ -45,6 +45,7 @@ export const useFolderStore = create<FolderState>((set) => ({
 
   createFolder: async ({ name, description, color }) => {
     const user = useAuthStore.getState().user;
+    console.log('Creating folder with data:', { name, description, color, userId: user?.id });
 
     if (!user?.id) {
       set({ error: 'User not authenticated' });
@@ -75,6 +76,7 @@ export const useFolderStore = create<FolderState>((set) => ({
     fetchFolders: async (userId: string) => {
     set({ loading: true, error: null });
     try {
+      console.log('Fetching folders for user:', userId);
       const response = await api.get<{ success: boolean; count: number; data: Folder[] }>(
         `/folders/user/${userId}`
       );
