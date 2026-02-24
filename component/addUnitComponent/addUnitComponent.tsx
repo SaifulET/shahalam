@@ -10,7 +10,6 @@ import { useAuthStore } from '@/store/authStore';
 import { useModelStore } from '@/store/useModelStore';
 import AddModelModal from '../addModel/addModel';
 
-
 interface Floor {
   id: string;
   name: string;

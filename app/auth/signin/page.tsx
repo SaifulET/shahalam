@@ -15,18 +15,16 @@ export default function LoginPage() {
   const [rememberPassword, setRememberPassword] = useState<boolean>(true);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-
   const route= useRouter()
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
   e.preventDefault();
 
   try {
     const res = await api.post("/auth/login", { email, password });
-  console.log('Login response:', res.data);
     const { accessToken, user } = res.data;
-
     // Update Zustand store
     useAuthStore.getState().login(user, accessToken);
+
 
     // Redirect to dashboard or home
     route.push("/"); // or "/"

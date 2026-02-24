@@ -40,6 +40,7 @@ export const useCreatProjectStore = create<ProjectState>((set) => ({
   createFullProject: async (projectData, floors, models = []) => {
     try {
       set({ loading: true, error: null });
+      
 
       // 1️⃣ CREATE PROJECT
       const formData = new FormData();
@@ -51,13 +52,14 @@ export const useCreatProjectStore = create<ProjectState>((set) => ({
         formData.append("image", projectData.image);
       }
 
-      const projectRes = await api.post("/projects/", projectData);
-console.log("projectRessss:", projectRes);
+      const projectRes = await api.post("/projects/",formData,
+        {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+      );
       const projectId = projectRes.data.data._id;
-      console.log("Project created with ID:", projectId);
 
       // 2️⃣ CREATE FLOORS
-      console.log("Creating floossssrs for project ID:", floors);
       for (const floor of floors) {
         await api.post("/floors", {
           projectId,

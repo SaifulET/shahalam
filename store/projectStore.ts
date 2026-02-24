@@ -57,7 +57,6 @@ export const useProjectStore = create<ProjectState>((set) => ({
 
   fetchModels: async (projectId) => {
     const res = await api.get(`/models/${projectId}`);
-    console.log("Fetched models:", res.data.data);
     set({ models: res.data.data });
   },
 }));

@@ -69,12 +69,12 @@ export default function ProjectCard({
       `}
     >
       <div className="w-full h-[96px] relative">
-        <Image
-          src={image}
-          alt={title}
-          fill
-          className="object-cover"
-        />
+        <img
+  src={image || "/rc1.png"}
+  alt={title}
+  className="w-full h-full object-cover"
+/>
+
         {isDragging && (
           <div className="absolute inset-0 bg-blue-100 bg-opacity-30 flex items-center justify-center">
             <div className="bg-blue-500 text-white  px-3 py-1 rounded-full text-sm font-medium">

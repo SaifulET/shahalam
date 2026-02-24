@@ -1,16 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Folder } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useFolderStore } from '@/store/folderStore';
+import { useAuthStore } from '@/store/authStore';
  // adjust path
 
 const CreateFolderPage = () => {
   const [folderName, setFolderName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedColor, setSelectedColor] = useState('#34D399');
-
+  const user= useAuthStore().user
+  useEffect(() => {
+    if (!user?.id) router.push("/auth/signin");})
   const colors = [
     '#34D399',
     '#60A5FA',
@@ -24,6 +27,7 @@ const CreateFolderPage = () => {
   const { createFolder, loading, error } = useFolderStore();
 
   const handleCreateFolder = async () => {
+
     await createFolder({
       name: folderName,
       description,
@@ -32,6 +36,8 @@ const CreateFolderPage = () => {
    
     router.push('/');
   };
+
+
 
   return (
     <div className="min-h-screen bg-white dark:bg-black flex justify-center items-center py-[15px]">

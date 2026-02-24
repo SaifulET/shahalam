@@ -1,15 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import api from '@/lib/api';
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
-
+  const router= useRouter()
+  let user = useAuthStore.getState().user;
+useEffect(()=>{
+   (async()=>{
+     const users= await api.post("/auth/refresh");
+    if(!users){
+      router.push("/auth/signin")
+    }
+    
+useAuthStore.getState().login(users.data.user, users.data.accessToken);
+ user =users.data.user
+   })() 
+},[])
   const isActive = (path: string) => {
     if (path === '/') {
       return pathname === '/';
@@ -20,7 +33,12 @@ export default function Navbar() {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-const user = useAuthStore.getState().user;
+
+
+ 
+
+
+
   return (
     <nav className='pr-[32px] dark:bg-[#28272A] bg-white border-b border-[#D1D5DB]'>
       <div className="px-[32px]  md:px-[80px]  dark:bg-[#28272A] bg-white">
@@ -68,13 +86,14 @@ const user = useAuthStore.getState().user;
           <Link  href="/company-profile">
           
           <div className="h-[32px] w-[32px] rounded-full overflow-hidden border-1 border-gray-200">
-              <Image
-                src={user?.profileImage || "/profile.jpg"}
-                alt={`${user?.name}'s Profile`}
-                width={32}
-                height={32}
-                className="h-full w-full object-cover"
-              />
+              <img
+  src={user?.profileImage || "/profile.jpg"}
+  alt={`${user?.name}'s Profile`}
+  width={32}
+  height={32}
+  className="h-full w-full object-cover rounded-full"
+/>
+
              
             </div>
            

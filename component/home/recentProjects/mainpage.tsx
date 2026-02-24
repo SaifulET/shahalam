@@ -11,6 +11,7 @@ interface ApiProject {
   _id: string;
   userId: string;
   name: string;
+  image:string;
   location: string;
   createdAt: string;
   updatedAt: string;
@@ -61,7 +62,7 @@ export default function RecentProjectsComponent() {
 
         const mappedProjects: Project[] = response.data.data.map((item) => ({
           id: item.projectId._id,
-          image: '/rc1.png', // static image for now
+          image:item.projectId?.image || '/rc1.png', // static image for now
           title: item.projectId.name,
           location: item.projectId.location,
           status: 'Active',

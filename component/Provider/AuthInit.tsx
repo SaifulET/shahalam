@@ -11,7 +11,6 @@ export default function AuthInit() {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        console.log("Attempting to refresh auth token...");
         const res = await api.post("/auth/refresh");
         const { accessToken, user } = res.data;
         setAuth(user, accessToken);

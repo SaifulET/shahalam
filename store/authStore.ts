@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 type User = {
   id: string;
@@ -24,17 +25,30 @@ type AuthStore = {
   setAccessToken: (token: string) => void;
 };
 
-export const useAuthStore = create<AuthStore>((set) => ({
-  user: null,
-  accessToken: null,
-  isAuthenticated: false,
-  loading: true,
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set) => ({
+      user: null,
+      accessToken: null,
+      isAuthenticated: false,
+      loading: false,
 
-  login: (user, token) =>
-    set({ user, accessToken: token, isAuthenticated: true, loading: false }),
+      login: (user, token) =>
+        set({ user, accessToken: token, isAuthenticated: true, loading: false }),
 
-  logout: () =>
-    set({ user: null, accessToken: null, isAuthenticated: false, loading: false }),
+      logout: () =>
+        set({ user: null, accessToken: null, isAuthenticated: false, loading: false }),
 
-  setAccessToken: (token) => set({ accessToken: token }),
-}));
+      setAccessToken: (token) => set({ accessToken: token }),
+    }),
+    {
+      name: "auth-storage", // unique name for localStorage key
+      // Optional: specify which fields to persist
+      partialize: (state) => ({ 
+        user: state.user, 
+        accessToken: state.accessToken,
+        isAuthenticated: state.isAuthenticated 
+      }),
+    }
+  )
+);
