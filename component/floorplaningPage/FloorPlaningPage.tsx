@@ -108,7 +108,7 @@ const floorLabelsLocalized = isArabic
 
 const floorsPanel = (
   <div
-    className="flex h-full min-h-[260px] flex-col items-center justify-between rounded-3xl border border-white/10 bg-[#1a221f]/30 px-4 py-6 text-center text-sm uppercase tracking-[0.2em] text-[#F2DFA7] sf-pro"
+    className="flex h-full  flex-col items-center justify-between rounded-3xl border border-white/10 bg-[#1a221f]/30 px-4 py-6 text-center text-sm uppercase tracking-[0.2em] text-[#F2DFA7] sf-pro"
     dir={isArabic ? "rtl" : "ltr"}
   >
     {/* Map in reverse order so first floor (1st) appears at bottom */}
@@ -227,7 +227,7 @@ const unitsPanel = (
             left: 0 !important;
             top: 0 !important;
             width: 210mm !important;
-            height: 297mm !important;
+          
             max-width: 210mm !important;
             margin: 0 !important;
             overflow: hidden !important;

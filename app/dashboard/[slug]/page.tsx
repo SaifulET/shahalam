@@ -351,7 +351,7 @@ export default function Home() {
 
   return (
     <div>
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="absolute right-1 top-3">
         <ThemeToggle />
       </div>

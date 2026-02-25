@@ -12,6 +12,7 @@
     "@hugeicons/core-free-icons": "^1.2.0",
     "@hugeicons/react": "^1.1.1",
     "axios": "^1.13.5",
+    "dom-to-image-more": "^3.7.2",
     "html2canvas": "^1.4.1",
     "i18next": "^25.8.13",
     "jspdf": "^4.0.0",
