@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { Playfair_Display, Poppins } from "next/font/google";
 import { Download } from "lucide-react";
@@ -46,10 +46,34 @@ interface ModelData {
   face: string;
 }
 
+const ARABIC_DIGITS = [
+  "\u0660",
+  "\u0661",
+  "\u0662",
+  "\u0663",
+  "\u0664",
+  "\u0665",
+  "\u0666",
+  "\u0667",
+  "\u0668",
+  "\u0669",
+];
+
+function fallbackArabicText(value: string) {
+  return value
+    .replace(/\d/g, (digit) => ARABIC_DIGITS[Number(digit)])
+    .replace(/,/g, "\u060C")
+    .replace(/;/g, "\u061B")
+    .replace(/\?/g, "\u061F");
+}
+
 export default function RealEstateProject() {
   const t = useTranslations("floorPlanning");
   const locale = useLocale();
   const [showAddPopup, setShowAddPopup] = useState(false);
+  const [translatedDynamicText, setTranslatedDynamicText] = useState<
+    Record<string, string>
+  >({});
   const [selectedUnitType, setSelectedUnitType] = useState<
     "apartment" | "annex" | null
   >(null);
@@ -68,6 +92,33 @@ export default function RealEstateProject() {
     fetchModels,
     setSelectedProject,
   } = useProjectStore();
+
+  const textsToTranslate = useMemo(() => {
+    const values: string[] = [
+      ...projects.map((project) => project.name),
+      ...floors.map((floor: FloorData) => floor.name),
+      ...floors.flatMap((floor: FloorData) =>
+        floor.units.map((unit) => unit.name)
+      ),
+      ...models.map((model: ModelData) => model.name),
+      ...models.map((model: ModelData) => String(model.area ?? "")),
+      ...models.map((model: ModelData) => model.face).filter(Boolean),
+    ];
+
+    return Array.from(
+      new Set(values.map((value) => value?.trim()).filter(Boolean))
+    ) as string[];
+  }, [projects, floors, models]);
+
+  const localizeDynamicText = (value?: string | null) => {
+    if (!value) return "";
+    const normalizedValue = value.trim();
+    const translatedValue = translatedDynamicText[normalizedValue];
+    if (translatedValue) return translatedValue;
+    return locale === "ar"
+      ? fallbackArabicText(normalizedValue)
+      : normalizedValue;
+  };
 
   // Fetch projects
   useEffect(() => {
@@ -91,10 +142,56 @@ export default function RealEstateProject() {
     }
   }, [selectedProjectId]);
 
+  useEffect(() => {
+    let active = true;
+
+    if (textsToTranslate.length === 0) {
+      setTranslatedDynamicText({});
+      return;
+    }
+
+    const fetchDynamicTranslations = async () => {
+      try {
+        const response = await fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            target: locale,
+            source: "auto",
+            texts: textsToTranslate,
+          }),
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch dynamic translations");
+        }
+
+        const data = (await response.json()) as {
+          translations?: Record<string, string>;
+        };
+
+        if (active) {
+          setTranslatedDynamicText(data.translations ?? {});
+        }
+      } catch {
+        if (active) {
+          setTranslatedDynamicText({});
+        }
+      }
+    };
+
+    fetchDynamicTranslations();
+
+    return () => {
+      active = false;
+    };
+  }, [locale, textsToTranslate]);
+
   // Transform floors data to match the unitRows structure
   const unitRows = floors.map((floor: FloorData) => ({
     units: floor.units.map((unit) => ({
-      label: unit.name,
+      label: localizeDynamicText(unit.name),
       tone: unit.status,
       wide: false, // You might want to add a `wide` field to your unit schema if needed
     })),
@@ -102,11 +199,9 @@ export default function RealEstateProject() {
 
   // Transform floor names for the floor labels panel
  // Transform floor names for the floor labels panel - REVERSE THE ORDER to match the visual layout
-const floorLabels = [...floors.map((floor: FloorData) => floor.name)];
-
-const floorLabelsLocalized = isArabic
-  ? floorLabels.map((label) => t("floorLabelArabic", { label }))
-  : floorLabels;
+const floorLabelsLocalized = floors.map((floor: FloorData) =>
+  localizeDynamicText(floor.name)
+);
 
 const floorsPanel = (
   <div
@@ -114,8 +209,8 @@ const floorsPanel = (
     dir={isArabic ? "rtl" : "ltr"}
   >
     {/* Map in reverse order so first floor (1st) appears at bottom */}
-    {floorLabelsLocalized.slice().reverse().map((label) => (
-      <span key={label} className="leading-6">
+    {floorLabelsLocalized.slice().reverse().map((label, index) => (
+      <span key={`floor-label-${index}`} className="leading-6">
         {label}
       </span>
     ))}
@@ -192,7 +287,9 @@ const unitsPanel = (
   };
 
   const currentProjectName =
-    projects.find((p) => p._id === selectedProjectId)?.name || t("selectProject");
+    localizeDynamicText(
+      projects.find((p) => p._id === selectedProjectId)?.name
+    ) || t("selectProject");
 
   return (
     <main
@@ -376,7 +473,7 @@ const unitsPanel = (
                       : "dark:hover:bg-white/10 hover:bg-[#1F2937] hover:text-white dark:hover:text-white",
                   ].join(" ")}
                 >
-                  {project.name}
+                  {localizeDynamicText(project.name)}
                 </button>
               ))}
             </nav>
@@ -455,10 +552,14 @@ const unitsPanel = (
                     {models.map((model: ModelData) => (
                       <div key={model._id} className="space-y-2">
                         <div className="print-pill inline-flex px-3 py-1 text-base bg-amber-100/70 rounded-full text-[#1B1B1F] sf-pro">
-                          {model.name}
+                          {localizeDynamicText(model.name)}
                         </div>
-                        <div className="text-white/70">{model.area}</div>
-                        <div className="text-white/40">{model.face}</div>
+                        <div className="text-white/70">
+                          {localizeDynamicText(String(model.area ?? ""))}
+                        </div>
+                        <div className="text-white/40">
+                          {localizeDynamicText(model.face)}
+                        </div>
                       </div>
                     ))}
                   </div>
