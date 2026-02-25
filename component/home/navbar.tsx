@@ -10,25 +10,59 @@ import ThemeToggle from '@/component/ThemeToggle/ThemeToggle';
 import LanguageSwitcher from '@/component/i18n/LanguageSwitcher';
 import { useAuthStore } from '@/store/authStore';
 import api from '@/lib/api';
+
+const FALLBACK_PROFILE_IMAGE =
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIzMiIgZmlsbD0iI2UyZThmMCIvPjxjaXJjbGUgY3g9IjMyIiBjeT0iMjYiIHI9IjEyIiBmaWxsPSIjOTRhM2I4Ii8+PHBhdGggZD0iTTE2IDUyYzAtOC44NCA3LjE2LTE2IDE2LTE2czE2IDcuMTYgMTYgMTYiIGZpbGw9IiM5NGEzYjgiLz48L3N2Zz4=';
+
+function resolveProfileImageSrc(profileImage?: string | null) {
+  if (!profileImage) return FALLBACK_PROFILE_IMAGE;
+  const value = profileImage.trim();
+  if (!value) return FALLBACK_PROFILE_IMAGE;
+  if (value.startsWith('data:') || value.startsWith('blob:')) return value;
+  if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith('/')) return value;
+
+  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001').replace(/\/+$/, '');
+  return `${apiBaseUrl}/${value.replace(/^\/+/, '')}`;
+}
+
 export default function Navbar() {
   const t = useTranslations('navbar');
   const locale = useLocale();
   const isRtl = locale === 'ar';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [avatarSrc, setAvatarSrc] = useState(FALLBACK_PROFILE_IMAGE);
   const pathname = usePathname();
-  const router= useRouter()
-  let user = useAuthStore.getState().user;
-useEffect(()=>{
-   (async()=>{
-     const users= await api.post("/auth/refresh");
-    if(!users){
-      router.push("/auth/signin")
-    }
-    
-useAuthStore.getState().login(users.data.user, users.data.accessToken);
- user =users.data.user
-   })() 
-},[])
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const login = useAuthStore((state) => state.login);
+
+  useEffect(() => {
+    setAvatarSrc(resolveProfileImageSrc(user?.profileImage));
+  }, [user?.profileImage]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const users = await api.post('/auth/refresh');
+        if (!users?.data?.user) {
+          router.push('/auth/signin');
+          return;
+        }
+
+        login(users.data.user, users.data.accessToken);
+      } catch {
+        router.push('/auth/signin');
+      }
+    })();
+  }, [login, router]);
+
+  const handleAvatarError = () => {
+    setAvatarSrc(FALLBACK_PROFILE_IMAGE);
+  };
+
+  const avatarAlt = t('profileAlt', { name: user?.name ?? t('userFallback') });
+
   const isActive = (path: string) => {
     if (path === '/') {
       return pathname === '/';
@@ -124,13 +158,14 @@ useAuthStore.getState().login(users.data.user, users.data.accessToken);
             href="/company-profile"
           >
           <div className="h-10 w-10 rounded-full overflow-hidden ring-1 ring-gray-200/90 dark:ring-gray-600">
-              <img
-  src={user?.profileImage || "/profile.jpg"}
-  alt={t('profileAlt', {name: user?.name ?? t('userFallback')})}
-  width={40}
-  height={40}
-  className="h-full w-full object-cover rounded-full"
-/>
+            <img
+              src={avatarSrc}
+              alt={avatarAlt}
+              width={40}
+              height={40}
+              onError={handleAvatarError}
+              className="h-full w-full object-cover rounded-full"
+            />
             </div>
           </Link>
           </div>
@@ -141,12 +176,13 @@ useAuthStore.getState().login(users.data.user, users.data.accessToken);
           <div className={`flex md:hidden items-center gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
             {/* Mobile Profile Picture */}
             <div className="h-8 w-8 rounded-full overflow-hidden ring-1 ring-gray-200 dark:ring-gray-700">
-              <Image
-                src="/profile.jpg"
-                alt={t('profileImageAlt')}
+              <img
+                src={avatarSrc}
+                alt={avatarAlt}
                 width={32}
                 height={32}
-                className="h-full w-full object-cover"
+                onError={handleAvatarError}
+                className="h-full w-full object-cover rounded-full"
               />
             </div>
             

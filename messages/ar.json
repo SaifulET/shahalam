@@ -201,6 +201,8 @@
     "continue": "متابعة",
     "projectName": "اسم المشروع",
     "edit": "تعديل",
+    "exportImage": "تصدير صورة",
+    "exportingImage": "جارٍ التصدير...",
     "exportPdf": "تصدير PDF",
     "buildingBackgroundAlt": "خلفية المبنى",
     "logoAlt": "شعار WSL",

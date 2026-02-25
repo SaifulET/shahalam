@@ -201,6 +201,8 @@
     "continue": "Continue",
     "projectName": "Project Name",
     "edit": "Edit",
+    "exportImage": "Export Image",
+    "exportingImage": "Exporting...",
     "exportPdf": "Export PDF",
     "buildingBackgroundAlt": "Building background",
     "logoAlt": "WSL logo",

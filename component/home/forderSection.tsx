@@ -1,9 +1,8 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { Plus } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useAuthStore } from '@/store/authStore';
 import { useFolderStore, Folder } from '@/store/folderStore';
 import { HugeiconsIcon } from '@hugeicons/react';
@@ -13,11 +12,41 @@ interface FoldersComponentProps {
   onProjectDropped: (folderName: string) => void;
 }
 
+const ARABIC_DIGITS = ['\u0660', '\u0661', '\u0662', '\u0663', '\u0664', '\u0665', '\u0666', '\u0667', '\u0668', '\u0669'];
+
+function fallbackArabicText(value: string) {
+  return value
+    .replace(/\d/g, (digit) => ARABIC_DIGITS[Number(digit)])
+    .replace(/,/g, '\u060C')
+    .replace(/;/g, '\u061B')
+    .replace(/\?/g, '\u061F');
+}
+
 const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped }) => {
   const t = useTranslations('home.folders');
+  const locale = useLocale();
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const { folders, fetchFolders, loading, error, addProjectToFolder ,deleteRecent} = useFolderStore();
+  const [translatedDynamicText, setTranslatedDynamicText] = useState<Record<string, string>>({});
+
+  const textsToTranslate = useMemo(() => {
+    const values = folders.map((folder) => folder.name);
+    return Array.from(
+      new Set(values.map((value) => value?.trim()).filter(Boolean))
+    ) as string[];
+  }, [folders]);
+
+  const localizeDynamicText = (value?: string | null) => {
+    if (!value) return '';
+    const normalizedValue = value.trim();
+    const translatedValue = translatedDynamicText[normalizedValue];
+    if (translatedValue) return translatedValue;
+
+    return locale === 'ar'
+      ? fallbackArabicText(normalizedValue)
+      : normalizedValue;
+  };
 
   // Fetch folders on mount
   useEffect(() => {
@@ -26,11 +55,57 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
     }
   }, [user?.id, fetchFolders]);
 
+  useEffect(() => {
+    let active = true;
+
+    if (textsToTranslate.length === 0) {
+      setTranslatedDynamicText({});
+      return;
+    }
+
+    const fetchDynamicTranslations = async () => {
+      try {
+        const response = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            target: locale,
+            source: 'auto',
+            texts: textsToTranslate,
+          }),
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch folder translations');
+        }
+
+        const data = (await response.json()) as {
+          translations?: Record<string, string>;
+        };
+
+        if (active) {
+          setTranslatedDynamicText(data.translations ?? {});
+        }
+      } catch {
+        if (active) {
+          setTranslatedDynamicText({});
+        }
+      }
+    };
+
+    fetchDynamicTranslations();
+
+    return () => {
+      active = false;
+    };
+  }, [locale, textsToTranslate]);
+
   const handlePlus = () => {
     router.push('/create-folder');
   };
 
-  const handleDragOver = (e: React.DragEvent, folderName: string) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.currentTarget.classList.add('bg-blue-50', 'border-blue-300');
   };
@@ -64,7 +139,7 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
   };
 
   return (
-    <div className="w-full bg-white py-8 lg:py-[54px] dark:bg-black">
+    <div dir="ltr" className="w-full bg-white py-8 lg:py-[54px] dark:bg-black">
       <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 md:px-8 lg:px-12 xl:px-20">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 lg:mb-8">
@@ -90,7 +165,7 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
             <div
               key={folder._id}
               className="bg-[#F9FAFB] dark:bg-[#1A1A1A] border border-[#E5E7EB] rounded-lg p-4 lg:p-5 flex flex-col justify-start cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-              onDragOver={(e) => handleDragOver(e, folder.name)}
+              onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, folder._id)}
             >
@@ -108,7 +183,7 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
 
               {/* {console.log(folder.color)} */}
               <h3 className="text-sm text-[#1F2937] dark:text-[#FFFFFF] lg:text-base font-medium mb-1 mt-[24px]">
-                {folder.name}
+                {localizeDynamicText(folder.name)}
               </h3>
               <p className="text-xs lg:text-sm text-gray-500">
                 {t('projectsCount', { count: folder.projects.length })}

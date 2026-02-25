@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { Playfair_Display, Poppins } from "next/font/google";
-import { Download } from "lucide-react";
+import { Download, ImageDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import domtoimage from "dom-to-image-more";
 import { useAuthStore } from "@/store/authStore";
 import { useProjectStore } from "@/store/projectStore";
 
@@ -71,6 +72,7 @@ export default function RealEstateProject() {
   const t = useTranslations("floorPlanning");
   const locale = useLocale();
   const [showAddPopup, setShowAddPopup] = useState(false);
+  const [isExportingImage, setIsExportingImage] = useState(false);
   const [translatedDynamicText, setTranslatedDynamicText] = useState<
     Record<string, string>
   >({});
@@ -79,6 +81,7 @@ export default function RealEstateProject() {
   >(null);
   const isArabic = locale === "ar";
   const exportRef = useRef<HTMLDivElement | null>(null);
+  const exportContentRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
   const user = useAuthStore().user;
@@ -286,6 +289,41 @@ const unitsPanel = (
     window.print();
   };
 
+  const handleExportImage = async () => {
+    const exportNode = exportContentRef.current;
+    if (!exportNode || isExportingImage) return;
+
+    try {
+      setIsExportingImage(true);
+
+      const imageDataUrl = await domtoimage.toPng(exportNode, {
+        cacheBust: true,
+        width: exportNode.scrollWidth,
+        height: exportNode.scrollHeight,
+        copyDefaultStyles: false,
+        style: {
+          border: "0",
+          outline: "0",
+        },
+      });
+
+      const link = document.createElement("a");
+      const baseName =
+        currentProjectName
+          ?.trim()
+          .replace(/[^\w-]+/g, "_")
+          .replace(/^_+|_+$/g, "") || "project-preview";
+
+      link.href = imageDataUrl;
+      link.download = `${baseName}.png`;
+      link.click();
+    } catch (error) {
+      console.error("Failed to export image", error);
+    } finally {
+      setIsExportingImage(false);
+    }
+  };
+
   const currentProjectName =
     localizeDynamicText(
       projects.find((p) => p._id === selectedProjectId)?.name
@@ -482,6 +520,14 @@ const unitsPanel = (
           <section className="flex min-w-0 flex-col items-center justify-start px-1 sm:px-2 lg:px-4">
             <div className="mb-4 flex w-full flex-wrap items-center justify-between gap-2 sm:mb-6 sm:justify-end">
               <button
+                onClick={handleExportImage}
+                disabled={isExportingImage}
+                className="flex rounded-xl bg-[#16A34A] px-3 py-2 font-semibold text-[#FFFFFF] disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                <ImageDown className="h-5 w-5 pr-1" />
+                {isExportingImage ? t("exportingImage") : t("exportImage")}
+              </button>
+              <button
                 onClick={handleEdit}
                 className="rounded-xl border border-[#D1D5DB] dark:border-white/10 bg-white/5 px-3 py-1 hover:bg-white/10 text-[#374151] text-md dark:text-[#D3D7DE]"
               >
@@ -507,7 +553,10 @@ const unitsPanel = (
               data-export="true"
               data-lang={locale}
             >
-              <div className="relative min-w-[680px] sm:min-w-[760px] lg:min-w-0">
+              <div
+                className="relative min-w-[680px] sm:min-w-[760px] lg:min-w-0"
+                ref={exportContentRef}
+              >
               <div className="print-bg absolute inset-0 opacity-40">
                 <Image
                   src="/bg.jpg"

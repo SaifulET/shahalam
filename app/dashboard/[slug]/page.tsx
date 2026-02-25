@@ -6,14 +6,26 @@ import { Add01FreeIcons } from '@hugeicons/core-free-icons';
 import { ArrowDownToDot, Edit, Trash2, Pencil, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
-import { useState, useEffect } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import { useState, useEffect, useMemo } from 'react';
 import { useApiStore, Project, Model, Floor, Unit, UnitStatus } from '@/store/editProjectStore';
 import { useAuthStore } from '@/store/authStore';
  // Assuming you have this
 
+const ARABIC_DIGITS = ['\u0660', '\u0661', '\u0662', '\u0663', '\u0664', '\u0665', '\u0666', '\u0667', '\u0668', '\u0669'];
+
+function fallbackArabicText(value: string) {
+  return value
+    .replace(/\d/g, (digit) => ARABIC_DIGITS[Number(digit)])
+    .replace(/,/g, '\u060C')
+    .replace(/;/g, '\u061B')
+    .replace(/\?/g, '\u061F');
+}
+
 export default function Home() {
   const t = useTranslations('dashboardEditor');
+  const locale = useLocale();
+  const isArabic = locale === 'ar';
   const router = useRouter();
   const params = useParams();
   const projectId = params?.slug as string; // Get project ID from URL slug
@@ -72,6 +84,35 @@ export default function Home() {
   const [tempModelArea, setTempModelArea] = useState('');
   const [tempModelFace, setTempModelFace] = useState('');
   const [saving, setSaving] = useState(false);
+  const [translatedDynamicText, setTranslatedDynamicText] = useState<Record<string, string>>({});
+
+  const textsToTranslate = useMemo(() => {
+    const values: string[] = [
+      ...projects.map((project) => project.name),
+      ...floors.map((floor) => floor.name),
+      ...floors.flatMap((floor) => floor.units.map((unit) => unit.name)),
+      ...models.map((model) => model.name),
+      ...models.map((model) => String(model.area ?? '')),
+      ...models.map((model) => model.face).filter(Boolean) as string[],
+    ];
+
+    return Array.from(
+      new Set(values.map((value) => value?.trim()).filter(Boolean))
+    ) as string[];
+  }, [projects, floors, models]);
+
+  const localizeDynamicText = (value?: string | number | null) => {
+    if (value === null || value === undefined) return '';
+    const normalizedValue = String(value).trim();
+    if (!normalizedValue) return '';
+
+    const translatedValue = translatedDynamicText[normalizedValue];
+    if (translatedValue) return translatedValue;
+
+    return locale === 'ar'
+      ? fallbackArabicText(normalizedValue)
+      : normalizedValue;
+  };
 
   const saveEditedFloor = async () => {
   if (!editingFloorData || !tempFloorName.trim() || !projectId) return;
@@ -168,8 +209,51 @@ export default function Home() {
     }
   }, [floors, selectedFloorId]);
 
-  // Get current project details
-  const selectedProject = projects.find(p => p._id === projectId);
+  useEffect(() => {
+    let active = true;
+
+    if (textsToTranslate.length === 0) {
+      setTranslatedDynamicText({});
+      return;
+    }
+
+    const fetchDynamicTranslations = async () => {
+      try {
+        const response = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            target: locale,
+            source: 'auto',
+            texts: textsToTranslate,
+          }),
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch dynamic translations');
+        }
+
+        const data = (await response.json()) as {
+          translations?: Record<string, string>;
+        };
+
+        if (active) {
+          setTranslatedDynamicText(data.translations ?? {});
+        }
+      } catch {
+        if (active) {
+          setTranslatedDynamicText({});
+        }
+      }
+    };
+
+    fetchDynamicTranslations();
+
+    return () => {
+      active = false;
+    };
+  }, [locale, textsToTranslate]);
   
   // Get selected floor and its units
   const selectedFloor = floors.find(f => f._id === selectedFloorId);
@@ -352,7 +436,7 @@ export default function Home() {
   }
 
   return (
-    <div>
+    <div dir="ltr" className="pt-14 sm:pt-16">
       {/* <Navbar /> */}
       <div className="fixed right-3 top-3 z-[100]">
         <ThemeToggle />
@@ -360,7 +444,7 @@ export default function Home() {
       
       <div className="flex min-h-screen flex-col xl:flex-row">
         {/* Sidebar */}
-        <div className="w-full border-b border-gray-200 bg-white dark:bg-[#28272A] xl:w-[420px] 2xl:w-[520px] xl:border-b-0 xl:border-r flex flex-col">
+        <div className={`w-full border-b border-gray-200 bg-white dark:bg-[#28272A] xl:w-[420px] 2xl:w-[520px] xl:border-b-0 xl:border-r flex flex-col ${isArabic ? 'text-right' : 'text-left'}`}>
           {/* Property Structure */}
           <div className="border-b border-gray-200 p-4 sm:p-6 xl:p-8">
             <h2 className="font-inter font-semibold text-base leading-6 tracking-[-0.5px] dark:text-[#FFFFFF] text-gray-900 mb-4">{t('propertyStructure')}</h2>
@@ -369,7 +453,9 @@ export default function Home() {
                 <button
                   key={project._id}
                   onClick={() => router.push(`/dashboard/${project._id}`)}
-                  className={`w-full dark:text-[#FFFFFF] text-[#000000] text-left px-3 py-2.5 rounded text-sm flex items-center gap-2 transition-colors ${
+                  className={`w-full dark:text-[#FFFFFF] text-[#000000] px-3 py-2.5 rounded text-sm flex items-center gap-2 transition-colors ${
+                    isArabic ? 'text-right flex-row-reverse' : 'text-left'
+                  } ${
                     project._id === projectId
                       ? 'dark:bg-[#0088FF33] bg-blue-100 text-gray-900'
                       : 'text-gray-700 dark:hover:bg-gray-600 hover:bg-gray-50'
@@ -378,7 +464,7 @@ export default function Home() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
-                  {project.name}
+                  {localizeDynamicText(project.name)}
                 </button>
               ))}
             </div>
@@ -400,10 +486,10 @@ export default function Home() {
               {models.map((model) => (
                 <div key={model._id} className="flex flex-col gap-2 rounded bg-gray-50 p-2 dark:bg-gray-700 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
-                    <div className="font-medium text-gray-900 dark:text-white">{model.name}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300">{model.area} {t('sqft')}</div>
+                    <div className="font-medium text-gray-900 dark:text-white">{localizeDynamicText(model.name)}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">{localizeDynamicText(model.area ?? '')} {t('sqft')}</div>
                     {model.face && (
-                      <div className="text-xs text-gray-500 dark:text-gray-400">{t('faceValue', { face: model.face })}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{t('faceValue', { face: localizeDynamicText(model.face) })}</div>
                     )}
                   </div>
                   <div className="flex items-center gap-1 self-end sm:self-auto">
@@ -438,7 +524,7 @@ export default function Home() {
               {unitsInSelectedFloor.length > 0 ? (
                 unitsInSelectedFloor.map((unit) => (
                   <div key={unit._id} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-                    <span className="w-full text-sm text-gray-700 dark:text-[#FFFFFF] sm:w-24">{t('unitWithName', { name: unit.name })}</span>
+                    <span className="w-full text-sm text-gray-700 dark:text-[#FFFFFF] sm:w-24">{t('unitWithName', { name: localizeDynamicText(unit.name) })}</span>
                     <select
                       value={unit.status}
                       onChange={(e) => handleUpdateUnitStatus(unit.floorId, unit._id, e.target.value as UnitStatus)}
@@ -499,7 +585,7 @@ export default function Home() {
                 >
                   {/* Floor Label */}
                   <div className="w-full flex-shrink-0 text-base font-medium text-gray-900 dark:text-[#FFFFFF] lg:w-24">
-                    {floor.name}
+                    {localizeDynamicText(floor.name)}
                   </div>
                   
                   {/* Units */}
@@ -523,7 +609,7 @@ export default function Home() {
                         
                         {/* Unit Box */}
                         <div className={`${getStatusColor(unit.status)} text-white px-5 py-2.5 rounded text-sm font-medium`}>
-                          {unit.name}
+                          {localizeDynamicText(unit.name)}
                         </div>
                       </div>
                     ))}

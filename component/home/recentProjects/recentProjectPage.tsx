@@ -21,7 +21,7 @@ interface RecentProjectsProps {
 export default function RecentProjects({ projects, onProjectMoved }: RecentProjectsProps) {
   const t = useTranslations('home.recentProjects');
   return (
-    <div className="mx-auto w-full max-w-screen-2xl px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-20">
+    <div dir="ltr" className="mx-auto w-full max-w-screen-2xl px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-20">
       <h2 className="font-inter font-semibold text-xl leading-7 tracking-[-0.5px] mb-6 dark:text-[#F9FAFB] text-[#1F2937]" >
         {t('title')}
       </h2>
