@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Plus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/store/authStore';
 import { useFolderStore, Folder } from '@/store/folderStore';
 import { HugeiconsIcon } from '@hugeicons/react';
@@ -13,6 +14,7 @@ interface FoldersComponentProps {
 }
 
 const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped }) => {
+  const t = useTranslations('home.folders');
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const { folders, fetchFolders, loading, error, addProjectToFolder ,deleteRecent} = useFolderStore();
@@ -63,27 +65,27 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
 
   return (
     <div className="w-full bg-white py-8 lg:py-[54px] dark:bg-black">
-      <div className="px-4 sm:px-6 md:px-8 lg:px-[79px]">
+      <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 md:px-8 lg:px-12 xl:px-20">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 lg:mb-8">
           <h2 className="font-inter font-semibold text-xl leading-7 tracking-[-0.5px] dark:text-[#F9FAFB] text-[#1F2937]">
-            Folders
+            {t('title')}
           </h2>
           <button
             onClick={handlePlus}
             className="w-10 h-10 rounded-full bg-[#0088FF] flex items-center justify-center hover:bg-[#0077DD] transition-colors"
-            aria-label="Add new folder"
+            aria-label={t('addNewFolder')}
           >
             <Plus className="w-5 h-5 text-white" />
           </button>
         </div>
 
         {/* Error / Loading */}
-        {loading && <p className="text-gray-500 mb-3">Loading folders...</p>}
+        {loading && <p className="text-gray-500 mb-3">{t('loading')}</p>}
         {error && <p className="text-red-500 mb-3">{error}</p>}
 
         {/* Folders Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-[37px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4 lg:gap-6 xl:gap-8">
           {folders.map((folder: Folder) => (
             <div
               key={folder._id}
@@ -109,7 +111,7 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
                 {folder.name}
               </h3>
               <p className="text-xs lg:text-sm text-gray-500">
-                {folder.projects.length} projects
+                {t('projectsCount', { count: folder.projects.length })}
               </p>
             </div>
           ))}
@@ -117,7 +119,7 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
           {
             folders.length === 0 && !loading && (
               <p className="text-gray-500 col-span-full text-center mt-8">
-                No folders found. 
+                {t('empty')}
               </p>
             )
           }

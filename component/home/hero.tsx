@@ -7,7 +7,7 @@ export default function HeroSection() {
       <div className="absolute inset-0">
         <Image
           src="/hero.jpg"
-          alt="Modern living room interior"
+          alt=""
           fill
           priority
           className="object-cover object-center"

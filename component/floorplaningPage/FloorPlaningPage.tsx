@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Playfair_Display, Poppins } from "next/font/google";
 import { Download } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useAuthStore } from "@/store/authStore";
 import { useProjectStore } from "@/store/projectStore";
 
@@ -46,12 +47,13 @@ interface ModelData {
 }
 
 export default function RealEstateProject() {
-  const [lang, setLang] = useState<"en" | "ar">("en");
+  const t = useTranslations("floorPlanning");
+  const locale = useLocale();
   const [showAddPopup, setShowAddPopup] = useState(false);
   const [selectedUnitType, setSelectedUnitType] = useState<
     "apartment" | "annex" | null
   >(null);
-  const isArabic = lang === "ar";
+  const isArabic = locale === "ar";
   const exportRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
@@ -103,7 +105,7 @@ export default function RealEstateProject() {
 const floorLabels = [...floors.map((floor: FloorData) => floor.name)];
 
 const floorLabelsLocalized = isArabic
-  ? floorLabels.map((label) => `الدور ${label}`)
+  ? floorLabels.map((label) => t("floorLabelArabic", { label }))
   : floorLabels;
 
 const floorsPanel = (
@@ -189,12 +191,13 @@ const unitsPanel = (
     window.print();
   };
 
-  const currentProjectName = projects.find(p => p._id === selectedProjectId)?.name || "Select a project";
+  const currentProjectName =
+    projects.find((p) => p._id === selectedProjectId)?.name || t("selectProject");
 
   return (
     <main
       className={`${body.className} min-h-screen bg-white dark:bg-[#0b1110] text-white`}
-      lang={lang}
+      lang={locale}
     >
       <style jsx global>{`
         @media print {
@@ -289,11 +292,11 @@ const unitsPanel = (
             <div className="w-full max-w-md px-6 ">
               {/* Title */}
               <h1 className="text-2xl font-semibold text-center mb-8 text-gray-900 dark:text-white">
-                Unit Type
+                {t("unitType")}
               </h1>
 
               {/* Radio Options */}
-              <div className="flex gap-6 mb-8 justify-center">
+              <div className="mb-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-6">
                 {/* Apartment Option */}
                 <label className="flex items-center gap-3 cursor-pointer">
                   <div className="relative">
@@ -308,7 +311,7 @@ const unitsPanel = (
                     <div className="w-6 h-6 rounded-full border-2 border-gray-400 dark:border-gray-500 peer-checked:border-blue-500 peer-checked:border-[6px] transition-all"></div>
                   </div>
                   <span className="text-lg text-gray-900 dark:text-white">
-                    Apartment
+                    {t("apartment")}
                   </span>
                 </label>
 
@@ -326,19 +329,19 @@ const unitsPanel = (
                     <div className="w-6 h-6 rounded-full border-2 border-gray-400 dark:border-gray-500 peer-checked:border-blue-500 peer-checked:border-[6px] transition-all"></div>
                   </div>
                   <span className="text-lg text-gray-900 dark:text-white">
-                    Annex
+                    {t("annex")}
                   </span>
                 </label>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
                 {/* Cancel Button */}
                 <button
                   onClick={handleCancel}
                   className="flex-1 py-3 rounded-lg border border-gray-300 dark:border-white bg-white dark:bg-black text-gray-900 dark:text-white font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
 
                 {/* Continue Button */}
@@ -347,7 +350,7 @@ const unitsPanel = (
                   disabled={!selectedUnitType}
                   className="flex-1 py-3 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Continue
+                  {t("continue")}
                 </button>
               </div>
             </div>
@@ -356,10 +359,10 @@ const unitsPanel = (
       )}
 
       <div className="grid min-h-screen grid-rows-[auto_1fr]">
-        <div className="grid grid-cols-[240px_1fr] p-6" dir="ltr">
-          <aside className="border-r border-white/10 dark:bg-[#0f1513] bg-[#E5E7EB] px-4 py-6 rounded-2xl">
+        <div className="grid grid-cols-1 gap-4 p-3 sm:p-4 lg:grid-cols-[240px_1fr] lg:p-6" dir="ltr">
+          <aside className="rounded-2xl border border-white/10 bg-[#E5E7EB] px-4 py-4 dark:bg-[#0f1513] lg:border-r lg:py-6">
             <div className="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-[#111827] dark:text-white/40">
-              Project Name
+              {t("projectName")}
             </div>
             <nav className="space-y-2 text-sm">
               {projects.map((project) => (
@@ -379,13 +382,13 @@ const unitsPanel = (
             </nav>
           </aside>
 
-          <section className="flex flex-col items-center justify-center px-6">
-            <div className="mb-6 flex w-full flex-wrap items-center justify-end gap-2">
+          <section className="flex min-w-0 flex-col items-center justify-start px-1 sm:px-2 lg:px-4">
+            <div className="mb-4 flex w-full flex-wrap items-center justify-between gap-2 sm:mb-6 sm:justify-end">
               <button
                 onClick={handleEdit}
                 className="rounded-xl border border-[#D1D5DB] dark:border-white/10 bg-white/5 px-3 py-1 hover:bg-white/10 text-[#374151] text-md dark:text-[#D3D7DE]"
               >
-                ✎ Edit
+                {t("edit")}
               </button>
               <button
                 onClick={handleAdd}
@@ -395,40 +398,41 @@ const unitsPanel = (
               </button>
               <button
                 onClick={handleExportPdf}
-                className="rounded-xl bg-[#0088FF] px-3 py-2 font-semibold text-[#FFFFFF] flex"
+                className="flex rounded-xl bg-[#0088FF] px-3 py-2 font-semibold text-[#FFFFFF]"
               >
-                <Download className="w-6 h-6 pr-1" /> Export PDF
+                <Download className="w-6 h-6 pr-1" /> {t("exportPdf")}
               </button>
             </div>
             <div
-              className="relative w-full overflow-hidden rounded-md border border-white/10 "
+              className="relative w-full overflow-x-auto overflow-y-hidden rounded-md border border-white/10"
               dir="ltr"
               ref={exportRef}
               data-export="true"
-              data-lang={lang}
+              data-lang={locale}
             >
+              <div className="relative min-w-[680px] sm:min-w-[760px] lg:min-w-0">
               <div className="print-bg absolute inset-0 opacity-40">
                 <Image
                   src="/bg.jpg"
-                  alt="Building background"
+                  alt={t("buildingBackgroundAlt")}
                   fill
                   className="object-cover"
                 />
               </div>
               <div className="print-white-overlay absolute inset-0 bg-black/15" />
 
-              <div className="print-scale relative flex min-h-[720px] flex-col px-8 py-10 lg:px-16">
+              <div className="print-scale relative flex min-h-[560px] sm:min-h-[640px] lg:min-h-[720px] flex-col px-4 py-6 sm:px-6 sm:py-8 lg:px-16 lg:py-10">
                 <header className="flex flex-col items-center text-center">
-                  <div className="mb-4 flex h-40 w-40 items-center justify-center rounded-[32px]">
+                  <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-[24px] sm:mb-4 sm:h-32 sm:w-32 lg:h-40 lg:w-40 lg:rounded-[32px]">
                     <Image
                       src="/logo.svg"
-                      alt="WSL logo"
+                      alt={t("logoAlt")}
                       width={160}
                       height={160}
-                      className="h-[160px] w-[160px]"
+                      className="h-full w-full"
                     />
                   </div>
-                  <h1 className="text-2xl font-bold text-white/90">
+                  <h1 className="text-lg font-bold text-white/90 sm:text-xl lg:text-2xl">
                     {currentProjectName}
                   </h1>
                 </header>
@@ -441,9 +445,9 @@ const unitsPanel = (
                 </div>
 
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-[#F2DFA7]">
-                  <LegendPill colorClass="bg-[#006400]" label="Available" />
-                  <LegendPill colorClass="bg-[#D5B60A]" label="Reserved" />
-                  <LegendPill colorClass="bg-[#6F0000]" label="Sold" />
+                  <LegendPill colorClass="bg-[#006400]" label={t("status.available")} />
+                  <LegendPill colorClass="bg-[#D5B60A]" label={t("status.reserved")} />
+                  <LegendPill colorClass="bg-[#6F0000]" label={t("status.sold")} />
                 </div>
 
                 <div className="print-models mt-8 border-t border-white/10 pt-6">
@@ -462,12 +466,12 @@ const unitsPanel = (
 
                
 
-                <div className="mt-[70px] flex flex-wrap items-center justify-between gap-4 text-xs text-white sf-pro">
-                  <div className="flex items-center gap-2  font-bold text-[32px] leading-none tracking-normal text-center">
+                <div className="mt-8 flex flex-wrap items-center justify-between gap-4 text-xs text-white sf-pro sm:mt-12 lg:mt-[70px]">
+                  <div className="flex items-center gap-2 text-center text-lg font-bold leading-none tracking-normal sm:text-2xl lg:text-[32px]">
                     <div>
                       <Image
                         src="/instagram.svg"
-                        alt="instagram"
+                        alt=""
                         width={60}
                         height={60}
                       />
@@ -475,7 +479,7 @@ const unitsPanel = (
                     <div>
                       <Image
                         src="/alart.svg"
-                        alt="instagram"
+                        alt=""
                         width={60}
                         height={60}
                       />
@@ -483,6 +487,7 @@ const unitsPanel = (
                     wsl.realestate
                   </div>
                 </div>
+              </div>
               </div>
             </div>
           </section>

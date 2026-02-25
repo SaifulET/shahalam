@@ -4,9 +4,11 @@ import { useState, useRef, KeyboardEvent, ClipboardEvent, FormEvent } from 'reac
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import api from '@/lib/api';
 import { useForgotPasswordStore } from "@/store/forgotPasswordStore";
 export default function VerifyOTPPage() {
+  const t = useTranslations('auth.otp');
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -67,10 +69,10 @@ export default function VerifyOTPPage() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      alert('Verification code resent to your email!');
+      alert(t('resendSuccess'));
     } catch (error) {
       console.error('Failed to resend code:', error);
-      alert('Failed to resend code. Please try again.');
+      alert(t('resendError'));
     }
   };
 const router= useRouter()
@@ -80,7 +82,7 @@ const router= useRouter()
     const otpValue = otp.join('');
     
     if (otpValue.length !== 4) {
-      alert('Please enter the complete 4-digit code');
+      alert(t('enterCompleteCode'));
       return;
     }
 
@@ -91,7 +93,7 @@ const router= useRouter()
     router.push("/auth/set-new-password")
     } catch (error) {
       setIsSubmitting(false);
-      alert('Invalid OTP. Please try again.');
+      alert(t('invalidOtp'));
     }
 
    
@@ -104,7 +106,7 @@ const router= useRouter()
       <div className="absolute inset-0 z-0">
         <Image
           src="/authbg.jpg" // Replace with your image path
-          alt="Background"
+          alt={t('backgroundAlt')}
           fill
           className="object-cover"
           priority
@@ -112,14 +114,14 @@ const router= useRouter()
       </div>
 
       {/* Verify OTP Card */}
-      <div className="relative z-10 w-[720px]">
-        <div className="bg-[#89C8FF] rounded-3xl p-[71px]">
+      <div className="relative z-10 w-full max-w-[720px]">
+        <div className="bg-[#89C8FF] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 lg:p-[71px]">
           {/* Logo */}
           <div className="flex justify-center mb-12">
-            <div className="w-32 h-32 sm:w-40 sm:h-40 relative">
+            <div className="relative h-24 w-24 sm:h-32 sm:w-32 md:h-40 md:w-40">
               <Image
                 src="/logo.svg" // Replace with your logo path
-                alt="حرم Real Estate Logo"
+                alt={t('logoAlt')}
                 fill
                 className="object-contain"
               />
@@ -128,18 +130,18 @@ const router= useRouter()
 
           {/* Title */}
           <h1 className="text-white text-2xl sm:text-3xl font-semibold text-center mb-4">
-            Verify OTP
+            {t('title')}
           </h1>
 
           {/* Description */}
           <p className="text-white text-center text-sm sm:text-base mb-8 leading-relaxed">
-            Please check your email. We have sent a code to contact @gmail.com
+            {t('description', { email: email || t('emailFallback') })}
           </p>
 
           {/* OTP Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* OTP Input Boxes */}
-            <div className="flex justify-center gap-3 sm:gap-4">
+            <div className="flex justify-center gap-2 sm:gap-3 md:gap-4">
               {otp.map((digit, index) => (
                 <input
                   key={index}
@@ -153,21 +155,21 @@ const router= useRouter()
                   onChange={(e) => handleChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
-                  className="w-16 h-16 sm:w-20 sm:h-20 text-center text-2xl sm:text-3xl font-bold bg-white text-[#0088FF] rounded-xl border-2 border-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all"
+                  className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 text-center text-xl sm:text-2xl md:text-3xl font-bold bg-white text-[#0088FF] rounded-xl border-2 border-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all"
                   placeholder="-"
                 />
               ))}
             </div>
 
             {/* Didn't receive code & Resend */}
-            <div className="flex items-center justify-between text-sm sm:text-base">
-              <span className="text-white">Didnt receive code?</span>
+            <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:text-base">
+              <span className="text-white">{t('didNotReceiveCode')}</span>
               <button
                 type="button"
                 onClick={handleResend}
                 className="text-[#F2DFA7] hover:underline transition-all font-medium"
               >
-                Resend
+                {t('resend')}
               </button>
             </div>
 
@@ -177,7 +179,7 @@ const router= useRouter()
               disabled={isSubmitting}
               className="w-full bg-[#F2DFA7] text-[#0088FF] font-semibold py-4 rounded-xl hover:bg-[#e8d399] active:scale-[0.98] transition-all shadow-lg text-base sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Verifying...' : 'Send Code'}
+              {isSubmitting ? t('verifying') : t('sendCode')}
             </button>
 
             {/* Back to Login Link */}
@@ -200,7 +202,7 @@ const router= useRouter()
                     d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
                   />
                 </svg>
-                Back to Login
+                {t('backToLogin')}
               </Link>
             </div>
           </form>

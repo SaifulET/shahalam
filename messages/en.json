@@ -1,0 +1,275 @@
+{
+  "languageSwitcher": {
+    "label": "Language",
+    "english": "English",
+    "arabic": "Arabic"
+  },
+  "themeToggle": {
+    "dark": "Dark",
+    "light": "Light"
+  },
+  "navbar": {
+    "logoAlt": "Logo",
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "profileAlt": "{name}'s profile",
+    "userFallback": "User",
+    "profileImageAlt": "Profile",
+    "openMainMenu": "Open main menu"
+  },
+  "home": {
+    "folders": {
+      "title": "Folders",
+      "addNewFolder": "Add new folder",
+      "loading": "Loading folders...",
+      "projectsCount": "{count} projects",
+      "empty": "No folders found."
+    },
+    "recentProjects": {
+      "title": "Recent Projects",
+      "loading": "Loading recent projects...",
+      "empty": "No recent projects found.",
+      "dragging": "Dragging...",
+      "statusActive": "Active",
+      "statusInactive": "Inactive"
+    }
+  },
+  "createFolder": {
+    "title": "Create New Folder",
+    "folderName": "Folder Name",
+    "folderNamePlaceholder": "e.g. Residential Projects",
+    "description": "Description",
+    "optional": "Optional",
+    "descriptionPlaceholder": "Add a description for this folder...",
+    "descriptionHint": "Help your team understand what this folder is for",
+    "folderAppearance": "Folder Appearance",
+    "selectColorAria": "Select color {color}",
+    "previewDefaultFolderName": "Residential Projects",
+    "previewItems": "0 Items",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "createFolder": "Create Folder"
+  },
+  "addModelModal": {
+    "allFieldsRequired": "All fields are required",
+    "title": "Add Model",
+    "cancel": "Cancel",
+    "saveModel": "Save Model",
+    "modelInformation": "Model Information",
+    "modelName": "Model Name",
+    "modelNamePlaceholder": "Enter model name",
+    "totalArea": "Total Area",
+    "totalAreaPlaceholder": "Enter total area",
+    "squareMeters": "sq m",
+    "face": "Face",
+    "facePlaceholder": "Enter face direction"
+  },
+  "addUnitForm": {
+    "title": "Unit Type",
+    "cancel": "Cancel",
+    "saveProperty": "Save Property",
+    "saveChanges": "Save Changes",
+    "propertyInformation": "Property Information",
+    "propertyName": "Property Name",
+    "propertyNamePlaceholder": "Enter property name",
+    "location": "Location",
+    "locationPlaceholder": "City, Area",
+    "address": "Address",
+    "addressPlaceholder": "Enter full address",
+    "addModel": "Add Model",
+    "models": "Models",
+    "modelsAddedCount": "{count} models added",
+    "removeModel": "Remove model",
+    "areaLabel": "Area:",
+    "squareMeters": "sq m",
+    "faceLabel": "Face:",
+    "floors": "Floors",
+    "addFloor": "Add Floor",
+    "noFloors": "No floors added yet. Click Add Floor to get started.",
+    "removeFloor": "Remove floor",
+    "unitPlaceholder": "Unit {number}",
+    "removeUnit": "Remove unit",
+    "addUnit": "Add Unit",
+    "coverImage": "Cover Image",
+    "coverPreviewAlt": "Cover preview",
+    "removeImage": "Remove image",
+    "uploadPropertyImage": "Upload property image",
+    "uploadHint": "Drag and drop your file here, or click to browse",
+    "chooseFile": "Choose File",
+    "fileTypeHint": "(PNG, JPG up to 10MB)",
+    "defaultFloorName": "Floor {number}",
+    "unitModal": {
+      "title": "Name of your Unit",
+      "placeholder": "Enter unit name"
+    },
+    "alerts": {
+      "enterUnitName": "Please enter a unit name",
+      "duplicateUnit": "Unit name \"{name}\" already exists on this floor. Unit names must be unique per floor.",
+      "confirmRemoveModel": "Are you sure you want to remove this model?",
+      "invalidImageFile": "Please select a valid image file (PNG or JPG)",
+      "maxFileSize": "File size must be less than 10MB",
+      "fillPropertyNameAndLocation": "Please fill property name and location"
+    }
+  },
+  "companyProfile": {
+    "title": "Company Profile",
+    "loading": "Loading...",
+    "notProvided": "Not provided",
+    "locationNotSpecified": "Location not specified",
+    "companyNameNotSet": "Company Name Not Set",
+    "noDescription": "No description provided.",
+    "primaryContact": "Primary Contact",
+    "emailNotProvided": "Email not provided",
+    "businessEmail": "Business Email",
+    "postal": "Postal: {postalCode}",
+    "location": "Location",
+    "website": "Website",
+    "aboutCompany": "About Company",
+    "memberSince": "Member since: {date}",
+    "employees": "Employees",
+    "activeProjects": "Active Projects"
+  },
+  "auth": {
+    "signIn": {
+      "genericError": "An error occurred",
+      "backgroundAlt": "Background",
+      "logoAlt": "Real Estate Logo",
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Password",
+      "hidePassword": "Hide password",
+      "showPassword": "Show password",
+      "rememberPassword": "Remember password",
+      "forgetPassword": "Forget password?",
+      "submit": "Sign In"
+    },
+    "forgotPassword": {
+      "backgroundAlt": "Background",
+      "logoAlt": "Real Estate Logo",
+      "title": "Forget Password",
+      "description": "Enter your email address to get a verification code for resetting your password.",
+      "emailPlaceholder": "example@email.com",
+      "sending": "Sending...",
+      "sendCode": "Send Code",
+      "backToLogin": "Back to Login",
+      "errors": {
+        "emailRequired": "Email is required",
+        "failedToSendOtp": "Failed to send OTP"
+      }
+    },
+    "otp": {
+      "backgroundAlt": "Background",
+      "logoAlt": "Real Estate Logo",
+      "title": "Verify OTP",
+      "description": "Please check your email. We have sent a code to {email}",
+      "emailFallback": "your email",
+      "didNotReceiveCode": "Didn't receive code?",
+      "resend": "Resend",
+      "verifying": "Verifying...",
+      "sendCode": "Send Code",
+      "backToLogin": "Back to Login",
+      "resendSuccess": "Verification code resent to your email!",
+      "resendError": "Failed to resend code. Please try again.",
+      "enterCompleteCode": "Please enter the complete 4-digit code",
+      "invalidOtp": "Invalid OTP. Please try again."
+    },
+    "setNewPassword": {
+      "backgroundAlt": "Background",
+      "logoAlt": "Real Estate Logo",
+      "title": "Set new password",
+      "newPasswordPlaceholder": "New Password",
+      "confirmNewPasswordPlaceholder": "Confirm New Password",
+      "hidePassword": "Hide password",
+      "showPassword": "Show password",
+      "updating": "Updating...",
+      "updatePassword": "Update Password",
+      "backToLogin": "Back to Login",
+      "errors": {
+        "fillAllFields": "Please fill in all fields",
+        "passwordMinLength": "Password must be at least 8 characters",
+        "passwordsDoNotMatch": "Passwords do not match",
+        "updateFailed": "Failed to update password. Please try again."
+      }
+    }
+  },
+  "floorPlanning": {
+    "floorLabelArabic": "Floor {label}",
+    "selectProject": "Select a project",
+    "unitType": "Unit Type",
+    "apartment": "Apartment",
+    "annex": "Annex",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "projectName": "Project Name",
+    "edit": "Edit",
+    "exportPdf": "Export PDF",
+    "buildingBackgroundAlt": "Building background",
+    "logoAlt": "WSL logo",
+    "status": {
+      "available": "Available",
+      "reserved": "Reserved",
+      "sold": "Sold"
+    }
+  },
+  "dashboardEditor": {
+    "loadingProjectData": "Loading project data...",
+    "propertyStructure": "Property Structure",
+    "models": "Models",
+    "addModel": "Add Model",
+    "sqft": "sqft",
+    "faceValue": "Face: {face}",
+    "editModel": "Edit model",
+    "deleteModel": "Delete model",
+    "noModelsAdded": "No models added yet",
+    "unitStatusManagement": "Unit Status Management",
+    "unitWithName": "Unit {name}",
+    "noUnitsInFloor": "No units in this floor",
+    "selectFloorToManage": "Select a floor to manage units",
+    "cancel": "Cancel",
+    "saveChanges": "Save Changes",
+    "livePreview": "Live Preview",
+    "addFloor": "Add Floor",
+    "addUnit": "Add Unit",
+    "editFloorAndUnits": "Edit floor and units",
+    "deleteFloor": "Delete floor",
+    "edit": "Edit",
+    "delete": "Delete",
+    "saving": "Saving...",
+    "add": "Add",
+    "status": {
+      "available": "Available",
+      "reserved": "Reserved",
+      "sold": "Sold"
+    },
+    "addFloorModal": {
+      "title": "Name of your Floor",
+      "placeholder": "Enter the Floor Name"
+    },
+    "addUnitModal": {
+      "title": "Add New Unit",
+      "placeholder": "Enter unit number/name"
+    },
+    "editFloorModal": {
+      "title": "Edit Floor & Units",
+      "floorName": "Floor Name",
+      "floorNamePlaceholder": "Enter floor name",
+      "unitsCount": "Units ({count})",
+      "newUnitPlaceholder": "New unit name"
+    },
+    "addModelModal": {
+      "title": "Add New Model",
+      "modelName": "Model Name",
+      "modelNamePlaceholder": "e.g., Model A, Premium Suite",
+      "totalArea": "Total Area (sqft)",
+      "totalAreaPlaceholder": "e.g., 1200",
+      "faceOptional": "Face (Optional)",
+      "facePlaceholder": "e.g., North, South, East, West"
+    },
+    "editModelModal": {
+      "title": "Edit Model",
+      "modelName": "Model Name",
+      "totalArea": "Total Area (sqft)",
+      "faceOptional": "Face (Optional)",
+      "facePlaceholder": "e.g., North, South, East, West"
+    }
+  }
+}

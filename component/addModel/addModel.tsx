@@ -3,12 +3,14 @@
 import { useModelStore } from '@/store/useModelStore';
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface AddModelModalProps {
   onClose: () => void;
 }
 
 export default function AddModelModal({ onClose }: AddModelModalProps) {
+  const t = useTranslations('addModelModal');
   const [modelName, setModelName] = useState('');
   const [totalArea, setTotalArea] = useState('');
   const [face, setFace] = useState('');
@@ -17,7 +19,7 @@ export default function AddModelModal({ onClose }: AddModelModalProps) {
 
   const handleSave = () => {
     if (!modelName || !totalArea || !face) {
-      alert("All fields are required");
+      alert(t('allFieldsRequired'));
       return;
     }
 
@@ -46,21 +48,21 @@ export default function AddModelModal({ onClose }: AddModelModalProps) {
       <div className="p-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h1 className="font-inter font-semibold text-[24px] leading-[32px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF]">
-            Add Model
+            <h1 className="font-inter font-semibold text-[24px] leading-[32px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF]">
+            {t('title')}
           </h1>
           <div className="flex gap-3 sm:gap-4">
             <button
               onClick={onClose}
               className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
             >
-              Cancel
+              {t('cancel')}
             </button>
             <button
               onClick={handleSave}
               className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
             >
-              Save Model
+              {t('saveModel')}
             </button>
           </div>
         </div>
@@ -68,13 +70,13 @@ export default function AddModelModal({ onClose }: AddModelModalProps) {
         {/* Model Information Section */}
         <div className="bg-white dark:bg-[#28272A] rounded-lg border border-gray-200 p-6 sm:p-8 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-[#FFFFFF] mb-6">
-            Model Information
+            {t('modelInformation')}
           </h2>
 
           {/* Model Name */}
           <div className="mb-6">
             <label htmlFor="modelName" className="block text-sm font-medium text-gray-700 mb-2 dark:text-[#E5E7EB]">
-              Model Name <span className="text-red-500">*</span>
+              {t('modelName')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -82,14 +84,14 @@ export default function AddModelModal({ onClose }: AddModelModalProps) {
               value={modelName}
               onChange={(e) => setModelName(e.target.value)}
               className="w-full px-4 py-2.5 dark:bg-[#28272A] dark:text-[#FFFFFF] text-sm text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              placeholder="Enter model name"
+              placeholder={t('modelNamePlaceholder')}
             />
           </div>
 
           {/* Total Area */}
           <div className="mb-6">
             <label htmlFor="totalArea" className="block dark:text-[#FFFFFF] text-sm font-medium text-gray-700 mb-2">
-              Total Area <span className="text-red-500">*</span>
+              {t('totalArea')} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -98,10 +100,10 @@ export default function AddModelModal({ onClose }: AddModelModalProps) {
                 value={totalArea}
                 onChange={(e) => setTotalArea(e.target.value)}
                 className="w-full px-4 py-2.5 dark:text-[#FFFFFF] dark:bg-[#28272A] text-sm text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all pr-16"
-                placeholder="Enter total area"
+                placeholder={t('totalAreaPlaceholder')}
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500">
-                sq m
+                {t('squareMeters')}
               </span>
             </div>
           </div>
@@ -109,7 +111,7 @@ export default function AddModelModal({ onClose }: AddModelModalProps) {
           {/* Face */}
           <div>
             <label htmlFor="face" className="block dark:text-[#FFFFFF] text-sm font-medium text-gray-700 mb-2">
-              Face <span className="text-red-500">*</span>
+              {t('face')} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -118,7 +120,7 @@ export default function AddModelModal({ onClose }: AddModelModalProps) {
                 value={face}
                 onChange={(e) => setFace(e.target.value)}
                 className="w-full px-4 py-2.5 dark:text-[#FFFFFF] dark:bg-[#28272A] text-sm text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter face direction"
+                placeholder={t('facePlaceholder')}
               />
             </div>
           </div>

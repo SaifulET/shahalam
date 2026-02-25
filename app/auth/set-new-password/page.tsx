@@ -4,10 +4,12 @@ import { useState, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useForgotPasswordStore } from '@/store/forgotPasswordStore';
 import api from '@/lib/api';
 
 export default function SetNewPasswordPage() {
+  const t = useTranslations('auth.setNewPassword');
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
@@ -22,17 +24,17 @@ export default function SetNewPasswordPage() {
 
     // Validation
     if (!newPassword || !confirmPassword) {
-      setError('Please fill in all fields');
+      setError(t('errors.fillAllFields'));
       return;
     }
 
     if (newPassword.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError(t('errors.passwordMinLength'));
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('errors.passwordsDoNotMatch'));
       return;
     }
 try {
@@ -45,7 +47,7 @@ try {
     setIsSubmitting(true);
     router.push("/auth/signin")
 } catch (error:unknown) {
-  setError('Failed to update password. Please try again.');
+  setError(t('errors.updateFailed'));
   
 }
    
@@ -57,7 +59,7 @@ try {
       <div className="absolute inset-0 z-0">
         <Image
           src="/authbg.jpg" // Replace with your image path
-          alt="Background"
+          alt={t('backgroundAlt')}
           fill
           className="object-cover"
           priority
@@ -65,14 +67,14 @@ try {
       </div>
 
       {/* Set New Password Card */}
-      <div className="relative z-10 w-[720px]">
-        <div className="bg-[#89C8FF] rounded-3xl p-[71px]">
+      <div className="relative z-10 w-full max-w-[720px]">
+        <div className="bg-[#89C8FF] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 lg:p-[71px]">
           {/* Logo */}
           <div className="flex justify-center mb-12">
-            <div className="w-32 h-32 sm:w-40 sm:h-40 relative">
+            <div className="relative h-24 w-24 sm:h-32 sm:w-32 md:h-40 md:w-40">
               <Image
                 src="/logo.svg" // Replace with your logo path
-                alt="حرم Real Estate Logo"
+                alt={t('logoAlt')}
                 fill
                 className="object-contain"
               />
@@ -81,7 +83,7 @@ try {
 
           {/* Title */}
           <h1 className="text-white text-2xl sm:text-3xl font-semibold text-center mb-8">
-            Set new password
+            {t('title')}
           </h1>
 
           {/* Set New Password Form */}
@@ -90,7 +92,7 @@ try {
             <div className="relative">
               <input
                 type={showNewPassword ? 'text' : 'password'}
-                placeholder="New Password"
+                placeholder={t('newPasswordPlaceholder')}
                 value={newPassword}
                 onChange={(e) => {
                   setNewPassword(e.target.value);
@@ -103,7 +105,7 @@ try {
                 type="button"
                 onClick={() => setShowNewPassword(!showNewPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 transition-colors"
-                aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                aria-label={showNewPassword ? t('hidePassword') : t('showPassword')}
               >
                 {showNewPassword ? (
                   <svg
@@ -148,7 +150,7 @@ try {
             <div className="relative">
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Confirm New Password"
+                placeholder={t('confirmNewPasswordPlaceholder')}
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
@@ -161,7 +163,7 @@ try {
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 transition-colors"
-                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                aria-label={showConfirmPassword ? t('hidePassword') : t('showPassword')}
               >
                 {showConfirmPassword ? (
                   <svg
@@ -215,7 +217,7 @@ try {
               disabled={isSubmitting}
               className="w-full bg-[#F2DFA7] text-[#0088FF] font-semibold py-4 rounded-xl hover:bg-[#e8d399] active:scale-[0.98] transition-all shadow-lg text-base sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Updating...' : 'Update Password'}
+              {isSubmitting ? t('updating') : t('updatePassword')}
             </button>
 
             {/* Back to Login Link */}
@@ -238,7 +240,7 @@ try {
                     d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
                   />
                 </svg>
-                Back to Login
+                {t('backToLogin')}
               </Link>
             </div>
           </form>

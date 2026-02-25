@@ -1,0 +1,275 @@
+{
+  "languageSwitcher": {
+    "label": "اللغة",
+    "english": "الإنجليزية",
+    "arabic": "العربية"
+  },
+  "themeToggle": {
+    "dark": "داكن",
+    "light": "فاتح"
+  },
+  "navbar": {
+    "logoAlt": "الشعار",
+    "home": "الرئيسية",
+    "dashboard": "لوحة التحكم",
+    "profileAlt": "الملف الشخصي لـ {name}",
+    "userFallback": "المستخدم",
+    "profileImageAlt": "الصورة الشخصية",
+    "openMainMenu": "فتح القائمة الرئيسية"
+  },
+  "home": {
+    "folders": {
+      "title": "المجلدات",
+      "addNewFolder": "إضافة مجلد جديد",
+      "loading": "جاري تحميل المجلدات...",
+      "projectsCount": "{count} مشروع",
+      "empty": "لا توجد مجلدات."
+    },
+    "recentProjects": {
+      "title": "المشاريع الأخيرة",
+      "loading": "جاري تحميل المشاريع الأخيرة...",
+      "empty": "لا توجد مشاريع حديثة.",
+      "dragging": "جارٍ السحب...",
+      "statusActive": "نشط",
+      "statusInactive": "غير نشط"
+    }
+  },
+  "createFolder": {
+    "title": "إنشاء مجلد جديد",
+    "folderName": "اسم المجلد",
+    "folderNamePlaceholder": "مثال: مشاريع سكنية",
+    "description": "الوصف",
+    "optional": "اختياري",
+    "descriptionPlaceholder": "أضف وصفًا لهذا المجلد...",
+    "descriptionHint": "ساعد فريقك على فهم الغرض من هذا المجلد",
+    "folderAppearance": "مظهر المجلد",
+    "selectColorAria": "اختر اللون {color}",
+    "previewDefaultFolderName": "مشاريع سكنية",
+    "previewItems": "0 عناصر",
+    "cancel": "إلغاء",
+    "creating": "جارٍ الإنشاء...",
+    "createFolder": "إنشاء المجلد"
+  },
+  "addModelModal": {
+    "allFieldsRequired": "جميع الحقول مطلوبة",
+    "title": "إضافة نموذج",
+    "cancel": "إلغاء",
+    "saveModel": "حفظ النموذج",
+    "modelInformation": "معلومات النموذج",
+    "modelName": "اسم النموذج",
+    "modelNamePlaceholder": "أدخل اسم النموذج",
+    "totalArea": "المساحة الإجمالية",
+    "totalAreaPlaceholder": "أدخل المساحة الإجمالية",
+    "squareMeters": "م²",
+    "face": "الواجهة",
+    "facePlaceholder": "أدخل اتجاه الواجهة"
+  },
+  "addUnitForm": {
+    "title": "نوع الوحدة",
+    "cancel": "إلغاء",
+    "saveProperty": "حفظ العقار",
+    "saveChanges": "حفظ التغييرات",
+    "propertyInformation": "معلومات العقار",
+    "propertyName": "اسم العقار",
+    "propertyNamePlaceholder": "أدخل اسم العقار",
+    "location": "الموقع",
+    "locationPlaceholder": "المدينة، المنطقة",
+    "address": "العنوان",
+    "addressPlaceholder": "أدخل العنوان الكامل",
+    "addModel": "إضافة نموذج",
+    "models": "النماذج",
+    "modelsAddedCount": "تمت إضافة {count} نموذج",
+    "removeModel": "حذف النموذج",
+    "areaLabel": "المساحة:",
+    "squareMeters": "م²",
+    "faceLabel": "الواجهة:",
+    "floors": "الأدوار",
+    "addFloor": "إضافة دور",
+    "noFloors": "لم تتم إضافة أدوار بعد. اضغط على إضافة دور للبدء.",
+    "removeFloor": "حذف الدور",
+    "unitPlaceholder": "الوحدة {number}",
+    "removeUnit": "حذف الوحدة",
+    "addUnit": "إضافة وحدة",
+    "coverImage": "صورة الغلاف",
+    "coverPreviewAlt": "معاينة الغلاف",
+    "removeImage": "حذف الصورة",
+    "uploadPropertyImage": "رفع صورة العقار",
+    "uploadHint": "اسحب الملف وأفلته هنا أو اضغط للتصفح",
+    "chooseFile": "اختر ملفًا",
+    "fileTypeHint": "(PNG, JPG حتى 10MB)",
+    "defaultFloorName": "الدور {number}",
+    "unitModal": {
+      "title": "اسم وحدتك",
+      "placeholder": "أدخل اسم الوحدة"
+    },
+    "alerts": {
+      "enterUnitName": "يرجى إدخال اسم الوحدة",
+      "duplicateUnit": "اسم الوحدة \"{name}\" موجود بالفعل في هذا الدور. يجب أن تكون أسماء الوحدات فريدة لكل دور.",
+      "confirmRemoveModel": "هل أنت متأكد أنك تريد حذف هذا النموذج؟",
+      "invalidImageFile": "يرجى اختيار ملف صورة صالح (PNG أو JPG)",
+      "maxFileSize": "يجب أن يكون حجم الملف أقل من 10MB",
+      "fillPropertyNameAndLocation": "يرجى إدخال اسم العقار والموقع"
+    }
+  },
+  "companyProfile": {
+    "title": "الملف التعريفي للشركة",
+    "loading": "جاري التحميل...",
+    "notProvided": "غير متوفر",
+    "locationNotSpecified": "الموقع غير محدد",
+    "companyNameNotSet": "لم يتم تحديد اسم الشركة",
+    "noDescription": "لا يوجد وصف.",
+    "primaryContact": "جهة الاتصال الرئيسية",
+    "emailNotProvided": "البريد الإلكتروني غير متوفر",
+    "businessEmail": "بريد العمل",
+    "postal": "الرمز البريدي: {postalCode}",
+    "location": "الموقع",
+    "website": "الموقع الإلكتروني",
+    "aboutCompany": "عن الشركة",
+    "memberSince": "عضو منذ: {date}",
+    "employees": "الموظفون",
+    "activeProjects": "المشاريع النشطة"
+  },
+  "auth": {
+    "signIn": {
+      "genericError": "حدث خطأ",
+      "backgroundAlt": "الخلفية",
+      "logoAlt": "شعار العقارات",
+      "emailPlaceholder": "البريد الإلكتروني",
+      "passwordPlaceholder": "كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور",
+      "showPassword": "إظهار كلمة المرور",
+      "rememberPassword": "تذكر كلمة المرور",
+      "forgetPassword": "نسيت كلمة المرور؟",
+      "submit": "تسجيل الدخول"
+    },
+    "forgotPassword": {
+      "backgroundAlt": "الخلفية",
+      "logoAlt": "شعار العقارات",
+      "title": "نسيت كلمة المرور",
+      "description": "أدخل بريدك الإلكتروني للحصول على رمز تحقق لإعادة تعيين كلمة المرور.",
+      "emailPlaceholder": "example@email.com",
+      "sending": "جارٍ الإرسال...",
+      "sendCode": "إرسال الرمز",
+      "backToLogin": "العودة إلى تسجيل الدخول",
+      "errors": {
+        "emailRequired": "البريد الإلكتروني مطلوب",
+        "failedToSendOtp": "فشل إرسال رمز التحقق"
+      }
+    },
+    "otp": {
+      "backgroundAlt": "الخلفية",
+      "logoAlt": "شعار العقارات",
+      "title": "التحقق من الرمز",
+      "description": "يرجى التحقق من بريدك الإلكتروني. لقد أرسلنا رمزًا إلى {email}",
+      "emailFallback": "بريدك الإلكتروني",
+      "didNotReceiveCode": "لم يصلك الرمز؟",
+      "resend": "إعادة الإرسال",
+      "verifying": "جارٍ التحقق...",
+      "sendCode": "إرسال الرمز",
+      "backToLogin": "العودة إلى تسجيل الدخول",
+      "resendSuccess": "تمت إعادة إرسال رمز التحقق إلى بريدك الإلكتروني!",
+      "resendError": "فشلت إعادة الإرسال. يرجى المحاولة مرة أخرى.",
+      "enterCompleteCode": "يرجى إدخال الرمز الكامل المكون من 4 أرقام",
+      "invalidOtp": "رمز التحقق غير صالح. حاول مرة أخرى."
+    },
+    "setNewPassword": {
+      "backgroundAlt": "الخلفية",
+      "logoAlt": "شعار العقارات",
+      "title": "تعيين كلمة مرور جديدة",
+      "newPasswordPlaceholder": "كلمة المرور الجديدة",
+      "confirmNewPasswordPlaceholder": "تأكيد كلمة المرور الجديدة",
+      "hidePassword": "إخفاء كلمة المرور",
+      "showPassword": "إظهار كلمة المرور",
+      "updating": "جارٍ التحديث...",
+      "updatePassword": "تحديث كلمة المرور",
+      "backToLogin": "العودة إلى تسجيل الدخول",
+      "errors": {
+        "fillAllFields": "يرجى تعبئة جميع الحقول",
+        "passwordMinLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+        "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين",
+        "updateFailed": "فشل تحديث كلمة المرور. حاول مرة أخرى."
+      }
+    }
+  },
+  "floorPlanning": {
+    "floorLabelArabic": "الدور {label}",
+    "selectProject": "اختر مشروعًا",
+    "unitType": "نوع الوحدة",
+    "apartment": "شقة",
+    "annex": "ملحق",
+    "cancel": "إلغاء",
+    "continue": "متابعة",
+    "projectName": "اسم المشروع",
+    "edit": "تعديل",
+    "exportPdf": "تصدير PDF",
+    "buildingBackgroundAlt": "خلفية المبنى",
+    "logoAlt": "شعار WSL",
+    "status": {
+      "available": "متاح",
+      "reserved": "محجوز",
+      "sold": "مباع"
+    }
+  },
+  "dashboardEditor": {
+    "loadingProjectData": "جاري تحميل بيانات المشروع...",
+    "propertyStructure": "هيكل العقار",
+    "models": "النماذج",
+    "addModel": "إضافة نموذج",
+    "sqft": "قدم²",
+    "faceValue": "الواجهة: {face}",
+    "editModel": "تعديل النموذج",
+    "deleteModel": "حذف النموذج",
+    "noModelsAdded": "لم تتم إضافة نماذج بعد",
+    "unitStatusManagement": "إدارة حالة الوحدات",
+    "unitWithName": "الوحدة {name}",
+    "noUnitsInFloor": "لا توجد وحدات في هذا الدور",
+    "selectFloorToManage": "اختر دورًا لإدارة الوحدات",
+    "cancel": "إلغاء",
+    "saveChanges": "حفظ التغييرات",
+    "livePreview": "معاينة مباشرة",
+    "addFloor": "إضافة دور",
+    "addUnit": "إضافة وحدة",
+    "editFloorAndUnits": "تعديل الدور والوحدات",
+    "deleteFloor": "حذف الدور",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "saving": "جارٍ الحفظ...",
+    "add": "إضافة",
+    "status": {
+      "available": "متاح",
+      "reserved": "محجوز",
+      "sold": "مباع"
+    },
+    "addFloorModal": {
+      "title": "اسم الدور",
+      "placeholder": "أدخل اسم الدور"
+    },
+    "addUnitModal": {
+      "title": "إضافة وحدة جديدة",
+      "placeholder": "أدخل رقم/اسم الوحدة"
+    },
+    "editFloorModal": {
+      "title": "تعديل الدور والوحدات",
+      "floorName": "اسم الدور",
+      "floorNamePlaceholder": "أدخل اسم الدور",
+      "unitsCount": "الوحدات ({count})",
+      "newUnitPlaceholder": "اسم وحدة جديد"
+    },
+    "addModelModal": {
+      "title": "إضافة نموذج جديد",
+      "modelName": "اسم النموذج",
+      "modelNamePlaceholder": "مثال: نموذج A، جناح فاخر",
+      "totalArea": "المساحة الإجمالية (قدم²)",
+      "totalAreaPlaceholder": "مثال: 1200",
+      "faceOptional": "الواجهة (اختياري)",
+      "facePlaceholder": "مثال: شمال، جنوب، شرق، غرب"
+    },
+    "editModelModal": {
+      "title": "تعديل النموذج",
+      "modelName": "اسم النموذج",
+      "totalArea": "المساحة الإجمالية (قدم²)",
+      "faceOptional": "الواجهة (اختياري)",
+      "facePlaceholder": "مثال: شمال، جنوب، شرق، غرب"
+    }
+  }
+}

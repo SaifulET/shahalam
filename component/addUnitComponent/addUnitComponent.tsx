@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { Plus, X, Upload, Home } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import ThemeToggle from '@/component/ThemeToggle/ThemeToggle';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -24,6 +25,7 @@ interface Model {
 }
 
 export default function PropertyUnitForm() {
+  const t = useTranslations('addUnitForm');
   const { createFullProject, loading } = useCreatProjectStore();
   const user = useAuthStore().user;
   const [propertyName, setPropertyName] = useState('');
@@ -46,7 +48,7 @@ export default function PropertyUnitForm() {
   const addFloor = () => {
     const newFloor: Floor = {
       id: Date.now().toString(),
-      name: `${floors.length + 1}${getOrdinalSuffix(floors.length + 1)} Floor`,
+      name: t('defaultFloorName', { number: floors.length + 1 }),
       units: []
     };
     setFloors([...floors, newFloor]);
@@ -78,7 +80,7 @@ export default function PropertyUnitForm() {
 
   const saveNewUnit = () => {
     if (!newUnitName.trim()) {
-      alert('Please enter a unit name');
+      alert(t('alerts.enterUnitName'));
       return;
     }
 
@@ -89,7 +91,7 @@ export default function PropertyUnitForm() {
       );
 
       if (isDuplicate) {
-        alert(`Unit name "${newUnitName}" already exists on this floor. Unit names must be unique per floor.`);
+        alert(t('alerts.duplicateUnit', { name: newUnitName }));
         return;
       }
     }
@@ -114,7 +116,7 @@ export default function PropertyUnitForm() {
         );
         
         if (isDuplicate) {
-          alert(`Unit name "${value}" already exists on this floor. Unit names must be unique per floor.`);
+          alert(t('alerts.duplicateUnit', { name: value }));
           return floor;
         }
         
@@ -137,18 +139,9 @@ export default function PropertyUnitForm() {
 
   const removeModelHandler = (modelId: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent any parent click events
-    if (window.confirm('Are you sure you want to remove this model?')) {
+    if (window.confirm(t('alerts.confirmRemoveModel'))) {
       removeModel(modelId);
     }
-  };
-
-  const getOrdinalSuffix = (num: number) => {
-    const j = num % 10;
-    const k = num % 100;
-    if (j === 1 && k !== 11) return 'st';
-    if (j === 2 && k !== 12) return 'nd';
-    if (j === 3 && k !== 13) return 'rd';
-    return 'th';
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,12 +149,12 @@ export default function PropertyUnitForm() {
     if (file) {
       const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
       if (!validTypes.includes(file.type)) {
-        alert('Please select a valid image file (PNG or JPG)');
+        alert(t('alerts.invalidImageFile'));
         return;
       }
 
       if (file.size > 10 * 1024 * 1024) {
-        alert('File size must be less than 10MB');
+        alert(t('alerts.maxFileSize'));
         return;
       }
 
@@ -189,7 +182,7 @@ export default function PropertyUnitForm() {
 
   const handleSave = async () => {
     if (!propertyName || !location) {
-      alert("Please fill property name and location");
+      alert(t('alerts.fillPropertyNameAndLocation'));
       return;
     }
 
@@ -215,38 +208,38 @@ export default function PropertyUnitForm() {
   };
 
   return (
-    <div className="min-h-screen px-[24px] md:px-[268px] pt-[35px] pb-[40px] bg-white dark:bg-black">
-      <div>
+    <div className="min-h-screen bg-white px-4 pb-10 pt-6 dark:bg-black sm:px-6 lg:px-10 xl:px-16">
+      <div className="mx-auto w-full max-w-screen-xl">
         {/* Header */}
         <div className="mb-6">
-          <div className="px-4 sm:px-6 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <h1 className="font-inter font-semibold text-[24px] leading-[32px] tracking-[-0.5px] text-black dark:text-white">Unit Type</h1>
+          <div className="flex flex-col gap-3 px-1 pb-4 sm:flex-row sm:items-center sm:justify-between">
+            <h1 className="font-inter font-semibold text-[24px] leading-[32px] tracking-[-0.5px] text-black dark:text-white">{t('title')}</h1>
             <div className="flex gap-2 sm:gap-3">
               <Link href="/dashboard">
-                <button className="px-[32px] py-[12px] font-inter font-medium text-[14px] leading-[14px] tracking-[-0.5px] text-center border rounded-lg border-[#D1D5DB] text-[#374151] hover:bg-gray-50 dark:text-gray-50 dark:hover:bg-gray-700 transition-colors">
-                  Cancel
+                <button className="rounded-lg border border-[#D1D5DB] px-4 py-2.5 text-center font-inter text-[14px] font-medium leading-[14px] tracking-[-0.5px] text-[#374151] transition-colors hover:bg-gray-50 dark:text-gray-50 dark:hover:bg-gray-700 sm:px-8 sm:py-3">
+                  {t('cancel')}
                 </button>
               </Link>
               <button 
                 onClick={handleSave} 
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
+                className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600"
               >
-                Save Property
+                {t('saveProperty')}
               </button>
             </div>
           </div>
 
           {/* Property Information */}
           <div className="p-4 sm:p-6 border rounded-lg border-[#E5E7EB] bg-white dark:bg-[#1A1A1A]">
-            <h2 className="font-inter font-medium text-[18px] leading-[28px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF] mb-4">Property Information</h2>
+            <h2 className="font-inter font-medium text-[18px] leading-[28px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF] mb-4">{t('propertyInformation')}</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-[#FFFFFF] mb-2">
-                  Property Name
+                  {t('propertyName')}
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter property name"
+                  placeholder={t('propertyNamePlaceholder')}
                   value={propertyName}
                   onChange={(e) => setPropertyName(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600 dark:text-[#D4D4D4]"
@@ -254,11 +247,11 @@ export default function PropertyUnitForm() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-[#FFFFFF] mb-2">
-                  Location
+                  {t('location')}
                 </label>
                 <input
                   type="text"
-                  placeholder="City, Area"
+                  placeholder={t('locationPlaceholder')}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 text-gray-600 dark:text-[#D4D4D4] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -267,10 +260,10 @@ export default function PropertyUnitForm() {
             </div>
             <div>
               <label className="block text-sm font-medium dark:text-[#FFFFFF] text-gray-700 mb-2">
-                Address
+                {t('address')}
               </label>
               <textarea
-                placeholder="Enter full address"
+                placeholder={t('addressPlaceholder')}
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 rows={3}
@@ -282,7 +275,7 @@ export default function PropertyUnitForm() {
               onClick={openModelModal}
               className="w-full gap-1 px-3 py-3 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-100 transition-colors text-center mt-2"
             >
-              Add Model
+              {t('addModel')}
             </button>
           </div>
         </div>
@@ -290,9 +283,9 @@ export default function PropertyUnitForm() {
         {/* Models Section - New section to display added models */}
         {models.length > 0 && (
           <div className="bg-white dark:bg-[#1A1A1A] rounded-lg border border-[#E5E7EB] mb-6">
-            <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
-              <h2 className="font-inter font-medium text-[18px] leading-[28px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF]">Models</h2>
-              <span className="text-sm text-gray-500 dark:text-gray-400">{models.length} model{models.length !== 1 ? 's' : ''} added</span>
+            <div className="flex flex-col gap-2 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 dark:border-gray-700">
+              <h2 className="font-inter font-medium text-[18px] leading-[28px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF]">{t('models')}</h2>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{t('modelsAddedCount', { count: models.length })}</span>
             </div>
 
             <div className="p-4 sm:p-6">
@@ -303,7 +296,7 @@ export default function PropertyUnitForm() {
                     <button
                       onClick={(e) => removeModelHandler(model.id, e)}
                       className="absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-20 opacity-0 group-hover:opacity-100 shadow-lg"
-                      title="Remove model"
+                      title={t('removeModel')}
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -318,11 +311,11 @@ export default function PropertyUnitForm() {
                       
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-gray-500 dark:text-gray-400">Area:</span>
-                          <span className="text-gray-900 dark:text-[#FFFFFF] font-medium">{model.area} sq m</span>
+                          <span className="text-gray-500 dark:text-gray-400">{t('areaLabel')}</span>
+                          <span className="text-gray-900 dark:text-[#FFFFFF] font-medium">{model.area} {t('squareMeters')}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-500 dark:text-gray-400">Face:</span>
+                          <span className="text-gray-500 dark:text-gray-400">{t('faceLabel')}</span>
                           <span className="text-gray-900 dark:text-[#FFFFFF] font-medium">{model.face}</span>
                         </div>
                       </div>
@@ -336,21 +329,21 @@ export default function PropertyUnitForm() {
 
         {/* Floors Section */}
         <div className="bg-white dark:bg-[#1A1A1A] rounded-lg border border-[#E5E7EB] mb-6">
-          <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
-            <h2 className="font-inter font-medium text-[18px] leading-[28px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF]">Floors</h2>
+          <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 dark:border-gray-700">
+            <h2 className="font-inter font-medium text-[18px] leading-[28px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF]">{t('floors')}</h2>
             <button
               onClick={addFloor}
               className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
             >
               <Plus className="w-4 h-4" />
-              Add Floor
+              {t('addFloor')}
             </button>
           </div>
 
           <div className="p-4 sm:p-6 space-y-4">
             {floors.length === 0 ? (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                No floors added yet. Click Add Floor to get started.
+                {t('noFloors')}
               </div>
             ) : (
               floors.map((floor) => (
@@ -358,7 +351,7 @@ export default function PropertyUnitForm() {
                   <button
                     onClick={() => removeFloor(floor.id)}
                     className="absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-20 opacity-0 group-hover:opacity-100 shadow-lg"
-                    title="Remove floor"
+                    title={t('removeFloor')}
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -372,14 +365,14 @@ export default function PropertyUnitForm() {
                           <input
                             type="text"
                             value={unit}
-                            placeholder={`Unit ${index + 1}`}
+                            placeholder={t('unitPlaceholder', { number: index + 1 })}
                             className="w-full px-3 py-2 pr-8 text-sm border text-[#000000] dark:text-[#E5E7EB] border-gray-300 rounded-md bg-white dark:bg-[#28272A] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             onChange={(e) => updateUnit(floor.id, index, e.target.value)}
                           />
                           <button
                             onClick={() => removeUnit(floor.id, index)}
                             className="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center bg-red-100 text-red-600 rounded-full opacity-0 group-hover/unit:opacity-100 transition-opacity hover:bg-red-200"
-                            title="Remove unit"
+                            title={t('removeUnit')}
                           >
                             <X className="w-3 h-3" />
                           </button>
@@ -392,7 +385,7 @@ export default function PropertyUnitForm() {
                       className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 bg-white border border-blue-200 rounded-md hover:bg-blue-50 transition-colors"
                     >
                       <Plus className="w-4 h-4" />
-                      Add Unit
+                      {t('addUnit')}
                     </button>
                   </div>
                 </div>
@@ -404,7 +397,7 @@ export default function PropertyUnitForm() {
         {/* Cover Image */}
         <div className="bg-white rounded-lg border border-[#E5E7EB] dark:bg-[#111827]">
           <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="font-inter font-medium text-[18px] leading-[28px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF]">Cover Image</h2>
+            <h2 className="font-inter font-medium text-[18px] leading-[28px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF]">{t('coverImage')}</h2>
           </div>
           
           <div className="p-4 sm:p-6">
@@ -420,13 +413,13 @@ export default function PropertyUnitForm() {
               <div className="relative border-2 border-gray-300 rounded-lg overflow-hidden group">
                 <img 
                   src={coverImage} 
-                  alt="Cover preview" 
+                  alt={t('coverPreviewAlt')} 
                   className="w-full h-64 object-cover"
                 />
                 <button
                   onClick={removeCoverImage}
                   className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 shadow-lg z-20"
-                  title="Remove image"
+                  title={t('removeImage')}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -446,8 +439,8 @@ export default function PropertyUnitForm() {
                   <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                     <Upload className="w-6 h-6 text-gray-400" />
                   </div>
-                  <h3 className="text-sm font-medium text-gray-900 mb-1">Upload property image</h3>
-                  <p className="text-sm text-gray-500 mb-4">Drag and drop your file here, or click to browse</p>
+                  <h3 className="text-sm font-medium text-gray-900 mb-1">{t('uploadPropertyImage')}</h3>
+                  <p className="text-sm text-gray-500 mb-4">{t('uploadHint')}</p>
                   <button 
                     type="button"
                     className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
@@ -456,9 +449,9 @@ export default function PropertyUnitForm() {
                       triggerFileInput();
                     }}
                   >
-                    Choose File
+                    {t('chooseFile')}
                   </button>
-                  <p className="text-xs text-gray-400 mt-3">(PNG, JPG up to 10MB)</p>
+                  <p className="text-xs text-gray-400 mt-3">{t('fileTypeHint')}</p>
                 </div>
               </div>
             )}
@@ -472,14 +465,14 @@ export default function PropertyUnitForm() {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
             <div className="p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6 text-center">
-                Name of your Unit
+                {t('unitModal.title')}
               </h2>
               
               <input
                 type="text"
                 value={newUnitName}
                 onChange={(e) => setNewUnitName(e.target.value)}
-                placeholder="Enter unit name"
+                placeholder={t('unitModal.placeholder')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-6"
                 autoFocus
                 onKeyPress={(e) => {
@@ -494,13 +487,13 @@ export default function PropertyUnitForm() {
                   onClick={closeUnitModal}
                   className="flex-1 px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={saveNewUnit}
                   className="flex-1 px-6 py-3 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
                 >
-                  Save Changes
+                  {t('saveChanges')}
                 </button>
               </div>
             </div>

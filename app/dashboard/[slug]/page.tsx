@@ -6,12 +6,14 @@ import { Add01FreeIcons } from '@hugeicons/core-free-icons';
 import { ArrowDownToDot, Edit, Trash2, Pencil, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useState, useEffect } from 'react';
 import { useApiStore, Project, Model, Floor, Unit, UnitStatus } from '@/store/editProjectStore';
 import { useAuthStore } from '@/store/authStore';
  // Assuming you have this
 
 export default function Home() {
+  const t = useTranslations('dashboardEditor');
   const router = useRouter();
   const params = useParams();
   const projectId = params?.slug as string; // Get project ID from URL slug
@@ -340,10 +342,10 @@ export default function Home() {
   // Loading states
   if (projectsLoading || modelsLoading || floorsLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading project data...</p>
+          <p className="mt-4 text-gray-600">{t('loadingProjectData')}</p>
         </div>
       </div>
     );
@@ -352,16 +354,16 @@ export default function Home() {
   return (
     <div>
       {/* <Navbar /> */}
-      <div className="absolute right-1 top-3">
+      <div className="fixed right-3 top-3 z-[100]">
         <ThemeToggle />
       </div>
       
-      <div className="flex h-screen">
+      <div className="flex min-h-screen flex-col xl:flex-row">
         {/* Sidebar */}
-        <div className="w-[150px] md:w-[520px] dark:bg-[#28272A] bg-white border-r border-gray-200 flex flex-col">
+        <div className="w-full border-b border-gray-200 bg-white dark:bg-[#28272A] xl:w-[420px] 2xl:w-[520px] xl:border-b-0 xl:border-r flex flex-col">
           {/* Property Structure */}
-          <div className="p-[24px] md:p-[32px] border-b border-gray-200">
-            <h2 className="font-inter font-semibold text-base leading-6 tracking-[-0.5px] dark:text-[#FFFFFF] text-gray-900 mb-4">Property Structure</h2>
+          <div className="border-b border-gray-200 p-4 sm:p-6 xl:p-8">
+            <h2 className="font-inter font-semibold text-base leading-6 tracking-[-0.5px] dark:text-[#FFFFFF] text-gray-900 mb-4">{t('propertyStructure')}</h2>
             <div className="space-y-1">
               {projects.map((project) => (
                 <button
@@ -383,39 +385,39 @@ export default function Home() {
           </div>
 
           {/* Model Management */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-inter font-semibold text-base leading-6 tracking-[-0.5px] dark:text-[#FFFFFF] text-gray-900">Models</h2>
+          <div className="border-b border-gray-200 p-4 sm:p-6">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+              <h2 className="font-inter font-semibold text-base leading-6 tracking-[-0.5px] dark:text-[#FFFFFF] text-gray-900">{t('models')}</h2>
               <button
                 onClick={handleAddModel}
                 className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1.5"
               >
-                + Add Model
+                + {t('addModel')}
               </button>
             </div>
             
             <div className="space-y-2">
               {models.map((model) => (
-                <div key={model._id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
-                  <div>
+                <div key={model._id} className="flex flex-col gap-2 rounded bg-gray-50 p-2 dark:bg-gray-700 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
                     <div className="font-medium text-gray-900 dark:text-white">{model.name}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300">{model.area} sqft</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">{model.area} {t('sqft')}</div>
                     {model.face && (
-                      <div className="text-xs text-gray-500 dark:text-gray-400">Face: {model.face}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{t('faceValue', { face: model.face })}</div>
                     )}
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 self-end sm:self-auto">
                     <button
                       onClick={() => openEditModelModal(model._id)}
                       className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                      title="Edit model"
+                      title={t('editModel')}
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteModel(model._id)}
                       className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                      title="Delete model"
+                      title={t('deleteModel')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -423,34 +425,34 @@ export default function Home() {
                 </div>
               ))}
               {models.length === 0 && (
-                <p className="text-sm text-gray-500 text-center py-2">No models added yet</p>
+                <p className="text-sm text-gray-500 text-center py-2">{t('noModelsAdded')}</p>
               )}
             </div>
           </div>
 
           {/* Unit Status Management */}
-          <div className="p-6 flex-1 overflow-auto">
-            <h2 className="font-inter font-semibold text-base leading-6 tracking-[-0.5px] dark:text-[#FFFFFF] text-gray-900 mb-4">Unit Status Management</h2>
+          <div className="flex-1 overflow-visible p-4 sm:p-6 xl:overflow-auto">
+            <h2 className="font-inter font-semibold text-base leading-6 tracking-[-0.5px] dark:text-[#FFFFFF] text-gray-900 mb-4">{t('unitStatusManagement')}</h2>
             
             <div className="space-y-3">
               {unitsInSelectedFloor.length > 0 ? (
                 unitsInSelectedFloor.map((unit) => (
-                  <div key={unit._id} className="flex items-center gap-3">
-                    <span className="text-sm text-gray-700 w-24 dark:text-[#FFFFFF]">Unit {unit.name}</span>
+                  <div key={unit._id} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                    <span className="w-full text-sm text-gray-700 dark:text-[#FFFFFF] sm:w-24">{t('unitWithName', { name: unit.name })}</span>
                     <select
                       value={unit.status}
                       onChange={(e) => handleUpdateUnitStatus(unit.floorId, unit._id, e.target.value as UnitStatus)}
                       className="flex-1 px-3 py-1.5 text-sm border text-gray-600 dark:text-white border-gray-300 rounded bg-white dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      <option value="available">Available</option>
-                      <option value="reserved">Reserved</option>
-                      <option value="sold">Sold</option>
+                      <option value="available">{t('status.available')}</option>
+                      <option value="reserved">{t('status.reserved')}</option>
+                      <option value="sold">{t('status.sold')}</option>
                     </select>
                   </div>
                 ))
               ) : (
                 <p className="text-sm text-gray-500">
-                  {selectedFloorId ? 'No units in this floor' : 'Select a floor to manage units'}
+                  {selectedFloorId ? t('noUnitsInFloor') : t('selectFloorToManage')}
                 </p>
               )}
             </div>
@@ -458,28 +460,28 @@ export default function Home() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col dark:bg-black bg-white">
+        <div className="flex min-w-0 flex-1 flex-col bg-white dark:bg-black">
           {/* Header with Theme Toggle */}
-          <div className="px-8 py-[38px] flex items-center justify-end">
-            <div className="flex gap-3">
+          <div className="flex items-center justify-end px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
               <Link href="/dashboard">
-                <button className="px-4 py-2 text-sm text-gray-700 dark:text-gray-50 dark:border-1 dark:border-gray-500 rounded-lg dark:hover:text-gray-300 hover:text-gray-900">
-                  Cancel
+                <button className="w-full rounded-lg px-4 py-2 text-sm text-gray-700 hover:text-gray-900 dark:border-1 dark:border-gray-500 dark:text-gray-50 dark:hover:text-gray-300 sm:w-auto">
+                  {t('cancel')}
                 </button>
               </Link>
-              <button onClick={handleSave} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                Save Changes
+              <button onClick={handleSave} className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-700 sm:w-auto">
+                {t('saveChanges')}
               </button>
             </div>
           </div>
 
           {/* Live Preview - Table Style Layout */}
-          <div className="flex-1 overflow-auto px-[52px]">
-            <div className='flex justify-between '>
-              <h1 className="text-lg font-semibold dark:text-[#E5E7EB] text-gray-900 pb-[32px]">Live Preview</h1>
+          <div className="flex-1 overflow-auto px-4 pb-6 sm:px-6 lg:px-8 xl:px-12">
+            <div className='flex flex-col gap-3 pb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:pb-8'>
+              <h1 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">{t('livePreview')}</h1>
               <div>
-                <button onClick={handleAddFloor} className='text-[#0088FF] bg-[#E1EFFB] p-[12px] rounded-lg hover:bg-[#e0e3e6]'>
-                  + Add Floor
+                <button onClick={handleAddFloor} className='rounded-lg bg-[#E1EFFB] p-3 text-[#0088FF] hover:bg-[#e0e3e6]'>
+                  + {t('addFloor')}
                 </button>
               </div>
             </div>
@@ -489,19 +491,19 @@ export default function Home() {
                 <div 
                   key={floor._id} 
                   onClick={() => handleFloorClick(floor._id)}
-                  className={`flex items-center px-6 py-4 my-2 border-1 border-[#E5E7EB] dark:border-none last:border-b-0 cursor-pointer transition-all rounded-lg ${
+                  className={`my-2 flex cursor-pointer flex-col gap-3 rounded-lg border-1 border-[#E5E7EB] px-4 py-4 transition-all dark:border-none sm:px-5 lg:flex-row lg:items-center ${
                     selectedFloorId === floor._id 
                       ? 'bg-blue-50 dark:bg-gray-900' 
                       : 'bg-white hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-800' 
                   }`}
                 >
                   {/* Floor Label */}
-                  <div className="text-base font-medium text-gray-900 dark:text-[#FFFFFF] w-16 flex-shrink-0">
+                  <div className="w-full flex-shrink-0 text-base font-medium text-gray-900 dark:text-[#FFFFFF] lg:w-24">
                     {floor.name}
                   </div>
                   
                   {/* Units */}
-                  <div className="flex items-center my-2 gap-2 flex-1 flex-wrap">
+                  <div className="my-1 flex flex-1 flex-wrap items-center gap-2">
                     {floor.units.map((unit) => (
                       <div key={unit._id} className="relative rounded-lg border-1 border-[#E5E7EB] dark:border-none">
                         {/* Delete X button on unit */}
@@ -537,12 +539,12 @@ export default function Home() {
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                       </svg>
-                      Add Unit
+                      {t('addUnit')}
                     </button>
                   </div>
 
                   {/* Action Buttons - Edit and Delete */}
-                  <div className="ml-4 flex items-center gap-2 flex-shrink-0">
+                  <div className="ml-0 flex flex-shrink-0 flex-wrap items-center gap-2 lg:ml-4 lg:flex-nowrap">
                     {/* Edit Button */}
                     <button
                       onClick={(e) => {
@@ -550,10 +552,10 @@ export default function Home() {
                         openEditFloorModal(floor._id);
                       }}
                       className="px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 rounded-lg flex items-center gap-1.5 transition-colors"
-                      title="Edit floor and units"
+                      title={t('editFloorAndUnits')}
                     >
                       <Pencil className="w-3.5 h-3.5" />
-                      Edit
+                      {t('edit')}
                     </button>
                     
                     {/* Delete Button */}
@@ -563,12 +565,12 @@ export default function Home() {
                         handleDeleteFloor(floor._id);
                       }}
                       className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 rounded-lg flex items-center gap-1.5 transition-colors"
-                      title="Delete floor"
+                      title={t('deleteFloor')}
                     >
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
-                      Delete
+                      {t('delete')}
                     </button>
                   </div>
                 </div>
@@ -576,18 +578,18 @@ export default function Home() {
             </div>
 
             {/* Legend */}
-            <div className="mt-8 flex items-center justify-center gap-6">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-6">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-green-700 rounded"></div>
-                <span className="text-sm text-gray-600">Available</span>
+                <span className="text-sm text-gray-600">{t('status.available')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-                <span className="text-sm text-gray-600">Reserved</span>
+                <span className="text-sm text-gray-600">{t('status.reserved')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-red-900 rounded"></div>
-                <span className="text-sm text-gray-600">Sold</span>
+                <span className="text-sm text-gray-600">{t('status.sold')}</span>
               </div>
             </div>
           </div>
@@ -599,7 +601,7 @@ export default function Home() {
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-                Name of your Floor
+                {t('addFloorModal.title')}
               </h3>
               
               <input
@@ -607,12 +609,12 @@ export default function Home() {
                 value={newFloorName}
                 onChange={(e) => setNewFloorName(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && confirmAddFloor()}
-                placeholder="Enter the Floor Name"
+                placeholder={t('addFloorModal.placeholder')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-base focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
                 autoFocus
               />
               
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => {
                     setShowAddFloorModal(false);
@@ -620,14 +622,14 @@ export default function Home() {
                   }}
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={confirmAddFloor}
                   disabled={!newFloorName.trim()}
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
                 >
-                  Add
+                  {t('add')}
                 </button>
               </div>
             </div>
@@ -639,7 +641,7 @@ export default function Home() {
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-                Add New Unit
+                {t('addUnitModal.title')}
               </h3>
               
               <div className="space-y-4">
@@ -647,13 +649,13 @@ export default function Home() {
                   type="text"
                   value={newUnitName}
                   onChange={(e) => setNewUnitName(e.target.value)}
-                  placeholder="Enter unit number/name"
+                  placeholder={t('addUnitModal.placeholder')}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                   autoFocus
                 />
               </div>
               
-              <div className="flex gap-3 mt-6">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => {
                     setShowAddUnitModal(false);
@@ -661,14 +663,14 @@ export default function Home() {
                   }}
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={confirmAddUnit}
                   disabled={!newUnitName.trim()}
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
                 >
-                  Add
+                  {t('add')}
                 </button>
               </div>
             </div>
@@ -681,20 +683,20 @@ export default function Home() {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 text-center">
-                  Edit Floor & Units
+                  {t('editFloorModal.title')}
                 </h3>
                 
                 {/* Floor Name */}
                 <div className="mb-8">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Floor Name
+                    {t('editFloorModal.floorName')}
                   </label>
                   <input
                     type="text"
                     value={tempFloorName}
                     onChange={(e) => setTempFloorName(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter floor name"
+                    placeholder={t('editFloorModal.floorNamePlaceholder')}
                   />
                 </div>
 
@@ -702,7 +704,7 @@ export default function Home() {
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-lg font-medium text-gray-900 dark:text-white">
-                      Units ({tempUnits.length})
+                      {t('editFloorModal.unitsCount', { count: tempUnits.length })}
                     </h4>
                     <div className="flex items-center gap-2">
                       <input
@@ -711,14 +713,14 @@ export default function Home() {
                         onChange={(e) => setNewUnitInEdit(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && addTempUnit()}
                         className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                        placeholder="New unit name"
+                        placeholder={t('editFloorModal.newUnitPlaceholder')}
                       />
                       <button
                         onClick={addTempUnit}
                         disabled={!newUnitInEdit.trim()}
                         className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
                       >
-                        Add Unit
+                        {t('addUnit')}
                       </button>
                     </div>
                   </div>
@@ -741,9 +743,9 @@ export default function Home() {
                             onChange={(e) => updateTempUnitStatus(unit._id, e.target.value as UnitStatus)}
                             className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                           >
-                            <option value="available">Available</option>
-                            <option value="reserved">Reserved</option>
-                            <option value="sold">Sold</option>
+                            <option value="available">{t('status.available')}</option>
+                            <option value="reserved">{t('status.reserved')}</option>
+                            <option value="sold">{t('status.sold')}</option>
                           </select>
                           <button
                             onClick={() => removeTempUnit(unit._id)}
@@ -756,13 +758,13 @@ export default function Home() {
                     </div>
                   ) : (
                     <div className="text-center py-8 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-                      <p className="text-gray-500 dark:text-gray-400">No units in this floor</p>
+                      <p className="text-gray-500 dark:text-gray-400">{t('noUnitsInFloor')}</p>
                     </div>
                   )}
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex flex-col gap-3 border-t border-gray-200 pt-4 dark:border-gray-700 sm:flex-row">
                   <button
                     onClick={() => {
                       setShowEditFloorModal(false);
@@ -772,7 +774,7 @@ export default function Home() {
                     }}
                     className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                   >
-                    Cancel
+                    {t('cancel')}
                   </button>
                  <button
   onClick={saveEditedFloor}
@@ -782,10 +784,10 @@ export default function Home() {
   {saving ? (
     <>
       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-      Saving...
+      {t('saving')}
     </>
   ) : (
-    'Save Changes'
+    t('saveChanges')
   )}
 </button>
                 </div>
@@ -799,19 +801,19 @@ export default function Home() {
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-                Add New Model
+                {t('addModelModal.title')}
               </h3>
               
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Model Name *
+                    {t('addModelModal.modelName')} *
                   </label>
                   <input
                     type="text"
                     value={newModelName}
                     onChange={(e) => setNewModelName(e.target.value)}
-                    placeholder="e.g., Model A, Premium Suite"
+                    placeholder={t('addModelModal.modelNamePlaceholder')}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                     autoFocus
                   />
@@ -819,32 +821,32 @@ export default function Home() {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Total Area (sqft) *
+                    {t('addModelModal.totalArea')} *
                   </label>
                   <input
                     type="number"
                     value={newModelArea}
                     onChange={(e) => setNewModelArea(e.target.value)}
-                    placeholder="e.g., 1200"
+                    placeholder={t('addModelModal.totalAreaPlaceholder')}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Face (Optional)
+                    {t('addModelModal.faceOptional')}
                   </label>
                   <input
                     type="text"
                     value={newModelFace}
                     onChange={(e) => setNewModelFace(e.target.value)}
-                    placeholder="e.g., North, South, East, West"
+                    placeholder={t('addModelModal.facePlaceholder')}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
               
-              <div className="flex gap-3 mt-6">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => {
                     setShowAddModelModal(false);
@@ -854,14 +856,14 @@ export default function Home() {
                   }}
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={confirmAddModel}
                   disabled={!newModelName.trim() || !newModelArea.trim()}
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
                 >
-                  Add Model
+                  {t('addModel')}
                 </button>
               </div>
             </div>
@@ -873,13 +875,13 @@ export default function Home() {
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-                Edit Model
+                {t('editModelModal.title')}
               </h3>
               
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Model Name *
+                    {t('editModelModal.modelName')} *
                   </label>
                   <input
                     type="text"
@@ -891,7 +893,7 @@ export default function Home() {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Total Area (sqft) *
+                    {t('editModelModal.totalArea')} *
                   </label>
                   <input
                     type="number"
@@ -903,19 +905,19 @@ export default function Home() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Face (Optional)
+                    {t('editModelModal.faceOptional')}
                   </label>
                   <input
                     type="text"
                     value={tempModelFace}
                     onChange={(e) => setTempModelFace(e.target.value)}
-                    placeholder="e.g., North, South, East, West"
+                    placeholder={t('editModelModal.facePlaceholder')}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
               
-              <div className="flex gap-3 mt-6">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => {
                     setShowEditModelModal(false);
@@ -926,14 +928,14 @@ export default function Home() {
                   }}
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={saveEditedModel}
                   disabled={!tempModelName.trim() || !tempModelArea.trim()}
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
                 >
-                  Save Changes
+                  {t('saveChanges')}
                 </button>
               </div>
             </div>

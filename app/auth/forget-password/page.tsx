@@ -4,10 +4,12 @@ import { useState, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useForgotPasswordStore } from '@/store/forgotPasswordStore';
 import api from '@/lib/api';
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations('auth.forgotPassword');
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -19,14 +21,14 @@ export default function ForgotPasswordPage() {
 
     // Validate email
     if (!email) {
-      setError('Email is Required');
+      setError(t('errors.emailRequired'));
       return;
     }
 
     // Email regex validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError('Email is Required');
+      setError(t('errors.emailRequired'));
       return;
     }
 
@@ -43,11 +45,11 @@ export default function ForgotPasswordPage() {
     router.push("/auth/otp")}
     else{
       setIsSubmitting(false);
-      setError(res.data.message || "Failed to send OTP");
+      setError(res.data.message || t('errors.failedToSendOtp'));
     }
    } catch (error:unknown) {
     setIsSubmitting(false);
-      setError( "Failed to send OTP");
+      setError(t('errors.failedToSendOtp'));
     
    } 
    
@@ -59,7 +61,7 @@ export default function ForgotPasswordPage() {
       <div className="absolute inset-0 z-0">
         <Image
           src="/authbg.jpg" // Replace with your image path
-          alt="Background"
+          alt={t('backgroundAlt')}
           fill
           className="object-cover"
           priority
@@ -67,14 +69,14 @@ export default function ForgotPasswordPage() {
       </div>
 
       {/* Forgot Password Card */}
-      <div className="relative z-10 w-[720px] ">
-        <div className="bg-[#89C8FF] rounded-3xl  p-[71px]">
+      <div className="relative z-10 w-full max-w-[720px]">
+        <div className="bg-[#89C8FF] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 lg:p-[71px]">
           {/* Logo */}
           <div className="flex justify-center mb-8">
-            <div className="w-32 h-32 sm:w-40 sm:h-40 relative">
+            <div className="relative h-24 w-24 sm:h-32 sm:w-32 md:h-40 md:w-40">
               <Image
                 src="/logo.svg" // Replace with your logo path
-                alt="حرم Real Estate Logo"
+                alt={t('logoAlt')}
                 fill
                 className="object-contain"
               />
@@ -83,12 +85,12 @@ export default function ForgotPasswordPage() {
 
           {/* Title */}
           <h1 className="text-white text-2xl sm:text-3xl font-semibold text-center mb-4">
-            Forget Password
+            {t('title')}
           </h1>
 
           {/* Description */}
           <p className="text-white text-center text-sm sm:text-base mb-8 leading-relaxed">
-            Enter your email address to get a verification code for resetting your password.
+            {t('description')}
           </p>
 
           {/* Forgot Password Form */}
@@ -97,7 +99,7 @@ export default function ForgotPasswordPage() {
             <div>
               <input
                 type="email"
-                placeholder="mostafin@gamil.com"
+                placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -120,7 +122,7 @@ export default function ForgotPasswordPage() {
               disabled={isSubmitting}
               className="w-full bg-[#F2DFA7] text-[#0088FF] font-semibold py-4 rounded-xl hover:bg-[#e8d399] active:scale-[0.98] transition-all shadow-lg text-base sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Sending...' : 'Send Code'}
+              {isSubmitting ? t('sending') : t('sendCode')}
             </button>
            
 
@@ -144,7 +146,7 @@ export default function ForgotPasswordPage() {
                     d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
                   />
                 </svg>
-                Back to Login
+                {t('backToLogin')}
               </Link>
             </div>
           </form>

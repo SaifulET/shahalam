@@ -4,12 +4,14 @@ import { useState, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/store/authStore';
 import api from '@/lib/api';
 
 
 
 export default function LoginPage() {
+  const t = useTranslations('auth.signIn');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [rememberPassword, setRememberPassword] = useState<boolean>(true);
@@ -29,7 +31,7 @@ export default function LoginPage() {
     // Redirect to dashboard or home
     route.push("/"); // or "/"
   } catch (err: unknown) {
-    setError(err instanceof Error ? err.message : "An error occurred");
+    setError(err instanceof Error ? err.message : t('genericError'));
   }
 };
 
@@ -40,7 +42,7 @@ export default function LoginPage() {
       <div className="absolute inset-0 z-0">
         <Image
           src="/authbg.jpg" // Replace with your image path
-          alt="Background"
+          alt={t('backgroundAlt')}
           fill
           className="object-cover"
           priority
@@ -48,14 +50,14 @@ export default function LoginPage() {
       </div>
 
       {/* Login Card */}
-      <div className="relative z-10 w-[720px]">
-        <div className="bg-[#89C8FF] rounded-3xl  p-[71px]">
+      <div className="relative z-10 w-full max-w-[720px]">
+        <div className="bg-[#89C8FF] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 lg:p-[71px]">
           {/* Logo */}
           <div className="flex justify-center mb-12">
-            <div className="w-32 h-32 sm:w-40 sm:h-40 relative">
+            <div className="relative h-24 w-24 sm:h-32 sm:w-32 md:h-40 md:w-40">
               <Image
                 src="/logo.svg" // Replace with your logo path
-                alt="حرم Real Estate Logo"
+                alt={t('logoAlt')}
                 fill
                 className="object-contain"
               />
@@ -68,7 +70,7 @@ export default function LoginPage() {
             <div>
               <input
                 type="email"
-                placeholder="Email"
+                placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-6 py-4 rounded-xl bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all text-base sm:text-lg"
@@ -80,7 +82,7 @@ export default function LoginPage() {
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Password"
+                placeholder={t('passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-6 py-4 rounded-xl bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all text-base sm:text-lg pr-12"
@@ -90,7 +92,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 transition-colors"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? t('hidePassword') : t('showPassword')}
               >
                 {showPassword ? (
                   <svg
@@ -132,7 +134,7 @@ export default function LoginPage() {
             </div>
 
             {/* Remember Password & Forgot Password */}
-            <div className="flex items-center justify-between text-sm sm:text-base">
+            <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:text-base">
               <label className="flex items-center cursor-pointer group">
                 <input
                   type="checkbox"
@@ -141,14 +143,14 @@ export default function LoginPage() {
                   className="w-4 h-4 sm:w-5 sm:h-5 rounded border-2 border-[#F8FAFB] bg-transparent checked:bg-[#F8FAFB]  cursor-pointer transition-all"
                 />
                 <span className="ml-2 text-[#F8FAFB] select-none">
-                  Remember password
+                  {t('rememberPassword')}
                 </span>
               </label>
               <Link
                 href="/auth/forget-password"
                 className="text-[#F2DFA7] hover:underline transition-all"
               >
-                Forget password?
+                {t('forgetPassword')}
               </Link>
             </div>
 
@@ -157,7 +159,7 @@ export default function LoginPage() {
               type="submit"
               className="w-full bg-[#F2DFA7] text-[#0088FF] font-semibold py-4 rounded-xl hover:bg-[#e8d399] active:scale-[0.98] transition-all shadow-lg text-base sm:text-lg"
             >
-              Sign In
+              {t('submit')}
             </button>
                 {error && <p className="text-red-500 text-center mt-4">{error}</p>}
            

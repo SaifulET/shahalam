@@ -1,6 +1,7 @@
 'use client'
 import Image from 'next/image';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface ProjectCardProps {
   id: string;
@@ -21,6 +22,7 @@ export default function ProjectCard({
   onProjectMoved ,
   recentid
 }: ProjectCardProps) {
+  const t = useTranslations('home.recentProjects');
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDragStart = (e: React.DragEvent) => {
@@ -68,7 +70,7 @@ export default function ProjectCard({
         }
       `}
     >
-      <div className="w-full h-[96px] relative">
+      <div className="relative h-24 w-full sm:h-[96px]">
         <img
   src={image || "/rc1.png"}
   alt={title}
@@ -78,7 +80,7 @@ export default function ProjectCard({
         {isDragging && (
           <div className="absolute inset-0 bg-blue-100 bg-opacity-30 flex items-center justify-center">
             <div className="bg-blue-500 text-white  px-3 py-1 rounded-full text-sm font-medium">
-              Dragging...
+              {t('dragging')}
             </div>
           </div>
         )}
@@ -91,7 +93,7 @@ export default function ProjectCard({
           {location}
         </p>
         <span className="inline-block text-sm font-medium text-green-600">
-          {status}
+          {status === 'Active' ? t('statusActive') : t('statusInactive')}
         </span>
       </div>
     </div>

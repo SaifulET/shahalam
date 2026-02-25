@@ -3,11 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { Folder } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useFolderStore } from '@/store/folderStore';
 import { useAuthStore } from '@/store/authStore';
  // adjust path
 
 const CreateFolderPage = () => {
+  const t = useTranslations('createFolder');
   const [folderName, setFolderName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedColor, setSelectedColor] = useState('#34D399');
@@ -40,24 +42,24 @@ const CreateFolderPage = () => {
 
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black flex justify-center items-center py-[15px]">
-      <div className="w-[560px]">
+    <div className="min-h-screen bg-white dark:bg-black flex justify-center items-center px-4 py-4 sm:px-6">
+      <div className="w-full max-w-[560px]">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-[#FFFFFF] mb-6">
-          Create New Folder
+          {t('title')}
         </h1>
 
-        <div className="p-[25px] border border-[#D1D5DB] rounded-md">
+        <div className="rounded-md border border-[#D1D5DB] p-4 sm:p-6">
 
           {/* Folder Name */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-900 dark:text-[#FFFFFF] mb-2">
-              Folder Name <span className="text-red-500">*</span>
+              {t('folderName')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={folderName}
               onChange={(e) => setFolderName(e.target.value)}
-              placeholder="e.g. Residential Projects"
+              placeholder={t('folderNamePlaceholder')}
               className="w-full bg-white dark:bg-[#28272A] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-gray-900 dark:text-[#FFFFFF]"
             />
           </div>
@@ -65,28 +67,28 @@ const CreateFolderPage = () => {
           {/* Description */}
           <div className="mb-2">
             <label className="block text-sm font-medium text-gray-900 dark:text-[#FFFFFF] mb-2">
-              Description <span className="text-gray-400 font-normal">(Optional)</span>
+              {t('description')} <span className="text-gray-400 font-normal">({t('optional')})</span>
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add a description for this folder..."
+              placeholder={t('descriptionPlaceholder')}
               rows={4}
               className="w-full bg-white dark:bg-[#28272A] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-gray-900 dark:text-[#FFFFFF] resize-none"
             />
           </div>
           <p className="text-xs text-gray-500 mb-6">
-            Help your team understand what this folder is for
+            {t('descriptionHint')}
           </p>
 
           {/* Folder Appearance */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-900 mb-3 dark:text-[#FFFFFF]">
-              Folder Appearance <span className="text-gray-400 font-normal">(Optional)</span>
+              {t('folderAppearance')} <span className="text-gray-400 font-normal">({t('optional')})</span>
             </label>
 
             {/* Color Picker */}
-            <div className="flex gap-3 mb-4">
+            <div className="mb-4 flex flex-wrap gap-3">
               {colors.map((color) => (
                 <button
                   key={color}
@@ -97,7 +99,7 @@ const CreateFolderPage = () => {
                       : 'hover:scale-110'
                   }`}
                   style={{ backgroundColor: color }}
-                  aria-label={`Select color ${color}`}
+                  aria-label={t('selectColorAria', { color })}
                 />
               ))}
             </div>
@@ -126,9 +128,9 @@ const CreateFolderPage = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-[#FFFFFF]">
-                    {folderName || 'Residential Projects'}
+                    {folderName || t('previewDefaultFolderName')}
                   </p>
-                  <p className="text-xs text-gray-500">0 Items</p>
+                  <p className="text-xs text-gray-500">{t('previewItems')}</p>
                 </div>
               </div>
             </div>
@@ -138,7 +140,7 @@ const CreateFolderPage = () => {
           {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 mt-8">
+          <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button
               onClick={() => {
                 router.back();
@@ -146,16 +148,16 @@ const CreateFolderPage = () => {
                 setDescription('');
                 setSelectedColor('#34D399');
               }}
-              className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="w-full px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors sm:w-auto"
             >
-              Cancel
+              {t('cancel')}
             </button>
             <button
               onClick={handleCreateFolder}
               disabled={!folderName.trim() || loading}
-              className="px-6 py-2.5 text-sm font-medium text-white dark:text-[#FFFFFF] bg-[#34D399] dark:bg-[#0088FF] rounded-lg hover:bg-[#2dd48e] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-6 py-2.5 text-sm font-medium text-white dark:text-[#FFFFFF] bg-[#34D399] dark:bg-[#0088FF] rounded-lg hover:bg-[#2dd48e] transition-colors disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
             >
-              {loading ? 'Creating...' : 'Create Folder'}
+              {loading ? t('creating') : t('createFolder')}
             </button>
           </div>
         </div>

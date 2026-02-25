@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import RecentProjects from "./recentProjectPage";
 import FoldersComponent from '../forderSection';
 import axios, { AxiosError } from 'axios';
@@ -42,6 +43,7 @@ interface Project {
 }
 
 export default function RecentProjectsComponent() {
+  const t = useTranslations('home.recentProjects');
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +101,7 @@ export default function RecentProjectsComponent() {
        
       />
 
-      {loading && <p className="px-6 text-gray-500">Loading recent projects...</p>}
+      {loading && <p className="px-6 text-gray-500">{t('loading')}</p>}
       {error && <p className="px-6 text-red-500">{error}</p>}
 
       <RecentProjects 
