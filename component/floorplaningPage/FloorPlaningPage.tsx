@@ -262,7 +262,7 @@ const unitsPanel = (
   const handleEdit = () => {
     const selectedProject = projects.find(p => p._id === selectedProjectId);
     if (selectedProject) {
-      router.push(`/dashboard/${selectedProjectId}`);
+      router.push(`/dashboards/${selectedProjectId}`);
     }
   };
 

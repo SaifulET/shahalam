@@ -204,7 +204,7 @@ export default function PropertyUnitForm() {
       }))
     );
 
-    route.push("/dashboard");
+    route.push("/dashboards");
   };
 
   return (
@@ -215,7 +215,7 @@ export default function PropertyUnitForm() {
           <div className="flex flex-col gap-3 px-1 pb-4 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="font-inter font-semibold text-[24px] leading-[32px] tracking-[-0.5px] text-black dark:text-white">{t('title')}</h1>
             <div className="flex gap-2 sm:gap-3">
-              <Link href="/dashboard">
+              <Link href="/dashboards">
                 <button className="rounded-lg border border-[#D1D5DB] px-4 py-2.5 text-center font-inter text-[14px] font-medium leading-[14px] tracking-[-0.5px] text-[#374151] transition-colors hover:bg-gray-50 dark:text-gray-50 dark:hover:bg-gray-700 sm:px-8 sm:py-3">
                   {t('cancel')}
                 </button>

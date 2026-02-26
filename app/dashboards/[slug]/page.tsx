@@ -289,7 +289,7 @@ export default function Home() {
   };
 
   const handleSave = () => {
-    router.push("/dashboard");
+    router.push("/dashboards");
   };
 
   const handleAddFloor = () => {
@@ -452,7 +452,7 @@ export default function Home() {
               {projects.map((project) => (
                 <button
                   key={project._id}
-                  onClick={() => router.push(`/dashboard/${project._id}`)}
+                  onClick={() => router.push(`/dashboards/${project._id}`)}
                   className={`w-full dark:text-[#FFFFFF] text-[#000000] px-3 py-2.5 rounded text-sm flex items-center gap-2 transition-colors ${
                     isArabic ? 'text-right flex-row-reverse' : 'text-left'
                   } ${
@@ -550,7 +550,7 @@ export default function Home() {
           {/* Header with Theme Toggle */}
           <div className="flex items-center justify-end px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-              <Link href="/dashboard">
+              <Link href="/dashboards">
                 <button className="w-full rounded-lg px-4 py-2 text-sm text-gray-700 hover:text-gray-900 dark:border-1 dark:border-gray-500 dark:text-gray-50 dark:hover:text-gray-300 sm:w-auto">
                   {t('cancel')}
                 </button>

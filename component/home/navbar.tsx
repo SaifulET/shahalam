@@ -137,10 +137,10 @@ export default function Navbar() {
               {t('home')}
             </Link>
             <Link
-              href="/dashboard"
-              className={desktopNavLinkClass('/dashboard')}
+              href="/dashboards"
+              className={desktopNavLinkClass('/dashboards')}
             >
-              {t('dashboard')}
+              {t('dashboards')}
             </Link>
           </div>
           <div
@@ -222,11 +222,11 @@ export default function Navbar() {
               {t('home')}
             </Link>
             <Link
-              href="/dashboard"
+              href="/dashboards"
               onClick={() => setIsMenuOpen(false)}
-              className={mobileNavLinkClass('/dashboard')}
+              className={mobileNavLinkClass('/dashboards')}
             >
-              {t('dashboard')}
+              {t('dashboards')}
             </Link>
           </div>
         </div>
