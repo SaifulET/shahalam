@@ -522,8 +522,8 @@ export default function Home() {
             
             <div className="space-y-3">
               {unitsInSelectedFloor.length > 0 ? (
-                unitsInSelectedFloor.map((unit) => (
-                  <div key={unit._id} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                unitsInSelectedFloor.map((unit, index) => (
+                  <div key={`${unit._id}-${unit.name}-${index}`} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                     <span className="w-full text-sm text-gray-700 dark:text-[#FFFFFF] sm:w-24">{t('unitWithName', { name: localizeDynamicText(unit.name) })}</span>
                     <select
                       value={unit.status}
@@ -590,8 +590,8 @@ export default function Home() {
                   
                   {/* Units */}
                   <div className="my-1 flex flex-1 flex-wrap items-center gap-2">
-                    {floor.units.map((unit) => (
-                      <div key={unit._id} className="relative rounded-lg border-1 border-[#E5E7EB] dark:border-none">
+                    {floor.units.map((unit, unitIndex) => (
+                      <div key={`${unit._id}-${unit.name}-${unitIndex}`} className="relative rounded-lg border-1 border-[#E5E7EB] dark:border-none">
                         {/* Delete X button on unit */}
                         <button
                           onClick={(e) => {
@@ -814,8 +814,8 @@ export default function Home() {
                   {/* Units List */}
                   {tempUnits.length > 0 ? (
                     <div className="space-y-3">
-                      {tempUnits.map((unit) => (
-                        <div key={unit._id} className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                      {tempUnits.map((unit, index) => (
+                        <div key={`${unit._id}-${unit.name}-${index}`} className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
                           <div className="flex-1">
                             <input
                               type="text"

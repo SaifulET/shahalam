@@ -138,6 +138,9 @@ const handleApiError = (error: unknown): string => {
   return "An unexpected error occurred";
 };
 
+const isUnitStatus = (value: unknown): value is UnitStatus =>
+  value === "available" || value === "reserved" || value === "sold";
+
 // ------------------- Zustand Store ------------------- //
 
 export const useApiStore = create<ApiStoreState>((set, get) => ({
@@ -317,14 +320,33 @@ export const useApiStore = create<ApiStoreState>((set, get) => ({
   addUnit: async (floorId: string, data: { name: string }) => {
     set({ floorsLoading: true, floorsError: null });
     try {
-        console.log("Adding unit to floorId:", floorId, "with data:", data); // Debug log
       const response = await api.post<UnitResponse>(`/floors/${floorId}/unit`, data);
+
+      // Backend may return either the created Unit or the updated Floor payload.
+      const payload = response.data.data as unknown;
+      const payloadObj = payload && typeof payload === "object" ? (payload as Record<string, unknown>) : null;
+      const payloadUnits = Array.isArray(payloadObj?.units) ? (payloadObj?.units as unknown[]) : null;
+      const lastUnitInPayload =
+        payloadUnits && payloadUnits.length > 0 && typeof payloadUnits[payloadUnits.length - 1] === "object"
+          ? (payloadUnits[payloadUnits.length - 1] as Record<string, unknown>)
+          : null;
+      const directUnitPayload = payloadObj && !Array.isArray(payloadObj?.units) ? payloadObj : null;
+      const extractedUnit = lastUnitInPayload ?? directUnitPayload;
+
+      const extractedId = typeof extractedUnit?._id === "string" ? extractedUnit._id : "";
+      const extractedStatus = isUnitStatus(extractedUnit?.status) ? extractedUnit.status : "available";
+      const normalizedUnit: Unit = {
+        _id: extractedId || `temp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        // Always trust submitted name for immediate preview correctness.
+        name: data.name.trim(),
+        status: extractedStatus,
+      };
       
       const updatedFloors = get().floors.map((floor) => {
         if (floor._id !== floorId) return floor;
         return {
           ...floor,
-          units: [...floor.units, response.data.data]
+          units: [...floor.units, normalizedUnit]
         };
       });
       

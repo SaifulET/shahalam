@@ -1,0 +1,13 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shahalam-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - NEXT_PUBLIC_API_URL=http://host.docker.internal:5001
+    restart: unless-stopped

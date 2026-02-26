@@ -232,8 +232,12 @@ const unitsPanel = (
         gridCols = "grid-cols-2";
       } else if (unitCount === 3) {
         gridCols = "grid-cols-3";
+      } else if (unitCount === 4) {
+        gridCols = "grid-cols-4";
       } else if (unitCount === 5) {
         gridCols = "grid-cols-5";
+      } else if (unitCount >= 6) {
+        gridCols = "grid-cols-6";
       }
 
       return (

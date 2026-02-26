@@ -31,7 +31,7 @@ export default function LoginPage() {
     // Redirect to dashboard or home
     route.push("/"); // or "/"
   } catch (err: unknown) {
-    setError(err instanceof Error ? err.message : t('genericError'));
+    setError(err instanceof Error ? "Invalid user or password" : t('genericError'));
   }
 };
 
