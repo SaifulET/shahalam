@@ -138,9 +138,9 @@ export default function Navbar() {
             </Link>
             <Link
               href="/dashboards"
-              className={desktopNavLinkClass('/dashboards')}
+              className={desktopNavLinkClass('/dashboard')}
             >
-              {t('dashboards')}
+              {t('dashboard')}
             </Link>
           </div>
           <div
