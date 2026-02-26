@@ -3,7 +3,7 @@ import axios from "axios";
 
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://api.ur-wsl.com",
 
   withCredentials: true, // send httpOnly cookie
 });
