@@ -110,13 +110,15 @@ export default function Navbar() {
               href="/"
               className="flex items-center rounded-xl p-1 transition-colors hover:bg-gray-100/70 dark:hover:bg-white/5"
             >
-              <Image
-                src="/logo.svg"
-                alt={t('logoAlt')}
-                width={64}
-                height={64}
-                priority
-              />
+              {user?.profileImage && (
+                                   <Image
+                                    src={`${user?.profileImage}`}
+                                    alt={t("logoAlt")}
+                                    width={64}
+                                    height={64}
+                                    className="h-full w-full"
+                                  />
+                                 )}
             </Link>
           </div>
 

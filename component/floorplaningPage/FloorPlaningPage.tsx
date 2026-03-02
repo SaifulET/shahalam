@@ -85,6 +85,7 @@ export default function RealEstateProject() {
   const router = useRouter();
 
   const user = useAuthStore().user;
+  console.log(user)
   const {
     projects,
     floors,
@@ -574,13 +575,15 @@ const unitsPanel = (
               <div className="print-scale relative flex min-h-[560px] sm:min-h-[640px] lg:min-h-[720px] flex-col px-4 py-6 sm:px-6 sm:py-8 lg:px-16 lg:py-10">
                 <header className="flex flex-col items-center text-center">
                   <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-[24px] sm:mb-4 sm:h-32 sm:w-32 lg:h-40 lg:w-40 lg:rounded-[32px]">
-                    <Image
-                      src="/logo.svg"
+                   {user?.profileImage && (
+                     <Image
+                      src={`${user?.profileImage}`}
                       alt={t("logoAlt")}
                       width={160}
                       height={160}
                       className="h-full w-full"
                     />
+                   )}
                   </div>
                   <h1 className="text-lg font-bold text-white/90 sm:text-xl lg:text-2xl">
                     {currentProjectName}
