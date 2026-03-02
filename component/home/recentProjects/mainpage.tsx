@@ -6,6 +6,7 @@ import RecentProjects from "./recentProjectPage";
 import FoldersComponent from '../forderSection';
 import { AxiosError } from 'axios';
 import { useAuthStore } from '@/store/authStore';
+import { useProjectStore } from '@/store/projectStore';
 import api from '@/lib/api';
 
 interface ApiProject {
@@ -61,6 +62,11 @@ export default function RecentProjectsComponent() {
   const [translatedDynamicText, setTranslatedDynamicText] = useState<Record<string, string>>({});
 
   const user = useAuthStore((state) => state.user);
+  const clearFolderId = useProjectStore((state) => state.clearFolderId);
+
+  useEffect(() => {
+    clearFolderId();
+  }, [clearFolderId]);
 
   const textsToTranslate = useMemo(() => {
     const values: string[] = [

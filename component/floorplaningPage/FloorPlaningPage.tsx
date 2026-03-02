@@ -85,13 +85,14 @@ export default function RealEstateProject() {
   const router = useRouter();
 
   const user = useAuthStore().user;
-  console.log(user)
   const {
     projects,
     floors,
     models,
+    folderId,
     selectedProjectId,
     fetchProjects,
+    fetchfolderProject,
     fetchFloors,
     fetchModels,
     setSelectedProject,
@@ -127,16 +128,23 @@ export default function RealEstateProject() {
   // Fetch projects
   useEffect(() => {
     if (user?.id) {
+      if (folderId) {
+        fetchfolderProject(folderId);
+        return;
+      }
       fetchProjects(user.id);
     }
-  }, [user]);
+  }, [user?.id, folderId, fetchProjects, fetchfolderProject]);
 
   // Auto select first project
   useEffect(() => {
     if (projects.length > 0 && !selectedProjectId) {
       setSelectedProject(projects[0]._id);
     }
-  }, [projects]);
+    if (projects.length === 0 && selectedProjectId) {
+      setSelectedProject(null);
+    }
+  }, [projects, selectedProjectId, setSelectedProject]);
 
   // Fetch floors & models when project changes
   useEffect(() => {
@@ -611,7 +619,7 @@ const unitsPanel = (
                           {localizeDynamicText(model.name)}
                         </div>
                         <div className="text-white/70">
-                          {localizeDynamicText(String(model.area ?? ""))}
+                          {localizeDynamicText(String(model.area ?? ""))} م²
                         </div>
                         <div className="text-white/40">
                           {localizeDynamicText(model.face)}

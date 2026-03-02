@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuthStore } from '@/store/authStore';
 import { useFolderStore, Folder } from '@/store/folderStore';
+import { useProjectStore } from '@/store/projectStore';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Folder01Icon } from '@hugeicons/core-free-icons';
 
@@ -27,6 +28,7 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
   const locale = useLocale();
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
+  const setFolderId = useProjectStore((state) => state.setFolderId);
   const { folders, fetchFolders, loading, error, addProjectToFolder ,deleteRecent} = useFolderStore();
   const [translatedDynamicText, setTranslatedDynamicText] = useState<Record<string, string>>({});
 
@@ -105,6 +107,11 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
     router.push('/create-folder');
   };
 
+  const handleFolderClick = (folderId: string) => {
+    setFolderId(folderId);
+    router.push('/dashboards');
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.currentTarget.classList.add('bg-blue-50', 'border-blue-300');
@@ -165,6 +172,7 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
             <div
               key={folder._id}
               className="bg-[#F9FAFB] dark:bg-[#1A1A1A] border border-[#E5E7EB] rounded-lg p-4 lg:p-5 flex flex-col justify-start cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              onClick={() => handleFolderClick(folder._id)}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, folder._id)}

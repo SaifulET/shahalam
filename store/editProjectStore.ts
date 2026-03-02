@@ -50,6 +50,10 @@ interface ProjectsResponse {
   currentPage?: number;
 }
 
+interface FolderProjectsResponse {
+  projects: Project[];
+}
+
 interface ModelsResponse {
   data: Model[];
   message?: string;
@@ -93,6 +97,7 @@ interface ApiStoreState {
   projectsCurrentPage?: number;
 
   getProjects: (userId: string, page?: number) => Promise<void>;
+  fetchfolderProject: (folderId: string) => Promise<void>;
 
   // ---------- Models ----------
   models: Model[];
@@ -165,6 +170,22 @@ export const useApiStore = create<ApiStoreState>((set, get) => ({
       set({ 
         projectsError: handleApiError(error), 
         projectsLoading: false 
+      });
+    }
+  },
+
+  fetchfolderProject: async (folderId: string) => {
+    set({ projectsLoading: true, projectsError: null });
+    try {
+      const response = await api.get<FolderProjectsResponse>(`/folders/folder/project/${folderId}`);
+      set({
+        projects: Array.isArray(response.data?.projects) ? response.data.projects : [],
+        projectsLoading: false,
+      });
+    } catch (error: unknown) {
+      set({
+        projectsError: handleApiError(error),
+        projectsLoading: false,
       });
     }
   },

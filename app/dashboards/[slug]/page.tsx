@@ -10,6 +10,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useState, useEffect, useMemo } from 'react';
 import { useApiStore, Project, Model, Floor, Unit, UnitStatus } from '@/store/editProjectStore';
 import { useAuthStore } from '@/store/authStore';
+import { useProjectStore } from '@/store/projectStore';
  // Assuming you have this
 
 const ARABIC_DIGITS = ['\u0660', '\u0661', '\u0662', '\u0663', '\u0664', '\u0665', '\u0666', '\u0667', '\u0668', '\u0669'];
@@ -32,6 +33,7 @@ export default function Home() {
   
   // Get user from auth store
   const { user } = useAuthStore();
+  const folderId = useProjectStore((state) => state.folderId);
   
   // Get store state and actions
   const {
@@ -39,6 +41,7 @@ export default function Home() {
     projects,
     projectsLoading,
     getProjects,
+    fetchfolderProject,
     
     // Models
     models,
@@ -187,9 +190,13 @@ export default function Home() {
   // Load data when component mounts and projectId is available
   useEffect(() => {
     if (user?.id) {
+      if (folderId) {
+        fetchfolderProject(folderId);
+        return;
+      }
       getProjects(user.id);
     }
-  }, [user, getProjects]);
+  }, [user?.id, folderId, getProjects, fetchfolderProject]);
 
   useEffect(() => {
     if (projectId) {
@@ -487,7 +494,9 @@ export default function Home() {
                 <div key={model._id} className="flex flex-col gap-2 rounded bg-gray-50 p-2 dark:bg-gray-700 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
                     <div className="font-medium text-gray-900 dark:text-white">{localizeDynamicText(model.name)}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300">{localizeDynamicText(model.area ?? '')} {t('sqft')}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
+                      {localizeDynamicText(model.area ?? '')} م²
+                    </div>
                     {model.face && (
                       <div className="text-xs text-gray-500 dark:text-gray-400">{t('faceValue', { face: localizeDynamicText(model.face) })}</div>
                     )}
@@ -696,7 +705,7 @@ export default function Home() {
                 onChange={(e) => setNewFloorName(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && confirmAddFloor()}
                 placeholder={t('addFloorModal.placeholder')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-base focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                className="mb-4 w-full rounded-lg border border-gray-300 px-4 py-3 text-center text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 autoFocus
               />
               
@@ -736,7 +745,7 @@ export default function Home() {
                   value={newUnitName}
                   onChange={(e) => setNewUnitName(e.target.value)}
                   placeholder={t('addUnitModal.placeholder')}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   autoFocus
                 />
               </div>
@@ -900,7 +909,7 @@ export default function Home() {
                     value={newModelName}
                     onChange={(e) => setNewModelName(e.target.value)}
                     placeholder={t('addModelModal.modelNamePlaceholder')}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     autoFocus
                   />
                 </div>
@@ -914,7 +923,7 @@ export default function Home() {
                     value={newModelArea}
                     onChange={(e) => setNewModelArea(e.target.value)}
                     placeholder={t('addModelModal.totalAreaPlaceholder')}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -927,7 +936,7 @@ export default function Home() {
                     value={newModelFace}
                     onChange={(e) => setNewModelFace(e.target.value)}
                     placeholder={t('addModelModal.facePlaceholder')}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -973,7 +982,7 @@ export default function Home() {
                     type="text"
                     value={tempModelName}
                     onChange={(e) => setTempModelName(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 
@@ -985,7 +994,7 @@ export default function Home() {
                     type="number"
                     value={tempModelArea}
                     onChange={(e) => setTempModelArea(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -998,7 +1007,7 @@ export default function Home() {
                     value={tempModelFace}
                     onChange={(e) => setTempModelFace(e.target.value)}
                     placeholder={t('editModelModal.facePlaceholder')}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
