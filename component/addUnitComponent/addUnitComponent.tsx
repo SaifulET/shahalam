@@ -24,6 +24,10 @@ interface Model {
   face: string;
 }
 
+function sanitizeUnitName(value: string) {
+  return value.normalize('NFKC').trim().replace(/\s+/g, ' ');
+}
+
 export default function PropertyUnitForm() {
   const t = useTranslations('addUnitForm');
   const { createFullProject, loading } = useCreatProjectStore();
@@ -79,26 +83,15 @@ export default function PropertyUnitForm() {
   };
 
   const saveNewUnit = () => {
-    if (!newUnitName.trim()) {
+    const sanitizedNewUnitName = sanitizeUnitName(newUnitName);
+    if (!sanitizedNewUnitName) {
       alert(t('alerts.enterUnitName'));
       return;
     }
 
-    const currentFloor = floors.find(f => f.id === currentFloorId);
-    if (currentFloor) {
-      const isDuplicate = currentFloor.units.some(
-        unit => unit.trim().toLowerCase() === newUnitName.trim().toLowerCase()
-      );
-
-      if (isDuplicate) {
-        alert(t('alerts.duplicateUnit', { name: newUnitName }));
-        return;
-      }
-    }
-
     setFloors(floors.map(floor => {
       if (floor.id === currentFloorId) {
-        return { ...floor, units: [...floor.units, newUnitName.trim()] };
+        return { ...floor, units: [...floor.units, sanitizedNewUnitName] };
       }
       return floor;
     }));
@@ -110,16 +103,7 @@ export default function PropertyUnitForm() {
     setFloors(floors.map(floor => {
       if (floor.id === floorId) {
         const newUnits = [...floor.units];
-        
-        const isDuplicate = floor.units.some((unit, idx) => 
-          idx !== index && unit.trim().toLowerCase() === value.trim().toLowerCase()
-        );
-        
-        if (isDuplicate) {
-          alert(t('alerts.duplicateUnit', { name: value }));
-          return floor;
-        }
-        
+
         newUnits[index] = value;
         return { ...floor, units: newUnits };
       }

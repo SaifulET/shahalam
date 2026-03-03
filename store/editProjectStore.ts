@@ -342,6 +342,7 @@ export const useApiStore = create<ApiStoreState>((set, get) => ({
     set({ floorsLoading: true, floorsError: null });
     try {
       const response = await api.post<UnitResponse>(`/floors/${floorId}/unit`, data);
+      console.log("resp",response);
 
       // Backend may return either the created Unit or the updated Floor payload.
       const payload = response.data.data as unknown;

@@ -41,7 +41,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} dir={dir} className={poppins.variable} suppressHydrationWarning>
-      <body>
+      <body suppressHydrationWarning>
         {/* ThemeProvider wraps the app */}
         <ThemeProvider attribute="class" defaultTheme="system">
           <NextIntlClientProvider locale={locale} messages={messages}>

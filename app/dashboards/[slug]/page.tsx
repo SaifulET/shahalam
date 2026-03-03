@@ -23,6 +23,10 @@ function fallbackArabicText(value: string) {
     .replace(/\?/g, '\u061F');
 }
 
+function sanitizeValue(value: string) {
+  return value.normalize('NFKC').trim().replace(/\s+/g, ' ');
+}
+
 export default function Home() {
   const t = useTranslations('dashboardEditor');
   const locale = useLocale();
@@ -118,15 +122,16 @@ export default function Home() {
   };
 
   const saveEditedFloor = async () => {
-  if (!editingFloorData || !tempFloorName.trim() || !projectId) return;
+  const sanitizedFloorName = sanitizeValue(tempFloorName);
+  if (!editingFloorData || !sanitizedFloorName || !projectId) return;
 
   try {
     // Show loading state (you might want to add a loading spinner)
     setSaving(true);
 
     // 1. Update floor name first
-    if (tempFloorName !== editingFloorData.name) {
-      await updateFloor(editingFloorData._id, { name: tempFloorName });
+    if (sanitizedFloorName !== editingFloorData.name) {
+      await updateFloor(editingFloorData._id, { name: sanitizedFloorName });
     }
 
     const originalUnits = editingFloorData.units;
@@ -144,7 +149,7 @@ export default function Home() {
     const newUnits = tempUnits.filter(unit => unit._id.startsWith('temp-'));
     
     for (const unit of newUnits) {
-      await addUnit(editingFloorData._id, { name: unit.name });
+      await addUnit(editingFloorData._id, { name: sanitizeValue(unit.name) });
       // Note: status defaults to 'available' from the store
     }
 
@@ -161,7 +166,7 @@ export default function Home() {
 
     for (const unit of updatedUnits) {
       await updateUnit(editingFloorData._id, unit._id, {
-        name: unit.name,
+        name: sanitizeValue(unit.name),
         status: unit.status
       });
     }
@@ -305,11 +310,12 @@ export default function Home() {
   };
 
   const confirmAddFloor = async () => {
-    if (!newFloorName.trim() || !projectId) return;
+    const sanitizedFloorName = sanitizeValue(newFloorName);
+    if (!sanitizedFloorName || !projectId) return;
     
     await addFloor({
       projectId,
-      name: newFloorName
+      name: sanitizedFloorName
     });
     
     setShowAddFloorModal(false);
@@ -317,9 +323,10 @@ export default function Home() {
   };
 
   const confirmAddUnit = async () => {
-    if (!newUnitName.trim() || !activeFloorForAdd) return;
+    const sanitizedUnitName = sanitizeValue(newUnitName);
+    if (!sanitizedUnitName || !activeFloorForAdd) return;
     
-    await addUnit(activeFloorForAdd, { name: newUnitName });
+    await addUnit(activeFloorForAdd, { name: sanitizedUnitName });
     
     setShowAddUnitModal(false);
     setNewUnitName('');
@@ -361,10 +368,12 @@ export default function Home() {
   };
 
   const addTempUnit = () => {
-    if (!newUnitInEdit.trim()) return;
+    const sanitizedUnitName = sanitizeValue(newUnitInEdit);
+    if (!sanitizedUnitName) return;
+
     const newUnit: Unit = {
       _id: `temp-${Date.now()}`,
-      name: newUnitInEdit,
+      name: sanitizedUnitName,
       status: 'available'
     };
     setTempUnits([...tempUnits, newUnit]);
@@ -384,13 +393,14 @@ export default function Home() {
   };
 
   const confirmAddModel = async () => {
-    if (!newModelName.trim() || !newModelArea.trim() || !projectId) return;
+    const sanitizedModelName = sanitizeValue(newModelName);
+    if (!sanitizedModelName || !newModelArea.trim() || !projectId) return;
     
     await addModel({
       projectId,
-      name: newModelName,
+      name: sanitizedModelName,
       area: parseFloat(newModelArea) || undefined,
-      face: newModelFace || undefined
+      face: sanitizeValue(newModelFace) || undefined
     });
     
     setShowAddModelModal(false);
@@ -411,12 +421,13 @@ export default function Home() {
   };
 
   const saveEditedModel = async () => {
-    if (!editingModelData || !tempModelName.trim() || !tempModelArea.trim()) return;
+    const sanitizedModelName = sanitizeValue(tempModelName);
+    if (!editingModelData || !sanitizedModelName || !tempModelArea.trim()) return;
 
     await updateModel(editingModelData._id, {
-      name: tempModelName,
+      name: sanitizedModelName,
       area: parseFloat(tempModelArea) || undefined,
-      face: tempModelFace || undefined
+      face: sanitizeValue(tempModelFace) || undefined
     });
 
     setShowEditModelModal(false);

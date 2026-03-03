@@ -12,7 +12,7 @@ type User = {
   website?: string;
   instagramLink?: string;
   description?: string;
-};
+} & Record<string, unknown>;
 
 type AuthStore = {
   user: User | null;
@@ -33,8 +33,37 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: false,
       loading: false,
 
-      login: (user, token) =>
-        set({ user, accessToken: token, isAuthenticated: true, loading: false }),
+      login: (user, token) => {
+        set((state) => {
+          const previousUser = state.user ?? ({} as User);
+          const userRecord = user as Record<string, unknown>;
+          const previousRecord = previousUser as Record<string, unknown>;
+
+          const normalizedId =
+            user.id ||
+            (typeof userRecord._id === "string" ? userRecord._id : previousUser.id || "");
+
+          const normalizedInstagramLink =
+            (typeof user.instagramLink === "string" && user.instagramLink.trim()) ||
+            (typeof userRecord.instagramlink === "string" && userRecord.instagramlink.trim()) ||
+            (typeof userRecord.instagram_link === "string" && userRecord.instagram_link.trim()) ||
+            (typeof previousUser.instagramLink === "string" && previousUser.instagramLink.trim()) ||
+            (typeof previousRecord.instagramlink === "string" && previousRecord.instagramlink.trim()) ||
+            "";
+
+          return {
+            user: {
+              ...previousUser,
+              ...user,
+              id: normalizedId,
+              instagramLink: normalizedInstagramLink || undefined,
+            },
+            accessToken: token,
+            isAuthenticated: true,
+            loading: false,
+          };
+        });
+      },
 
       logout: () =>
         set({ user: null, accessToken: null, isAuthenticated: false, loading: false }),

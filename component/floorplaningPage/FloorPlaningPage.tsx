@@ -85,6 +85,11 @@ export default function RealEstateProject() {
   const router = useRouter();
 
   const user = useAuthStore().user;
+  
+  const instagramLink =
+    typeof user?.instagramLink === "string" && user.instagramLink.trim().length > 0
+      ? user.instagramLink.trim()
+      : "wsl.realestate";
   const {
     projects,
     floors,
@@ -649,7 +654,7 @@ const unitsPanel = (
                         height={60}
                       />
                     </div>
-                    wsl.realestate
+                    {instagramLink}
                   </div>
                 </div>
               </div>
