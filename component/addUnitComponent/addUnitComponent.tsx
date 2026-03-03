@@ -242,7 +242,7 @@ export default function PropertyUnitForm() {
                   placeholder={t('propertyNamePlaceholder')}
                   value={propertyName}
                   onChange={(e) => setPropertyName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600 dark:text-[#D4D4D4]"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#111827] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-[#E5E7EB] placeholder:text-gray-500 dark:placeholder:text-gray-400"
                 />
               </div>
               <div>
@@ -254,7 +254,7 @@ export default function PropertyUnitForm() {
                   placeholder={t('locationPlaceholder')}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 text-gray-600 dark:text-[#D4D4D4] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#111827] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-[#E5E7EB] placeholder:text-gray-500 dark:placeholder:text-gray-400"
                 />
               </div>
             </div>
@@ -267,7 +267,7 @@ export default function PropertyUnitForm() {
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 border text-gray-600 dark:text-[#D4D4D4] border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#111827] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-900 dark:text-[#E5E7EB] placeholder:text-gray-500 dark:placeholder:text-gray-400"
               />
             </div>
 
@@ -366,7 +366,7 @@ export default function PropertyUnitForm() {
                             type="text"
                             value={unit}
                             placeholder={t('unitPlaceholder', { number: index + 1 })}
-                            className="w-full px-3 py-2 pr-8 text-sm border text-[#000000] dark:text-[#E5E7EB] border-gray-300 rounded-md bg-white dark:bg-[#28272A] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-3 py-2 pr-8 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#28272A] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-[#E5E7EB] placeholder:text-gray-500 dark:placeholder:text-gray-400"
                             onChange={(e) => updateUnit(floor.id, index, e.target.value)}
                           />
                           <button
@@ -462,9 +462,9 @@ export default function PropertyUnitForm() {
       {/* Unit Modal */}
       {showUnitModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+          <div className="bg-white dark:bg-[#1A1A1A] rounded-lg shadow-xl w-full max-w-md">
             <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6 text-center">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 text-center">
                 {t('unitModal.title')}
               </h2>
               
@@ -473,7 +473,7 @@ export default function PropertyUnitForm() {
                 value={newUnitName}
                 onChange={(e) => setNewUnitName(e.target.value)}
                 placeholder={t('unitModal.placeholder')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-6"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#111827] text-center text-lg text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-6"
                 autoFocus
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
@@ -485,7 +485,7 @@ export default function PropertyUnitForm() {
               <div className="flex gap-3">
                 <button
                   onClick={closeUnitModal}
-                  className="flex-1 px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                 >
                   {t('cancel')}
                 </button>

@@ -619,7 +619,7 @@ const unitsPanel = (
                           {localizeDynamicText(model.name)}
                         </div>
                         <div className="text-white/70">
-                          {localizeDynamicText(String(model.area ?? ""))} م²
+                          {localizeDynamicText(String(model.area ?? ""))} {t("squareMeters")}
                         </div>
                         <div className="text-white/40">
                           {localizeDynamicText(model.face)}

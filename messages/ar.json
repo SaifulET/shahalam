@@ -206,6 +206,7 @@
     "exportPdf": "تصدير PDF",
     "buildingBackgroundAlt": "خلفية المبنى",
     "logoAlt": "شعار WSL",
+    "squareMeters": "م²",
     "status": {
       "available": "متاح",
       "reserved": "محجوز",
@@ -218,6 +219,7 @@
     "models": "النماذج",
     "addModel": "إضافة نموذج",
     "sqft": "قدم²",
+    "squareMeters": "م²",
     "faceValue": "الواجهة: {face}",
     "editModel": "تعديل النموذج",
     "deleteModel": "حذف النموذج",

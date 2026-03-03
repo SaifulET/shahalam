@@ -495,7 +495,7 @@ export default function Home() {
                   <div className="min-w-0">
                     <div className="font-medium text-gray-900 dark:text-white">{localizeDynamicText(model.name)}</div>
                     <div className="text-sm text-gray-600 dark:text-gray-300">
-                      {localizeDynamicText(model.area ?? '')} م²
+                      {localizeDynamicText(model.area ?? '')} {t('squareMeters')}
                     </div>
                     {model.face && (
                       <div className="text-xs text-gray-500 dark:text-gray-400">{t('faceValue', { face: localizeDynamicText(model.face) })}</div>
@@ -694,8 +694,8 @@ export default function Home() {
         {/* Add Floor Modal */}
         {showAddFloorModal && (
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
                 {t('addFloorModal.title')}
               </h3>
               
@@ -705,7 +705,7 @@ export default function Home() {
                 onChange={(e) => setNewFloorName(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && confirmAddFloor()}
                 placeholder={t('addFloorModal.placeholder')}
-                className="mb-4 w-full rounded-lg border border-gray-300 px-4 py-3 text-center text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mb-4 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-center text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 autoFocus
               />
               
@@ -715,7 +715,7 @@ export default function Home() {
                     setShowAddFloorModal(false);
                     setNewFloorName('');
                   }}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                 >
                   {t('cancel')}
                 </button>
@@ -734,8 +734,8 @@ export default function Home() {
         {/* Add Unit Modal */}
         {showAddUnitModal && (
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
                 {t('addUnitModal.title')}
               </h3>
               
@@ -745,7 +745,7 @@ export default function Home() {
                   value={newUnitName}
                   onChange={(e) => setNewUnitName(e.target.value)}
                   placeholder={t('addUnitModal.placeholder')}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   autoFocus
                 />
               </div>
@@ -756,7 +756,7 @@ export default function Home() {
                     setShowAddUnitModal(false);
                     setNewUnitName('');
                   }}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                 >
                   {t('cancel')}
                 </button>
@@ -894,14 +894,14 @@ export default function Home() {
         {/* Add Model Modal */}
         {showAddModelModal && (
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
                 {t('addModelModal.title')}
               </h3>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('addModelModal.modelName')} *
                   </label>
                   <input
@@ -909,13 +909,13 @@ export default function Home() {
                     value={newModelName}
                     onChange={(e) => setNewModelName(e.target.value)}
                     placeholder={t('addModelModal.modelNamePlaceholder')}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     autoFocus
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('addModelModal.totalArea')} *
                   </label>
                   <input
@@ -923,12 +923,12 @@ export default function Home() {
                     value={newModelArea}
                     onChange={(e) => setNewModelArea(e.target.value)}
                     placeholder={t('addModelModal.totalAreaPlaceholder')}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('addModelModal.faceOptional')}
                   </label>
                   <input
@@ -936,7 +936,7 @@ export default function Home() {
                     value={newModelFace}
                     onChange={(e) => setNewModelFace(e.target.value)}
                     placeholder={t('addModelModal.facePlaceholder')}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -949,7 +949,7 @@ export default function Home() {
                     setNewModelArea('');
                     setNewModelFace('');
                   }}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                 >
                   {t('cancel')}
                 </button>
@@ -968,38 +968,38 @@ export default function Home() {
         {/* Edit Model Modal */}
         {showEditModelModal && editingModelData && (
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
                 {t('editModelModal.title')}
               </h3>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('editModelModal.modelName')} *
                   </label>
                   <input
                     type="text"
                     value={tempModelName}
                     onChange={(e) => setTempModelName(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('editModelModal.totalArea')} *
                   </label>
                   <input
                     type="number"
                     value={tempModelArea}
                     onChange={(e) => setTempModelArea(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('editModelModal.faceOptional')}
                   </label>
                   <input
@@ -1007,7 +1007,7 @@ export default function Home() {
                     value={tempModelFace}
                     onChange={(e) => setTempModelFace(e.target.value)}
                     placeholder={t('editModelModal.facePlaceholder')}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -1021,7 +1021,7 @@ export default function Home() {
                     setTempModelArea('');
                     setTempModelFace('');
                   }}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                 >
                   {t('cancel')}
                 </button>

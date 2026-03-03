@@ -206,6 +206,7 @@
     "exportPdf": "Export PDF",
     "buildingBackgroundAlt": "Building background",
     "logoAlt": "WSL logo",
+    "squareMeters": "sq m",
     "status": {
       "available": "Available",
       "reserved": "Reserved",
@@ -218,6 +219,7 @@
     "models": "Models",
     "addModel": "Add Model",
     "sqft": "sqft",
+    "squareMeters": "sq m",
     "faceValue": "Face: {face}",
     "editModel": "Edit model",
     "deleteModel": "Delete model",
