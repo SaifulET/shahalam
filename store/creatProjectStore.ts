@@ -29,7 +29,8 @@ interface ProjectState {
       image?: File | null;
     },
     floors: FloorPayload[],
-    models?: ModelPayload[]
+    models?: ModelPayload[],
+    folderId?:string
   ) => Promise<void>;
 }
 
@@ -37,27 +38,38 @@ export const useCreatProjectStore = create<ProjectState>((set) => ({
   loading: false,
   error: null,
 
-  createFullProject: async (projectData, floors, models = []) => {
+  createFullProject: async (projectData, floors, models = [],folderId) => {
     try {
       set({ loading: true, error: null });
-      
 
       // 1️⃣ CREATE PROJECT
       const formData = new FormData();
       formData.append("userId", projectData.userId);
       formData.append("name", projectData.name);
       formData.append("location", projectData.location);
+      if(folderId)formData.append("folderId",folderId);
 
       if (projectData.image) {
         formData.append("image", projectData.image);
       }
-
-      const projectRes = await api.post("/projects/",formData,
+      let projectId;
+if(!folderId){
+  const projectRes = await api.post("/projects/",formData,
         {
         headers: { 'Content-Type': 'multipart/form-data' },
       }
       );
-      const projectId = projectRes.data.data._id;
+      projectId = projectRes.data.data._id;
+}
+else{
+  const projectRes = await api.post("/projects/createproject/addtoFolder",formData,
+        {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+      );
+      projectId = projectRes.data.data._id;
+}
+     
 
       // 2️⃣ CREATE FLOORS
       for (const floor of floors) {

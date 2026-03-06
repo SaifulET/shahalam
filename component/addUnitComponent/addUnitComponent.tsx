@@ -10,6 +10,7 @@ import { useCreatProjectStore } from '@/store/creatProjectStore';
 import { useAuthStore } from '@/store/authStore';
 import { useModelStore } from '@/store/useModelStore';
 import AddModelModal from '../addModel/addModel';
+import { useProjectStore } from '@/store/projectStore';
 
 interface Floor {
   id: string;
@@ -43,6 +44,7 @@ export default function PropertyUnitForm() {
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const {folderId}= useProjectStore()
   
   // Get models from store
   const models = useModelStore((state) => state.models);
@@ -185,7 +187,7 @@ export default function PropertyUnitForm() {
         name: model.name,
         area: model.area,
         face: model.face,
-      }))
+      })),folderId
     );
 
     route.push("/dashboards");

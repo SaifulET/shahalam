@@ -36,7 +36,6 @@ export default function Navbar() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const login = useAuthStore((state) => state.login);
-  console.log(user, "abc")
 
   useEffect(() => {
     setAvatarSrc(resolveProfileImageSrc(user?.profileImage));
