@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/store/authStore";
 import axios from "axios";
+import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME, type AppLocale } from "./i18n";
 
 
 const api = axios.create({
@@ -9,12 +10,39 @@ const api = axios.create({
   withCredentials: true, // send httpOnly cookie
 });
 
+const getEffectiveLocale = (): AppLocale => {
+  if (typeof document === "undefined") return DEFAULT_LOCALE;
+  const cookieValue = document.cookie
+    .split(";")
+    .map((item) => item.trim())
+    .find((item) => item.startsWith(`${LOCALE_COOKIE_NAME}=`))
+    ?.split("=")[1];
+
+  return cookieValue === "ar" || cookieValue === "en"
+    ? cookieValue
+    : DEFAULT_LOCALE;
+};
+
 // Attach access token
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken;
+  const locale = getEffectiveLocale();
+
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  if (config.headers) {
+    config.headers["Accept-Language"] = locale;
+    config.headers["x-language"] = locale;
+  }
+
+  if (!config.params) {
+    config.params = {};
+  }
+  if (!Object.prototype.hasOwnProperty.call(config.params, "lang")) {
+    config.params.lang = locale;
+  }
+
   return config;
 });
 

@@ -67,7 +67,7 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
 
     const fetchDynamicTranslations = async () => {
       try {
-        const response = await fetch('/api/translate', {
+        const response = await fetch('/internal-translate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
