@@ -12,6 +12,7 @@
     "logoAlt": "الشعار",
     "home": "الرئيسية",
     "dashboard": "لوحة التحكم",
+    "logout": "تسجيل الخروج",
     "profileAlt": "الملف الشخصي لـ {name}",
     "userFallback": "المستخدم",
     "profileImageAlt": "الصورة الشخصية",

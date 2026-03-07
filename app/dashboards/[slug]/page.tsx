@@ -3,7 +3,7 @@
 import Navbar from '@/component/home/navbar';
 import ThemeToggle from '@/component/ThemeToggle/ThemeToggle';
 import { Add01FreeIcons } from '@hugeicons/core-free-icons';
-import { ArrowDownToDot, Edit, Trash2, Pencil, X } from 'lucide-react';
+import { ArrowDownToDot, Edit, Trash2, Pencil, X, Check } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
@@ -11,6 +11,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useApiStore, Project, Model, Floor, Unit, UnitStatus } from '@/store/editProjectStore';
 import { useAuthStore } from '@/store/authStore';
 import { useProjectStore } from '@/store/projectStore';
+import api from '@/lib/api';
  // Assuming you have this
 
 const ARABIC_DIGITS = ['\u0660', '\u0661', '\u0662', '\u0663', '\u0664', '\u0665', '\u0666', '\u0667', '\u0668', '\u0669'];
@@ -91,6 +92,9 @@ export default function Home() {
   const [tempModelArea, setTempModelArea] = useState('');
   const [tempModelFace, setTempModelFace] = useState('');
   const [saving, setSaving] = useState(false);
+  const [isEditingProjectName, setIsEditingProjectName] = useState(false);
+  const [projectNameInput, setProjectNameInput] = useState('');
+  const [isProjectNameSaving, setIsProjectNameSaving] = useState(false);
   const [translatedDynamicText, setTranslatedDynamicText] = useState<Record<string, string>>({});
 
   const textsToTranslate = useMemo(() => {
@@ -120,6 +124,17 @@ export default function Home() {
       ? fallbackArabicText(normalizedValue)
       : normalizedValue;
   };
+
+  const currentProject = useMemo(
+    () => projects.find((project) => project._id === projectId),
+    [projects, projectId]
+  );
+
+  useEffect(() => {
+    if (!isEditingProjectName) {
+      setProjectNameInput(currentProject?.name ?? '');
+    }
+  }, [currentProject?.name, isEditingProjectName]);
 
   const saveEditedFloor = async () => {
   const sanitizedFloorName = sanitizeValue(tempFloorName);
@@ -441,6 +456,37 @@ export default function Home() {
     await deleteModel(modelId);
   };
 
+  const handleSaveProjectName = async () => {
+    const sanitizedProjectName = sanitizeValue(projectNameInput);
+    if (!projectId || !sanitizedProjectName) return;
+
+    if (sanitizedProjectName === (currentProject?.name ?? '')) {
+      setIsEditingProjectName(false);
+      return;
+    }
+
+    try {
+      setIsProjectNameSaving(true);
+      await api.patch('/projects/update/projectname/project', {
+        projectId,
+        name: sanitizedProjectName,
+      });
+
+      if (user?.id) {
+        if (folderId) {
+          await fetchfolderProject(folderId);
+        } else {
+          await getProjects(user.id);
+        }
+      }
+
+      setIsEditingProjectName(false);
+    } catch {
+    } finally {
+      setIsProjectNameSaving(false);
+    }
+  };
+
   // Loading states
   if (projectsLoading || modelsLoading || floorsLoading) {
     return (
@@ -454,7 +500,7 @@ export default function Home() {
   }
 
   return (
-    <div dir="ltr" className="pt-14 sm:pt-16">
+    <div dir="ltr" className="pt-16 sm:pt-20">
       {/* <Navbar /> */}
       <div className="fixed right-3 top-3 z-[100]">
         <ThemeToggle />
@@ -583,6 +629,70 @@ export default function Home() {
 
           {/* Live Preview - Table Style Layout */}
           <div className="flex-1 overflow-auto px-4 pb-6 sm:px-6 lg:px-8 xl:px-12">
+            <div className="mb-6 flex items-center justify-center gap-2 sm:mb-8">
+              <div className="flex min-w-0 items-center justify-center">
+                {isEditingProjectName ? (
+                  <input
+                    type="text"
+                    value={projectNameInput}
+                    onChange={(e) => setProjectNameInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveProjectName();
+                      if (e.key === 'Escape') {
+                        setIsEditingProjectName(false);
+                        setProjectNameInput(currentProject?.name ?? '');
+                      }
+                    }}
+                    className="w-[240px] max-w-md rounded-lg border border-gray-300 bg-white px-3 py-2 mt-2 text-center text-lg font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:w-[320px] dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    placeholder={t('propertyStructure')}
+                    autoFocus
+                  />
+                ) : (
+                  <h1 className="max-w-[320px] truncate text-center text-xl font-semibold text-gray-900 dark:text-[#E5E7EB]">
+                    {localizeDynamicText(currentProject?.name || '')}
+                  </h1>
+                )}
+              </div>
+
+              <div className="mt-1 flex items-center gap-2">
+                {isEditingProjectName ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        setIsEditingProjectName(false);
+                        setProjectNameInput(currentProject?.name ?? '');
+                      }}
+                      disabled={isProjectNameSaving}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+                      title={t('cancel')}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={handleSaveProjectName}
+                      disabled={!projectNameInput.trim() || isProjectNameSaving}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      title={t('saveChanges')}
+                    >
+                      {isProjectNameSaving ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      ) : (
+                        <Check className="h-4 w-4" />
+                      )}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setIsEditingProjectName(true)}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-300 dark:hover:bg-blue-900/30"
+                    title={t('edit')}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+
             <div className='flex flex-col gap-3 pb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:pb-8'>
               <h1 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">{t('livePreview')}</h1>
               <div>

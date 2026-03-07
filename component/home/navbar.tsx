@@ -31,11 +31,13 @@ export default function Navbar() {
   const locale = useLocale();
   const isRtl = locale === 'ar';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState(FALLBACK_PROFILE_IMAGE);
   const pathname = usePathname();
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const login = useAuthStore((state) => state.login);
+  const logout = useAuthStore((state) => state.logout);
 
   useEffect(() => {
     setAvatarSrc(resolveProfileImageSrc(user?.profileImage));
@@ -72,6 +74,21 @@ export default function Navbar() {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // Continue to clear client state and redirect even if the API fails.
+    } finally {
+      logout();
+      router.push('/auth/signin');
+      setIsMenuOpen(false);
+      setIsLoggingOut(false);
+    }
   };
 
   const desktopNavGapSide = isRtl ? 'md:ml-2' : 'md:mr-2';
@@ -144,6 +161,14 @@ export default function Navbar() {
             >
               {t('dashboard')}
             </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="relative inline-flex h-10 items-center px-2 text-[15px] font-[family-name:var(--font-poppins)] font-medium tracking-tight text-gray-600 transition-colors duration-200 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-60 dark:text-gray-300 dark:hover:text-white"
+            >
+              {t('logout')}
+            </button>
           </div>
           <div
             dir="ltr"
@@ -230,6 +255,14 @@ export default function Navbar() {
             >
               {t('dashboards')}
             </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="block w-full rounded-xl px-3 py-2.5 text-left text-sm font-[family-name:var(--font-poppins)] font-medium tracking-tight text-gray-700 transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-60 dark:text-gray-200 dark:hover:bg-white/5 dark:hover:text-white"
+            >
+              {t('logout')}
+            </button>
           </div>
         </div>
       )}

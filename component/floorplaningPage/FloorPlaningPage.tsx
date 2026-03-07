@@ -205,8 +205,10 @@ export default function RealEstateProject() {
     };
   }, [locale, textsToTranslate]);
 
+  const floorsInDisplayOrder = [...floors].reverse();
+
   // Transform floors data to match the unitRows structure
-  const unitRows = floors.map((floor: FloorData) => ({
+  const unitRows = floorsInDisplayOrder.map((floor: FloorData) => ({
     units: floor.units.map((unit) => ({
       label: localizeDynamicText(unit.name),
       tone: unit.status,
@@ -215,8 +217,7 @@ export default function RealEstateProject() {
   }));
 
   // Transform floor names for the floor labels panel
- // Transform floor names for the floor labels panel - REVERSE THE ORDER to match the visual layout
-const floorLabelsLocalized = floors.map((floor: FloorData) =>
+const floorLabelsLocalized = floorsInDisplayOrder.map((floor: FloorData) =>
   localizeDynamicText(floor.name)
 );
 
@@ -225,8 +226,7 @@ const floorsPanel = (
     className="flex h-full  flex-col items-center justify-between rounded-3xl border border-white/10 bg-[#1a221f]/30 px-4 py-6 text-center text-sm uppercase tracking-[0.2em] text-[#F2DFA7] sf-pro"
     dir={isArabic ? "rtl" : "ltr"}
   >
-    {/* Map in reverse order so first floor (1st) appears at bottom */}
-    {floorLabelsLocalized.slice().reverse().map((label, index) => (
+    {floorLabelsLocalized.map((label, index) => (
       <span key={`floor-label-${index}`} className="leading-6">
         {label}
       </span>

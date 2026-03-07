@@ -10,7 +10,7 @@ export interface ModelPayload {
 interface ModelStore {
   models: ModelPayload[];
   addModel: (model: ModelPayload) => void;
-  removeModel: (name: string) => void;
+  removeModel: (id: string) => void;
   clearModels: () => void;
 }
 
@@ -22,9 +22,9 @@ export const useModelStore = create<ModelStore>((set) => ({
       models: [...state.models, model],
     })),
 
-  removeModel: (name) =>
+  removeModel: (id) =>
     set((state) => ({
-      models: state.models.filter((m) => m.name !== name),
+      models: state.models.filter((m) => m.id !== id),
     })),
 
   clearModels: () => set({ models: [] }),

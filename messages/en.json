@@ -12,6 +12,7 @@
     "logoAlt": "Logo",
     "home": "Home",
     "dashboard": "Dashboard",
+    "logout": "Logout",
     "profileAlt": "{name}'s profile",
     "userFallback": "User",
     "profileImageAlt": "Profile",
