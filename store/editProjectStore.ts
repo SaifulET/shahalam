@@ -54,6 +54,12 @@ interface FolderProjectsResponse {
   projects: Project[];
 }
 
+interface RecentProjectsResponse {
+  data: Array<{
+    projectId: Project;
+  }>;
+}
+
 interface ModelsResponse {
   data: Model[];
   message?: string;
@@ -97,6 +103,7 @@ interface ApiStoreState {
   projectsCurrentPage?: number;
 
   getProjects: (userId: string, page?: number) => Promise<void>;
+  getRecentProjects: (userId: string) => Promise<void>;
   fetchfolderProject: (folderId: string) => Promise<void>;
 
   // ---------- Models ----------
@@ -170,6 +177,30 @@ export const useApiStore = create<ApiStoreState>((set, get) => ({
       set({ 
         projectsError: handleApiError(error), 
         projectsLoading: false 
+      });
+    }
+  },
+
+  getRecentProjects: async (userId: string) => {
+    set({ projectsLoading: true, projectsError: null });
+    try {
+      const response = await api.get<RecentProjectsResponse>(`/recents/user/${userId}`);
+      const projects = Array.isArray(response.data?.data)
+        ? response.data.data
+            .map((item) => item.projectId)
+            .filter((project): project is Project => Boolean(project?._id))
+        : [];
+      const uniqueProjects = Array.from(
+        new Map(projects.map((project) => [project._id, project])).values()
+      );
+      set({
+        projects: uniqueProjects,
+        projectsLoading: false,
+      });
+    } catch (error: unknown) {
+      set({
+        projectsError: handleApiError(error),
+        projectsLoading: false,
       });
     }
   },
