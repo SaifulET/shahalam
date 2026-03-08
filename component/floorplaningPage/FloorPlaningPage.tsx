@@ -96,7 +96,7 @@ export default function RealEstateProject() {
     models,
     folderId,
     selectedProjectId,
-    fetchProjects,
+    fetchRecentProjects,
     fetchfolderProject,
     fetchFloors,
     fetchModels,
@@ -137,9 +137,9 @@ export default function RealEstateProject() {
         fetchfolderProject(folderId);
         return;
       }
-      fetchProjects(user.id);
+      fetchRecentProjects(user.id);
     }
-  }, [user?.id, folderId, fetchProjects, fetchfolderProject]);
+  }, [user?.id, folderId, fetchRecentProjects, fetchfolderProject]);
 
   // Auto select first project
   useEffect(() => {

@@ -6,6 +6,14 @@ interface Project {
   name: string;
 }
 
+interface RecentProjectItem {
+  _id: string;
+  projectId: {
+    _id: string;
+    name: string;
+  };
+}
+
 interface Unit {
   _id: string;
   name: string;
@@ -33,6 +41,7 @@ interface ProjectState {
   selectedProjectId: string | null;
 
   fetchProjects: (userId: string) => Promise<void>;
+  fetchRecentProjects: (userId: string) => Promise<void>;
   fetchfolderProject: (folderId: string) => Promise<void>;
   fetchFloors: (projectId: string) => Promise<void>;
   fetchModels: (projectId: string) => Promise<void>;
@@ -58,6 +67,23 @@ export const useProjectStore = create<ProjectState>((set) => ({
     set({
       projects,
       selectedProjectId: projects[0]?._id ?? null,
+    });
+  },
+
+  fetchRecentProjects: async (userId) => {
+    const res = await api.get(`/recents/user/${userId}`);
+    const items = Array.isArray(res.data?.data)
+      ? (res.data.data as RecentProjectItem[])
+      : [];
+    const projects = items
+      .map((item) => item.projectId)
+      .filter((project): project is Project => Boolean(project?._id));
+    const uniqueProjects = Array.from(
+      new Map(projects.map((project) => [project._id, project])).values()
+    );
+    set({
+      projects: uniqueProjects,
+      selectedProjectId: uniqueProjects[0]?._id ?? null,
     });
   },
 

@@ -45,7 +45,7 @@ export default function Home() {
     // Projects
     projects,
     projectsLoading,
-    getProjects,
+    getRecentProjects,
     fetchfolderProject,
     
     // Models
@@ -214,9 +214,9 @@ export default function Home() {
         fetchfolderProject(folderId);
         return;
       }
-      getProjects(user.id);
+      getRecentProjects(user.id);
     }
-  }, [user?.id, folderId, getProjects, fetchfolderProject]);
+  }, [user?.id, folderId, getRecentProjects, fetchfolderProject]);
 
   useEffect(() => {
     if (projectId) {
@@ -476,7 +476,7 @@ export default function Home() {
         if (folderId) {
           await fetchfolderProject(folderId);
         } else {
-          await getProjects(user.id);
+          await getRecentProjects(user.id);
         }
       }
 
