@@ -205,7 +205,7 @@ export default function RealEstateProject() {
     };
   }, [locale, textsToTranslate]);
 
-  const floorsInDisplayOrder = [...floors].reverse();
+  const floorsInDisplayOrder = [...floors];
 
   // Transform floors data to match the unitRows structure
   const unitRows = floorsInDisplayOrder.map((floor: FloorData) => ({
