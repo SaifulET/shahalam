@@ -6,7 +6,7 @@ import { Poppins } from "next/font/google";
 import { Download, ImageDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { resolveApiImageSrc } from "@/lib/resolveApiImageSrc";
+import { resolveApiImageSrc, resolveExportImageSrc } from "@/lib/resolveApiImageSrc";
 import { useAuthStore } from "@/store/authStore";
 import { useProjectStore } from "@/store/projectStore";
 
@@ -48,6 +48,8 @@ export default function RealEstateProject() {
   const locale = useLocale();
   const [showAddPopup, setShowAddPopup] = useState(false);
   const [isExportingImage, setIsExportingImage] = useState(false);
+  const [projectImageSrc, setProjectImageSrc] = useState<string | null>(null);
+  const [profileImageSrc, setProfileImageSrc] = useState<string | null>(null);
   const [selectedUnitType, setSelectedUnitType] = useState<
     "apartment" | "annex" | null
   >(null);
@@ -114,6 +116,33 @@ export default function RealEstateProject() {
     (project) => project._id === selectedProjectId
   );
   const currentProjectImage = resolveApiImageSrc(currentProject?.image);
+  const currentProfileImage = resolveApiImageSrc(user?.profileImage);
+  const exportProjectImage = resolveExportImageSrc(currentProject?.image);
+  const exportProfileImage = resolveExportImageSrc(user?.profileImage);
+
+  useEffect(() => {
+    setProjectImageSrc(currentProjectImage ?? exportProjectImage);
+  }, [currentProjectImage, exportProjectImage]);
+
+  useEffect(() => {
+    setProfileImageSrc(currentProfileImage ?? exportProfileImage);
+  }, [currentProfileImage, exportProfileImage]);
+
+  const waitForImageLoad = async (image: HTMLImageElement | null) => {
+    if (!image) return;
+    if (image.complete && image.naturalWidth > 0) return;
+
+    await new Promise<void>((resolve) => {
+      const done = () => {
+        image.removeEventListener("load", done);
+        image.removeEventListener("error", done);
+        resolve();
+      };
+
+      image.addEventListener("load", done, { once: true });
+      image.addEventListener("error", done, { once: true });
+    });
+  };
 
   // Transform floors data to match the unitRows structure
   const unitRows = floorsInDisplayOrder.map((floor: FloorData) => ({
@@ -221,18 +250,48 @@ const unitsPanel = (
 
     try {
       setIsExportingImage(true);
-      const domtoimage = (await import("dom-to-image-more")).default;
+      const projectImageNode = exportNode.querySelector<HTMLImageElement>(
+        "[data-export-project-image]"
+      );
+      const profileImageNode = exportNode.querySelector<HTMLImageElement>(
+        "[data-export-profile-image]"
+      );
+      const originalProjectSrc = projectImageNode?.getAttribute("src") ?? null;
+      const originalProfileSrc = profileImageNode?.getAttribute("src") ?? null;
 
-      const imageDataUrl = await domtoimage.toPng(exportNode, {
-        cacheBust: true,
-        width: exportNode.scrollWidth,
-        height: exportNode.scrollHeight,
-        copyDefaultStyles: false,
-        style: {
-          border: "0",
-          outline: "0",
-        },
-      });
+      if (projectImageNode && exportProjectImage) {
+        projectImageNode.src = exportProjectImage;
+      }
+      if (profileImageNode && exportProfileImage) {
+        profileImageNode.src = exportProfileImage;
+      }
+
+      await Promise.all([
+        waitForImageLoad(projectImageNode),
+        waitForImageLoad(profileImageNode),
+      ]);
+
+      const domtoimage = (await import("dom-to-image-more")).default;
+      let imageDataUrl = "";
+      try {
+        imageDataUrl = await domtoimage.toPng(exportNode, {
+          cacheBust: true,
+          width: exportNode.scrollWidth,
+          height: exportNode.scrollHeight,
+          copyDefaultStyles: false,
+          style: {
+            border: "0",
+            outline: "0",
+          },
+        });
+      } finally {
+        if (projectImageNode && originalProjectSrc) {
+          projectImageNode.src = originalProjectSrc;
+        }
+        if (profileImageNode && originalProfileSrc) {
+          profileImageNode.src = originalProfileSrc;
+        }
+      }
 
       const link = document.createElement("a");
       const baseName =
@@ -243,7 +302,9 @@ const unitsPanel = (
 
       link.href = imageDataUrl;
       link.download = `${baseName}.png`;
+      document.body.appendChild(link);
       link.click();
+      link.remove();
     } catch (error) {
       console.error("Failed to export image", error);
     } finally {
@@ -483,12 +544,20 @@ const unitsPanel = (
                 ref={exportContentRef}
               >
               <div className="print-bg absolute inset-0 opacity-40">
-                {currentProjectImage && (
+                {projectImageSrc && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={currentProjectImage}
+                    src={projectImageSrc}
                     alt={t("buildingBackgroundAlt")}
                     className="h-full w-full object-cover"
+                    data-export-project-image="true"
+                    onError={() => {
+                      if (projectImageSrc !== exportProjectImage && exportProjectImage) {
+                        setProjectImageSrc(exportProjectImage);
+                        return;
+                      }
+                      setProjectImageSrc(null);
+                    }}
                   />
                 )}
               </div>
@@ -497,13 +566,20 @@ const unitsPanel = (
               <div className="print-scale relative flex min-h-[560px] sm:min-h-[640px] lg:min-h-[720px] flex-col px-4 py-6 sm:px-6 sm:py-8 lg:px-16 lg:py-10">
                 <header className="flex flex-col items-center text-center">
                   <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-[24px] sm:mb-4 sm:h-32 sm:w-32 lg:h-40 lg:w-40 lg:rounded-[32px]">
-                   {user?.profileImage && (
-                     <Image
-                      src={`${user?.profileImage}`}
+                   {profileImageSrc && (
+                     // eslint-disable-next-line @next/next/no-img-element
+                     <img
+                      src={profileImageSrc}
                       alt={t("logoAlt")}
-                      width={160}
-                      height={160}
-                      className="h-full w-full"
+                      className="h-full w-full object-contain"
+                      data-export-profile-image="true"
+                      onError={() => {
+                        if (profileImageSrc !== exportProfileImage && exportProfileImage) {
+                          setProfileImageSrc(exportProfileImage);
+                          return;
+                        }
+                        setProfileImageSrc(null);
+                      }}
                     />
                    )}
                   </div>
