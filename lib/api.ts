@@ -4,9 +4,8 @@ import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME, type AppLocale } from "./i18n";
 
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://api.ur-wsl.com",
-  // baseURL: "http://localhost:5001",
-
+  // baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001",
+  baseURL: "https://api.ur-wsl.com",
   withCredentials: true, // send httpOnly cookie
 });
 

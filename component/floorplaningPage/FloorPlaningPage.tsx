@@ -121,11 +121,11 @@ export default function RealEstateProject() {
   const exportProfileImage = resolveExportImageSrc(user?.profileImage);
 
   useEffect(() => {
-    setProjectImageSrc(currentProjectImage ?? exportProjectImage);
+    setProjectImageSrc(exportProjectImage ?? currentProjectImage);
   }, [currentProjectImage, exportProjectImage]);
 
   useEffect(() => {
-    setProfileImageSrc(currentProfileImage ?? exportProfileImage);
+    setProfileImageSrc(exportProfileImage ?? currentProfileImage);
   }, [currentProfileImage, exportProfileImage]);
 
   const waitForImageLoad = async (image: HTMLImageElement | null) => {
@@ -142,6 +142,45 @@ export default function RealEstateProject() {
       image.addEventListener("load", done, { once: true });
       image.addEventListener("error", done, { once: true });
     });
+  };
+
+  const loadImageAsDataUrl = async (imageSrc?: string | null) => {
+    if (!imageSrc || imageSrc.startsWith("data:")) return imageSrc ?? null;
+
+    try {
+      const response = await fetch(imageSrc, {
+        cache: "no-store",
+        credentials: "same-origin",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Unable to fetch image: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+
+      return await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            resolve(reader.result);
+            return;
+          }
+
+          reject(new Error("Failed to convert image to data URL"));
+        };
+
+        reader.onerror = () => {
+          reject(reader.error ?? new Error("Failed to read image blob"));
+        };
+
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error("Failed to prepare export image", error);
+      return imageSrc;
+    }
   };
 
   // Transform floors data to match the unitRows structure
@@ -259,11 +298,16 @@ const unitsPanel = (
       const originalProjectSrc = projectImageNode?.getAttribute("src") ?? null;
       const originalProfileSrc = profileImageNode?.getAttribute("src") ?? null;
 
-      if (projectImageNode && exportProjectImage) {
-        projectImageNode.src = exportProjectImage;
+      const [preparedProjectImage, preparedProfileImage] = await Promise.all([
+        loadImageAsDataUrl(exportProjectImage),
+        loadImageAsDataUrl(exportProfileImage),
+      ]);
+
+      if (projectImageNode && preparedProjectImage) {
+        projectImageNode.src = preparedProjectImage;
       }
-      if (profileImageNode && exportProfileImage) {
-        profileImageNode.src = exportProfileImage;
+      if (profileImageNode && preparedProfileImage) {
+        profileImageNode.src = preparedProfileImage;
       }
 
       await Promise.all([
@@ -552,8 +596,8 @@ const unitsPanel = (
                     className="h-full w-full object-cover"
                     data-export-project-image="true"
                     onError={() => {
-                      if (projectImageSrc !== exportProjectImage && exportProjectImage) {
-                        setProjectImageSrc(exportProjectImage);
+                      if (projectImageSrc !== currentProjectImage && currentProjectImage) {
+                        setProjectImageSrc(currentProjectImage);
                         return;
                       }
                       setProjectImageSrc(null);
@@ -574,8 +618,8 @@ const unitsPanel = (
                       className="h-full w-full object-contain"
                       data-export-profile-image="true"
                       onError={() => {
-                        if (profileImageSrc !== exportProfileImage && exportProfileImage) {
-                          setProfileImageSrc(exportProfileImage);
+                        if (profileImageSrc !== currentProfileImage && currentProfileImage) {
+                          setProfileImageSrc(currentProfileImage);
                           return;
                         }
                         setProfileImageSrc(null);

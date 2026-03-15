@@ -24,7 +24,8 @@ export default function LoginPage() {
   try {
     const res = await api.post("/auth/login", { email, password });
     const { accessToken, user } = res.data;
-    console.log(user,"kdkkdkdkd")
+
+    console.log(res,"kdkkdkdkd")
     // Update Zustand store
     useAuthStore.getState().login(user, accessToken);
 
