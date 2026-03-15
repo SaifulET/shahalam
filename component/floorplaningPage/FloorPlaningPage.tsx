@@ -6,7 +6,6 @@ import { Poppins } from "next/font/google";
 import { Download, ImageDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import domtoimage from "dom-to-image-more";
 import { resolveApiImageSrc } from "@/lib/resolveApiImageSrc";
 import { useAuthStore } from "@/store/authStore";
 import { useProjectStore } from "@/store/projectStore";
@@ -110,7 +109,7 @@ export default function RealEstateProject() {
     }
   }, [fetchFloors, fetchModels, selectedProjectId]);
 
-  const floorsInDisplayOrder = [...floors].reverse();
+  const floorsInDisplayOrder = [...floors];
   const currentProject = projects.find(
     (project) => project._id === selectedProjectId
   );
@@ -222,6 +221,7 @@ const unitsPanel = (
 
     try {
       setIsExportingImage(true);
+      const domtoimage = (await import("dom-to-image-more")).default;
 
       const imageDataUrl = await domtoimage.toPng(exportNode, {
         cacheBust: true,
