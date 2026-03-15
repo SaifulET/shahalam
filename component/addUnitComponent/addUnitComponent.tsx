@@ -1,10 +1,8 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Plus, X, Upload, Home } from 'lucide-react';
+import { Plus, X, Upload, Home, Pencil } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import ThemeToggle from '@/component/ThemeToggle/ThemeToggle';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCreatProjectStore } from '@/store/creatProjectStore';
 import { useAuthStore } from '@/store/authStore';
@@ -18,20 +16,13 @@ interface Floor {
   units: string[];
 }
 
-interface Model {
-  id: string;
-  name: string;
-  area: number;
-  face: string;
-}
-
 function sanitizeUnitName(value: string) {
   return value.normalize('NFKC').trim().replace(/\s+/g, ' ');
 }
 
 export default function PropertyUnitForm() {
   const t = useTranslations('addUnitForm');
-  const { createFullProject, loading } = useCreatProjectStore();
+  const { createFullProject, loading, error } = useCreatProjectStore();
   const user = useAuthStore().user;
   const [propertyName, setPropertyName] = useState('');
   const [location, setLocation] = useState('');
@@ -39,6 +30,7 @@ export default function PropertyUnitForm() {
   const [floors, setFloors] = useState<Floor[]>([]);
   const [showUnitModal, setShowUnitModal] = useState(false);
   const [showModelModal, setShowModelModal] = useState(false);
+  const [editingModelId, setEditingModelId] = useState<string | null>(null);
   const [currentFloorId, setCurrentFloorId] = useState<string>('');
   const [newUnitName, setNewUnitName] = useState('');
   const [coverImage, setCoverImage] = useState<string | null>(null);
@@ -46,10 +38,11 @@ export default function PropertyUnitForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {folderId}= useProjectStore()
   
-  // Get models from store
   const models = useModelStore((state) => state.models);
   const removeModel = useModelStore((state) => state.removeModel);
+  const clearModels = useModelStore((state) => state.clearModels);
   const route = useRouter();
+  const editingModel = models.find((model) => model.id === editingModelId) ?? null;
 
   const addFloor = () => {
     const newFloor: Floor = {
@@ -76,12 +69,14 @@ export default function PropertyUnitForm() {
     setNewUnitName('');
   };
 
-  const openModelModal = () => {
+  const openModelModal = (modelId?: string) => {
+    setEditingModelId(modelId ?? null);
     setShowModelModal(true);
   };
 
   const closeModelModal = () => {
     setShowModelModal(false);
+    setEditingModelId(null);
   };
 
   const saveNewUnit = () => {
@@ -167,12 +162,14 @@ export default function PropertyUnitForm() {
   };
 
   const handleSave = async () => {
+    if (loading) return;
+
     if (!propertyName || !location) {
       alert(t('alerts.fillPropertyNameAndLocation'));
       return;
     }
 
-    await createFullProject(
+    const created = await createFullProject(
       {
         userId: user?.id || "",
         name: propertyName,
@@ -190,6 +187,12 @@ export default function PropertyUnitForm() {
       })),folderId
     );
 
+    if (!created) {
+      alert(useCreatProjectStore.getState().error || error || t('alerts.createPropertyFailed'));
+      return;
+    }
+
+    clearModels();
     route.push("/dashboards");
   };
 
@@ -200,19 +203,6 @@ export default function PropertyUnitForm() {
         <div className="mb-6">
           <div className="flex flex-col gap-3 px-1 pb-4 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="font-inter font-semibold text-[24px] leading-[32px] tracking-[-0.5px] text-black dark:text-white">{t('title')}</h1>
-            <div className="flex gap-2 sm:gap-3">
-              <Link href="/dashboards">
-                <button className="rounded-lg border border-[#D1D5DB] px-4 py-2.5 text-center font-inter text-[14px] font-medium leading-[14px] tracking-[-0.5px] text-[#374151] transition-colors hover:bg-gray-50 dark:text-gray-50 dark:hover:bg-gray-700 sm:px-8 sm:py-3">
-                  {t('cancel')}
-                </button>
-              </Link>
-              <button 
-                onClick={handleSave} 
-                className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600"
-              >
-                {t('saveProperty')}
-              </button>
-            </div>
           </div>
 
           {/* Property Information */}
@@ -258,7 +248,7 @@ export default function PropertyUnitForm() {
             </div>
 
             <button 
-              onClick={openModelModal}
+              onClick={() => openModelModal()}
               className="w-full gap-1 px-3 py-3 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-100 transition-colors text-center mt-2"
             >
               {t('addModel')}
@@ -278,14 +268,24 @@ export default function PropertyUnitForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {models.map((model) => (
                   <div key={model.id} className="relative group">
-                    {/* Remove button - always visible on hover, with high z-index */}
-                    <button
-                      onClick={(e) => removeModelHandler(model.id, e)}
-                      className="absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-20 opacity-0 group-hover:opacity-100 shadow-lg"
-                      title={t('removeModel')}
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
+                    <div className="absolute right-2 top-2 z-20 flex gap-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
+                      <button
+                        onClick={() => openModelModal(model.id)}
+                        type="button"
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg transition-colors hover:bg-blue-600"
+                        title={t('editModel')}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => removeModelHandler(model.id, e)}
+                        type="button"
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-colors hover:bg-red-600"
+                        title={t('removeModel')}
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
                     
                     <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-[#28272A] hover:shadow-md transition-shadow relative z-10">
                       <div className="flex items-start justify-between mb-3">
@@ -397,6 +397,7 @@ export default function PropertyUnitForm() {
             
             {coverImage ? (
               <div className="relative border-2 border-gray-300 rounded-lg overflow-hidden group">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img 
                   src={coverImage} 
                   alt={t('coverPreviewAlt')} 
@@ -442,6 +443,32 @@ export default function PropertyUnitForm() {
               </div>
             )}
           </div>
+        </div>
+
+        <div className="mt-6 flex flex-col gap-3 border-t border-[#E5E7EB] pt-6 dark:border-gray-800 sm:flex-row sm:justify-end">
+          <button
+            onClick={() => {
+              if (!loading) {
+                route.push('/dashboards');
+              }
+            }}
+            type="button"
+            disabled={loading}
+            className="rounded-lg border border-[#D1D5DB] px-4 py-3 text-center font-inter text-[14px] font-medium leading-[14px] tracking-[-0.5px] text-[#374151] transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:text-gray-50 dark:hover:bg-gray-700 sm:px-8"
+          >
+            {t('cancel')}
+          </button>
+          <button
+            onClick={handleSave}
+            type="button"
+            disabled={loading}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-500 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-70 sm:min-w-[160px]"
+          >
+            {loading && (
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            )}
+            {loading ? t('addingProperty') : t('addProperty')}
+          </button>
         </div>
       </div>
 
@@ -491,7 +518,7 @@ export default function PropertyUnitForm() {
       {showModelModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white dark:bg-black rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <AddModelModal onClose={closeModelModal} />
+            <AddModelModal onClose={closeModelModal} modelToEdit={editingModel} />
           </div>
         </div>
       )}

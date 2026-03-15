@@ -1,34 +1,56 @@
 'use client';
 
 import { useModelStore } from '@/store/useModelStore';
-import React, { useState } from 'react';
+import type { ModelPayload } from '@/store/useModelStore';
+import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 interface AddModelModalProps {
   onClose: () => void;
+  modelToEdit?: ModelPayload | null;
 }
 
-export default function AddModelModal({ onClose }: AddModelModalProps) {
+export default function AddModelModal({ onClose, modelToEdit = null }: AddModelModalProps) {
   const t = useTranslations('addModelModal');
   const [modelName, setModelName] = useState('');
   const [totalArea, setTotalArea] = useState('');
   const [face, setFace] = useState('');
-  
+  const isEditing = Boolean(modelToEdit);
   const addModel = useModelStore((state) => state.addModel);
+  const updateModel = useModelStore((state) => state.updateModel);
+
+  useEffect(() => {
+    setModelName(modelToEdit?.name ?? '');
+    setTotalArea(modelToEdit?.area?.toString() ?? '');
+    setFace(modelToEdit?.face ?? '');
+  }, [modelToEdit]);
 
   const handleSave = () => {
-    if (!modelName || !totalArea || !face) {
+    const sanitizedModelName = modelName.trim();
+    const sanitizedFace = face.trim();
+    const sanitizedArea = totalArea.trim();
+
+    if (!sanitizedModelName || !sanitizedArea || !sanitizedFace) {
       alert(t('allFieldsRequired'));
       return;
     }
 
-    // Generate a unique ID for the model
+    if (isEditing && modelToEdit) {
+      updateModel(modelToEdit.id, {
+        name: sanitizedModelName,
+        area: Number(sanitizedArea),
+        face: sanitizedFace,
+      });
+      onClose();
+      return;
+    }
+
     const newModel = {
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      name: modelName,
-      area: Number(totalArea),
-      face,
+      id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
+      name: sanitizedModelName,
+      area: Number(sanitizedArea),
+      face: sanitizedFace,
     };
 
     addModel(newModel);
@@ -41,6 +63,7 @@ export default function AddModelModal({ onClose }: AddModelModalProps) {
       <button
         onClick={onClose}
         className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors z-10"
+        type="button"
       >
         <X className="w-4 h-4 text-gray-600 dark:text-gray-300" />
       </button>
@@ -49,20 +72,22 @@ export default function AddModelModal({ onClose }: AddModelModalProps) {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <h1 className="font-inter font-semibold text-[24px] leading-[32px] tracking-[-0.5px] text-gray-900 dark:text-[#FFFFFF]">
-            {t('title')}
+            {isEditing ? t('editTitle') : t('title')}
           </h1>
           <div className="flex gap-3 sm:gap-4">
             <button
               onClick={onClose}
+              type="button"
               className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
             >
               {t('cancel')}
             </button>
             <button
               onClick={handleSave}
+              type="button"
               className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
             >
-              {t('saveModel')}
+              {isEditing ? t('updateModel') : t('saveModel')}
             </button>
           </div>
         </div>

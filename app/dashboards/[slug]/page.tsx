@@ -1,28 +1,15 @@
 'use client';
 
-import Navbar from '@/component/home/navbar';
 import ThemeToggle from '@/component/ThemeToggle/ThemeToggle';
-import { Add01FreeIcons } from '@hugeicons/core-free-icons';
-import { ArrowDownToDot, Edit, Trash2, Pencil, X, Check } from 'lucide-react';
+import { Trash2, Pencil, X, Check } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useEffect, useMemo } from 'react';
-import { useApiStore, Project, Model, Floor, Unit, UnitStatus } from '@/store/editProjectStore';
+import { useApiStore, Model, Floor, Unit, UnitStatus } from '@/store/editProjectStore';
 import { useAuthStore } from '@/store/authStore';
 import { useProjectStore } from '@/store/projectStore';
 import api from '@/lib/api';
- // Assuming you have this
-
-const ARABIC_DIGITS = ['\u0660', '\u0661', '\u0662', '\u0663', '\u0664', '\u0665', '\u0666', '\u0667', '\u0668', '\u0669'];
-
-function fallbackArabicText(value: string) {
-  return value
-    .replace(/\d/g, (digit) => ARABIC_DIGITS[Number(digit)])
-    .replace(/,/g, '\u060C')
-    .replace(/;/g, '\u061B')
-    .replace(/\?/g, '\u061F');
-}
 
 function sanitizeValue(value: string) {
   return value.normalize('NFKC').trim().replace(/\s+/g, ' ');
@@ -95,34 +82,10 @@ export default function Home() {
   const [isEditingProjectName, setIsEditingProjectName] = useState(false);
   const [projectNameInput, setProjectNameInput] = useState('');
   const [isProjectNameSaving, setIsProjectNameSaving] = useState(false);
-  const [translatedDynamicText, setTranslatedDynamicText] = useState<Record<string, string>>({});
-
-  const textsToTranslate = useMemo(() => {
-    const values: string[] = [
-      ...projects.map((project) => project.name),
-      ...floors.map((floor) => floor.name),
-      ...floors.flatMap((floor) => floor.units.map((unit) => unit.name)),
-      ...models.map((model) => model.name),
-      ...models.map((model) => String(model.area ?? '')),
-      ...models.map((model) => model.face).filter(Boolean) as string[],
-    ];
-
-    return Array.from(
-      new Set(values.map((value) => value?.trim()).filter(Boolean))
-    ) as string[];
-  }, [projects, floors, models]);
 
   const localizeDynamicText = (value?: string | number | null) => {
     if (value === null || value === undefined) return '';
-    const normalizedValue = String(value).trim();
-    if (!normalizedValue) return '';
-
-    const translatedValue = translatedDynamicText[normalizedValue];
-    if (translatedValue) return translatedValue;
-
-    return locale === 'ar'
-      ? fallbackArabicText(normalizedValue)
-      : normalizedValue;
+    return String(value);
   };
 
   const currentProject = useMemo(
@@ -200,8 +163,7 @@ export default function Home() {
     // Optional: Show success message
     // toast.success('Floor updated successfully');
 
-  } catch (error) {
-    
+  } catch {
     setSaving(false);
     // Optional: Show error message
     // toast.error('Failed to update floor');
@@ -235,52 +197,6 @@ export default function Home() {
       setSelectedFloorId('');
     }
   }, [floors, selectedFloorId]);
-
-  useEffect(() => {
-    let active = true;
-
-    if (textsToTranslate.length === 0) {
-      setTranslatedDynamicText({});
-      return;
-    }
-
-    const fetchDynamicTranslations = async () => {
-      try {
-        const response = await fetch('/internal-translate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            target: locale,
-            source: 'auto',
-            texts: textsToTranslate,
-          }),
-          cache: 'no-store',
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch dynamic translations');
-        }
-
-        const data = (await response.json()) as {
-          translations?: Record<string, string>;
-        };
-
-        if (active) {
-          setTranslatedDynamicText(data.translations ?? {});
-        }
-      } catch {
-        if (active) {
-          setTranslatedDynamicText({});
-        }
-      }
-    };
-
-    fetchDynamicTranslations();
-
-    return () => {
-      active = false;
-    };
-  }, [locale, textsToTranslate]);
   
   // Get selected floor and its units
   const selectedFloor = floors.find(f => f._id === selectedFloorId);

@@ -21,8 +21,13 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Shahalam",
+  title: "Real Estate",
   description: "Real estate project management",
+  icons: {
+    icon: "/logo.svg",
+    shortcut: "/logo.svg",
+    apple: "/logo.svg",
+  },
 };
 
 export default async function RootLayout({

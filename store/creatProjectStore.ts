@@ -1,9 +1,5 @@
 import { create } from "zustand";
 import api from "@/lib/api";
-import { useModelStore } from "./useModelStore";
-
-
-
 
 interface FloorPayload {
   name: string;
@@ -31,7 +27,7 @@ interface ProjectState {
     floors: FloorPayload[],
     models?: ModelPayload[],
     folderId?:string
-  ) => Promise<void>;
+  ) => Promise<boolean>;
 }
 
 export const useCreatProjectStore = create<ProjectState>((set) => ({
@@ -92,11 +88,25 @@ else{
       }
 
       set({ loading: false });
+      return true;
     } catch (error: unknown) {
+      const message =
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof (error as { response?: { data?: { message?: string } } }).response
+          ?.data?.message === "string"
+          ? (error as { response?: { data?: { message?: string } } }).response!
+              .data!.message!
+          : error instanceof Error
+            ? error.message
+            : "Failed to create property";
+
       set({
         loading: false,
-       
+        error: message,
       });
+      return false;
     }
   },
 }));

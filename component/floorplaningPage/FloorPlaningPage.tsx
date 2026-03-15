@@ -1,19 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Playfair_Display, Poppins } from "next/font/google";
+import { Poppins } from "next/font/google";
 import { Download, ImageDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import domtoimage from "dom-to-image-more";
+import { resolveApiImageSrc } from "@/lib/resolveApiImageSrc";
 import { useAuthStore } from "@/store/authStore";
 import { useProjectStore } from "@/store/projectStore";
 
-const display = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["500", "700"],
-});
 const body = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
@@ -47,35 +44,11 @@ interface ModelData {
   face: string;
 }
 
-const ARABIC_DIGITS = [
-  "\u0660",
-  "\u0661",
-  "\u0662",
-  "\u0663",
-  "\u0664",
-  "\u0665",
-  "\u0666",
-  "\u0667",
-  "\u0668",
-  "\u0669",
-];
-
-function fallbackArabicText(value: string) {
-  return value
-    .replace(/\d/g, (digit) => ARABIC_DIGITS[Number(digit)])
-    .replace(/,/g, "\u060C")
-    .replace(/;/g, "\u061B")
-    .replace(/\?/g, "\u061F");
-}
-
 export default function RealEstateProject() {
   const t = useTranslations("floorPlanning");
   const locale = useLocale();
   const [showAddPopup, setShowAddPopup] = useState(false);
   const [isExportingImage, setIsExportingImage] = useState(false);
-  const [translatedDynamicText, setTranslatedDynamicText] = useState<
-    Record<string, string>
-  >({});
   const [selectedUnitType, setSelectedUnitType] = useState<
     "apartment" | "annex" | null
   >(null);
@@ -103,31 +76,9 @@ export default function RealEstateProject() {
     setSelectedProject,
   } = useProjectStore();
 
-  const textsToTranslate = useMemo(() => {
-    const values: string[] = [
-      ...projects.map((project) => project.name),
-      ...floors.map((floor: FloorData) => floor.name),
-      ...floors.flatMap((floor: FloorData) =>
-        floor.units.map((unit) => unit.name)
-      ),
-      ...models.map((model: ModelData) => model.name),
-      ...models.map((model: ModelData) => String(model.area ?? "")),
-      ...models.map((model: ModelData) => model.face).filter(Boolean),
-    ];
-
-    return Array.from(
-      new Set(values.map((value) => value?.trim()).filter(Boolean))
-    ) as string[];
-  }, [projects, floors, models]);
-
   const localizeDynamicText = (value?: string | null) => {
     if (!value) return "";
-    const normalizedValue = value.trim();
-    const translatedValue = translatedDynamicText[normalizedValue];
-    if (translatedValue) return translatedValue;
-    return locale === "ar"
-      ? fallbackArabicText(normalizedValue)
-      : normalizedValue;
+    return value;
   };
 
   // Fetch projects
@@ -157,59 +108,17 @@ export default function RealEstateProject() {
       fetchFloors(selectedProjectId);
       fetchModels(selectedProjectId);
     }
-  }, [selectedProjectId]);
-
-  useEffect(() => {
-    let active = true;
-
-    if (textsToTranslate.length === 0) {
-      setTranslatedDynamicText({});
-      return;
-    }
-
-    const fetchDynamicTranslations = async () => {
-      try {
-        const response = await fetch("/internal-translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            target: locale,
-            source: "auto",
-            texts: textsToTranslate,
-          }),
-          cache: "no-store",
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch dynamic translations");
-        }
-
-        const data = (await response.json()) as {
-          translations?: Record<string, string>;
-        };
-
-        if (active) {
-          setTranslatedDynamicText(data.translations ?? {});
-        }
-      } catch {
-        if (active) {
-          setTranslatedDynamicText({});
-        }
-      }
-    };
-
-    fetchDynamicTranslations();
-
-    return () => {
-      active = false;
-    };
-  }, [locale, textsToTranslate]);
+  }, [fetchFloors, fetchModels, selectedProjectId]);
 
   const floorsInDisplayOrder = [...floors].reverse();
+  const currentProject = projects.find(
+    (project) => project._id === selectedProjectId
+  );
+  const currentProjectImage = resolveApiImageSrc(currentProject?.image);
 
   // Transform floors data to match the unitRows structure
   const unitRows = floorsInDisplayOrder.map((floor: FloorData) => ({
-    units: floor.units.map((unit) => ({
+    units: [...floor.units].reverse().map((unit) => ({
       label: localizeDynamicText(unit.name),
       tone: unit.status,
       wide: false, // You might want to add a `wide` field to your unit schema if needed
@@ -343,9 +252,7 @@ const unitsPanel = (
   };
 
   const currentProjectName =
-    localizeDynamicText(
-      projects.find((p) => p._id === selectedProjectId)?.name
-    ) || t("selectProject");
+    localizeDynamicText(currentProject?.name) || t("selectProject");
 
   return (
     <main
@@ -576,12 +483,14 @@ const unitsPanel = (
                 ref={exportContentRef}
               >
               <div className="print-bg absolute inset-0 opacity-40">
-                <Image
-                  src="/bg.jpg"
-                  alt={t("buildingBackgroundAlt")}
-                  fill
-                  className="object-cover"
-                />
+                {currentProjectImage && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={currentProjectImage}
+                    alt={t("buildingBackgroundAlt")}
+                    className="h-full w-full object-cover"
+                  />
+                )}
               </div>
               <div className="print-white-overlay absolute inset-0 bg-black/15" />
 

@@ -54,8 +54,10 @@
   "addModelModal": {
     "allFieldsRequired": "جميع الحقول مطلوبة",
     "title": "إضافة نموذج",
+    "editTitle": "تعديل النموذج",
     "cancel": "إلغاء",
     "saveModel": "حفظ النموذج",
+    "updateModel": "تحديث النموذج",
     "modelInformation": "معلومات النموذج",
     "modelName": "اسم النموذج",
     "modelNamePlaceholder": "أدخل اسم النموذج",
@@ -69,6 +71,8 @@
     "title": "نوع الوحدة",
     "cancel": "إلغاء",
     "saveProperty": "حفظ العقار",
+    "addProperty": "إضافة العقار",
+    "addingProperty": "جارٍ إضافة العقار...",
     "saveChanges": "حفظ التغييرات",
     "propertyInformation": "معلومات العقار",
     "propertyName": "اسم العقار",
@@ -80,6 +84,7 @@
     "addModel": "إضافة نموذج",
     "models": "النماذج",
     "modelsAddedCount": "تمت إضافة {count} نموذج",
+    "editModel": "تعديل النموذج",
     "removeModel": "حذف النموذج",
     "areaLabel": "المساحة:",
     "squareMeters": "م²",
@@ -109,7 +114,8 @@
       "confirmRemoveModel": "هل أنت متأكد أنك تريد حذف هذا النموذج؟",
       "invalidImageFile": "يرجى اختيار ملف صورة صالح (PNG أو JPG)",
       "maxFileSize": "يجب أن يكون حجم الملف أقل من 10MB",
-      "fillPropertyNameAndLocation": "يرجى إدخال اسم العقار والموقع"
+      "fillPropertyNameAndLocation": "يرجى إدخال اسم العقار والموقع",
+      "createPropertyFailed": "فشل إنشاء العقار"
     }
   },
   "companyProfile": {

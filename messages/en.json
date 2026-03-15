@@ -54,8 +54,10 @@
   "addModelModal": {
     "allFieldsRequired": "All fields are required",
     "title": "Add Model",
+    "editTitle": "Edit Model",
     "cancel": "Cancel",
     "saveModel": "Save Model",
+    "updateModel": "Update Model",
     "modelInformation": "Model Information",
     "modelName": "Model Name",
     "modelNamePlaceholder": "Enter model name",
@@ -69,6 +71,8 @@
     "title": "Unit Type",
     "cancel": "Cancel",
     "saveProperty": "Save Property",
+    "addProperty": "Add Property",
+    "addingProperty": "Adding Property...",
     "saveChanges": "Save Changes",
     "propertyInformation": "Property Information",
     "propertyName": "Property Name",
@@ -80,6 +84,7 @@
     "addModel": "Add Model",
     "models": "Models",
     "modelsAddedCount": "{count} models added",
+    "editModel": "Edit model",
     "removeModel": "Remove model",
     "areaLabel": "Area:",
     "squareMeters": "sq m",
@@ -109,7 +114,8 @@
       "confirmRemoveModel": "Are you sure you want to remove this model?",
       "invalidImageFile": "Please select a valid image file (PNG or JPG)",
       "maxFileSize": "File size must be less than 10MB",
-      "fillPropertyNameAndLocation": "Please fill property name and location"
+      "fillPropertyNameAndLocation": "Please fill property name and location",
+      "createPropertyFailed": "Failed to create property"
     }
   },
   "companyProfile": {

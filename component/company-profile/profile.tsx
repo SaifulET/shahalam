@@ -119,7 +119,7 @@ export default function CompanyProfile() {
           <div className="space-y-6">
             {/* Company Header */}
             <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-              <div className="w-16 h-16 bg-[#2563EB] rounded-2xl flex items-center justify-center flex-shrink-0">
+              <div className="w-16 h-16 bg-[#E5E7EB] rounded-2xl flex items-center justify-center flex-shrink-0">
                 {company?.profileImage ? (
                   <img 
                     src={company.profileImage} 
@@ -127,7 +127,7 @@ export default function CompanyProfile() {
                     className="w-full h-full rounded-2xl object-cover"
                   />
                 ) : (
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 )}

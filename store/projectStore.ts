@@ -4,14 +4,13 @@ import api from "@/lib/api";
 interface Project {
   _id: string;
   name: string;
+  image?: string | null;
+  location?: string;
 }
 
 interface RecentProjectItem {
   _id: string;
-  projectId: {
-    _id: string;
-    name: string;
-  };
+  projectId: Project;
 }
 
 interface Unit {
