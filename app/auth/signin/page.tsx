@@ -20,6 +20,7 @@ export default function LoginPage() {
   const route= useRouter()
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
   e.preventDefault();
+  setError('');
 
   try {
     const res = await api.post("/auth/login", { email, password });
@@ -32,7 +33,21 @@ export default function LoginPage() {
     // Redirect to dashboard or home
     route.push("/"); // or "/"
   } catch (err: unknown) {
-    setError(err instanceof Error ? "Invalid user or password" : t('genericError'));
+    const message =
+      typeof err === "object" &&
+      err !== null &&
+      "response" in err &&
+      typeof err.response === "object" &&
+      err.response !== null &&
+      "data" in err.response &&
+      typeof err.response.data === "object" &&
+      err.response.data !== null &&
+      "message" in err.response.data &&
+      typeof err.response.data.message === "string"
+        ? err.response.data.message
+        : "Invalid user or password";
+
+    setError(message);
   }
 };
 
