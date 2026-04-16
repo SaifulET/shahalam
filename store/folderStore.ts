@@ -10,8 +10,9 @@ folders: Folder[];
   error: string | null;
   createFolder: (data: { name: string; description: string; color: string }) => Promise<void>;
   fetchFolders: (userId: string) => Promise<void>;
-    addProjectToFolder: (folderId: string, projectId: string) => void;
-    deleteRecent: (recentId: string) => Promise<void>;
+  addProjectToFolder: (folderId: string, projectId: string) => void;
+  deleteRecent: (recentId: string) => Promise<void>;
+  deleteFolder: (folderId: string) => Promise<void>;
 }
 export interface Project {
   _id: string;
@@ -109,6 +110,22 @@ export const useFolderStore = create<FolderState>((set) => ({
     }
 
 
+  },
+
+  deleteFolder: async (folderId: string) => {
+    set({ error: null });
+    try {
+      await api.delete(`/folders/${folderId}`);
+      set((state) => ({
+        folders: state.folders.filter((folder) => folder._id !== folderId),
+      }));
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      set({
+        error: error.response?.data?.message || error.message,
+      });
+      throw err;
+    }
   },
 
 

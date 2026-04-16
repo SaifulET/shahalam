@@ -22,6 +22,10 @@
     "folders": {
       "title": "Folders",
       "addNewFolder": "Add new folder",
+      "deleteFolder": "Delete folder",
+      "deleteFolderAria": "Delete folder {name}",
+      "deleteConfirm": "Delete \"{name}\"? Projects inside it will not be deleted.",
+      "deleting": "Deleting folder...",
       "loading": "Loading folders...",
       "projectsCount": "{count} projects",
       "empty": "No folders found."

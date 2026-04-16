@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuthStore } from '@/store/authStore';
 import { useFolderStore, Folder } from '@/store/folderStore';
@@ -27,9 +27,11 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
   const t = useTranslations('home.folders');
   const locale = useLocale();
   const router = useRouter();
+  const [deletingFolderId, setDeletingFolderId] = useState<string | null>(null);
   const user = useAuthStore((state) => state.user);
   const setFolderId = useProjectStore((state) => state.setFolderId);
-  const { folders, fetchFolders, loading, error, addProjectToFolder ,deleteRecent} = useFolderStore();
+  const { folders, fetchFolders, loading, error, addProjectToFolder, deleteRecent, deleteFolder } =
+    useFolderStore();
   const [translatedDynamicText, setTranslatedDynamicText] = useState<Record<string, string>>({});
 
   const textsToTranslate = useMemo(() => {
@@ -145,6 +147,20 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
     }
   };
 
+  const handleDeleteFolder = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    folder: Folder
+  ) => {
+    e.stopPropagation();
+
+    try {
+      setDeletingFolderId(folder._id);
+      await deleteFolder(folder._id);
+    } finally {
+      setDeletingFolderId(null);
+    }
+  };
+
   return (
     <div dir="ltr" className="w-full bg-white py-8 lg:py-[54px] dark:bg-black">
       <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 md:px-8 lg:px-12 xl:px-20">
@@ -177,25 +193,34 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, folder._id)}
             >
-              {/* <Image src="/folder.svg" alt="folder" width={24} height={21} /> */}
-<HugeiconsIcon
-  icon={Folder01Icon}
-  width={28}
-  height={24}
-  style={{ fill: folder.color, color: folder.color }}
- 
-/>
+              <div className="flex items-start justify-between gap-3">
+                <HugeiconsIcon
+                  icon={Folder01Icon}
+                  width={28}
+                  height={24}
+                  style={{ fill: folder.color, color: folder.color }}
+                />
+                <button
+                  type="button"
+                  onClick={(e) => handleDeleteFolder(e, folder)}
+                  disabled={deletingFolderId === folder._id}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-red-950/40"
+                  aria-label={t('deleteFolderAria', { name: folder.name })}
+                  title={t('deleteFolder')}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
 
-
-
-
-              {/* {console.log(folder.color)} */}
               <h3 className="text-sm text-[#1F2937] dark:text-[#FFFFFF] lg:text-base font-medium mb-1 mt-[24px]">
                 {localizeDynamicText(folder.name)}
               </h3>
               <p className="text-xs lg:text-sm text-gray-500">
                 {t('projectsCount', { count: folder.projects.length })}
               </p>
+              {deletingFolderId === folder._id && (
+                <p className="mt-3 text-xs text-gray-500">{t('deleting')}</p>
+              )}
             </div>
           ))}
 

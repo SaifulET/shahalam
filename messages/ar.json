@@ -22,6 +22,10 @@
     "folders": {
       "title": "المجلدات",
       "addNewFolder": "إضافة مجلد جديد",
+      "deleteFolder": "حذف المجلد",
+      "deleteFolderAria": "حذف المجلد {name}",
+      "deleteConfirm": "هل تريد حذف \"{name}\"؟ لن يتم حذف المشاريع الموجودة داخله.",
+      "deleting": "جارٍ حذف المجلد...",
       "loading": "جاري تحميل المجلدات...",
       "projectsCount": "{count} مشروع",
       "empty": "لا توجد مجلدات."

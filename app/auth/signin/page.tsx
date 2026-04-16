@@ -22,8 +22,12 @@ export default function LoginPage() {
   e.preventDefault();
   setError('');
 
+  const requestBody = { email, password };
+
   try {
-    const res = await api.post("/auth/login", { email, password });
+    console.log("Login request body:", requestBody);
+
+    const res = await api.post("/auth/login", requestBody);
     const { accessToken, user } = res.data;
     console.log(user,"kdkkdkdkd")
     // Update Zustand store
@@ -33,6 +37,11 @@ export default function LoginPage() {
     // Redirect to dashboard or home
     route.push("/"); // or "/"
   } catch (err: unknown) {
+    console.error("Login request failed:", {
+      requestBody,
+      error: err,
+    });
+
     const message =
       typeof err === "object" &&
       err !== null &&
