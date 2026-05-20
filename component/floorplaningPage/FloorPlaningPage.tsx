@@ -6,7 +6,12 @@ import { Poppins } from "next/font/google";
 import { Download, ImageDown } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { resolveApiImageSrc, resolveExportImageSrc } from "@/lib/resolveApiImageSrc";
+import {
+  resolveApiImageSrc,
+  resolveApiImageSrcCandidates,
+  resolveExportImageSrc,
+  resolveExportImageSrcCandidates,
+} from "@/lib/resolveApiImageSrc";
 import { useAuthStore } from "@/store/authStore";
 import { useProjectStore } from "@/store/projectStore";
 
@@ -185,6 +190,10 @@ export default function RealEstateProject() {
   const currentProfileImage = resolveApiImageSrc(user?.profileImage);
   const exportProjectImage = resolveExportImageSrc(currentProject?.image);
   const exportProfileImage = resolveExportImageSrc(user?.profileImage);
+  const currentProjectImageCandidates = resolveApiImageSrcCandidates(currentProject?.image);
+  const currentProfileImageCandidates = resolveApiImageSrcCandidates(user?.profileImage);
+  const exportProjectImageCandidates = resolveExportImageSrcCandidates(currentProject?.image);
+  const exportProfileImageCandidates = resolveExportImageSrcCandidates(user?.profileImage);
 
   useEffect(() => {
     setProjectImageSrc(currentProjectImage ?? exportProjectImage);
@@ -258,6 +267,19 @@ export default function RealEstateProject() {
     }
 
     return null;
+  };
+
+  const setNextImageCandidate = (
+    failedSrc: string | null,
+    candidates: string[],
+    setImageSrc: (src: string | null) => void
+  ) => {
+    const currentIndex = failedSrc ? candidates.indexOf(failedSrc) : -1;
+    const nextCandidate = candidates.find((candidate, index) => (
+      candidate !== failedSrc && (currentIndex === -1 || index > currentIndex)
+    ));
+
+    setImageSrc(nextCandidate ?? null);
   };
 
   // Transform floors data to match the unitRows structure
@@ -379,12 +401,23 @@ const unitsPanel = (
       const originalProfileSrc = profileImageNode?.getAttribute("src") ?? null;
 
       const [exportProjectDataUrl, exportProfileDataUrl] = await Promise.all([
-        loadFirstImageAsDataUrl([exportProjectImage, currentProjectImage, originalProjectSrc]),
-        loadFirstImageAsDataUrl([exportProfileImage, currentProfileImage, originalProfileSrc]),
+        loadFirstImageAsDataUrl([
+          ...exportProjectImageCandidates,
+          ...currentProjectImageCandidates,
+          originalProjectSrc,
+        ]),
+        loadFirstImageAsDataUrl([
+          ...exportProfileImageCandidates,
+          ...currentProfileImageCandidates,
+          originalProfileSrc,
+        ]),
       ]);
 
       if (projectImageNode && exportProjectDataUrl) {
         projectImageNode.src = exportProjectDataUrl;
+      }
+      if (projectImageNode && !exportProjectDataUrl) {
+        projectImageNode.style.visibility = "hidden";
       }
       if (profileImageNode && exportProfileDataUrl) {
         profileImageNode.src = exportProfileDataUrl;
@@ -685,11 +718,11 @@ const unitsPanel = (
                     className="h-full w-full object-cover"
                     data-export-project-image="true"
                     onError={() => {
-                      if (projectImageSrc !== exportProjectImage && exportProjectImage) {
-                        setProjectImageSrc(exportProjectImage);
-                        return;
-                      }
-                      setProjectImageSrc(null);
+                      setNextImageCandidate(
+                        projectImageSrc,
+                        currentProjectImageCandidates,
+                        setProjectImageSrc
+                      );
                     }}
                   />
                 )}
@@ -707,11 +740,11 @@ const unitsPanel = (
                       className="h-full w-full object-contain"
                       data-export-profile-image="true"
                       onError={() => {
-                        if (profileImageSrc !== exportProfileImage && exportProfileImage) {
-                          setProfileImageSrc(exportProfileImage);
-                          return;
-                        }
-                        setProfileImageSrc(null);
+                        setNextImageCandidate(
+                          profileImageSrc,
+                          currentProfileImageCandidates,
+                          setProfileImageSrc
+                        );
                       }}
                     />
                    )}
