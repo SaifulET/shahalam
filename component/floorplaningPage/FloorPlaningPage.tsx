@@ -61,7 +61,7 @@ export default function RealEstateProject() {
   const searchParams = useSearchParams();
   const projectIdFromUrl = searchParams.get("project");
 
-  const user = useAuthStore().user;
+  const { user, accessToken } = useAuthStore();
   
   const instagramLink =
     typeof user?.instagramLink === "string" && user.instagramLink.trim().length > 0
@@ -213,7 +213,20 @@ export default function RealEstateProject() {
   const loadImageAsDataUrl = async (src: string | null) => {
     if (!src || src.startsWith("data:") || src.startsWith("blob:")) return src;
 
-    const response = await fetch(src, { cache: "no-store" });
+    const headers = new Headers();
+    const imageUrl = new URL(src, window.location.origin);
+    const shouldSendAuth =
+      imageUrl.origin === window.location.origin || src.includes("/api/image-proxy");
+
+    if (accessToken && shouldSendAuth) {
+      headers.set("Authorization", `Bearer ${accessToken}`);
+    }
+
+    const response = await fetch(src, {
+      cache: "no-store",
+      credentials: shouldSendAuth ? "include" : "omit",
+      headers,
+    });
     if (!response.ok) {
       throw new Error(`Failed to load export image: ${response.status}`);
     }
@@ -225,6 +238,26 @@ export default function RealEstateProject() {
       reader.onerror = () => reject(reader.error);
       reader.readAsDataURL(blob);
     });
+  };
+
+  const tryLoadImageAsDataUrl = async (src: string | null) => {
+    try {
+      return await loadImageAsDataUrl(src);
+    } catch (error) {
+      console.warn("Skipping image during export", error);
+      return null;
+    }
+  };
+
+  const loadFirstImageAsDataUrl = async (sources: Array<string | null>) => {
+    const uniqueSources = Array.from(new Set(sources.filter(Boolean))) as string[];
+
+    for (const src of uniqueSources) {
+      const dataUrl = await tryLoadImageAsDataUrl(src);
+      if (dataUrl) return dataUrl;
+    }
+
+    return null;
   };
 
   // Transform floors data to match the unitRows structure
@@ -346,8 +379,8 @@ const unitsPanel = (
       const originalProfileSrc = profileImageNode?.getAttribute("src") ?? null;
 
       const [exportProjectDataUrl, exportProfileDataUrl] = await Promise.all([
-        loadImageAsDataUrl(exportProjectImage ?? currentProjectImage),
-        loadImageAsDataUrl(exportProfileImage ?? currentProfileImage),
+        loadFirstImageAsDataUrl([exportProjectImage, currentProjectImage, originalProjectSrc]),
+        loadFirstImageAsDataUrl([exportProfileImage, currentProfileImage, originalProfileSrc]),
       ]);
 
       if (projectImageNode && exportProjectDataUrl) {
@@ -355,6 +388,9 @@ const unitsPanel = (
       }
       if (profileImageNode && exportProfileDataUrl) {
         profileImageNode.src = exportProfileDataUrl;
+      }
+      if (profileImageNode && !exportProfileDataUrl) {
+        profileImageNode.style.visibility = "hidden";
       }
 
       await Promise.all([
@@ -379,8 +415,14 @@ const unitsPanel = (
         if (projectImageNode && originalProjectSrc) {
           projectImageNode.src = originalProjectSrc;
         }
+        if (projectImageNode) {
+          projectImageNode.style.visibility = "";
+        }
         if (profileImageNode && originalProfileSrc) {
           profileImageNode.src = originalProfileSrc;
+        }
+        if (profileImageNode) {
+          profileImageNode.style.visibility = "";
         }
       }
 

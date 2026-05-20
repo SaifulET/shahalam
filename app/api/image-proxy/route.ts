@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const FALLBACK_API_BASE_URL = "https://api.ur-wsl.com";
+
+function isApiImageUrl(imageUrl: URL) {
+  try {
+    const apiBaseUrl = new URL(process.env.NEXT_PUBLIC_API_URL || FALLBACK_API_BASE_URL);
+    return imageUrl.origin === apiBaseUrl.origin;
+  } catch {
+    return imageUrl.origin === FALLBACK_API_BASE_URL;
+  }
+}
+
 export async function GET(request: NextRequest) {
   const src = request.nextUrl.searchParams.get("src");
 
@@ -20,11 +31,24 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const headers = new Headers({
+      Accept: "image/*,*/*;q=0.8",
+    });
+    if (isApiImageUrl(imageUrl)) {
+      const authorization = request.headers.get("authorization");
+      const cookie = request.headers.get("cookie");
+
+      if (authorization) {
+        headers.set("Authorization", authorization);
+      }
+      if (cookie) {
+        headers.set("Cookie", cookie);
+      }
+    }
+
     const response = await fetch(imageUrl.toString(), {
       cache: "no-store",
-      headers: {
-        Accept: "image/*,*/*;q=0.8",
-      },
+      headers,
     });
 
     if (!response.ok) {
@@ -42,6 +66,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         "Content-Type": contentType,
+        "Access-Control-Allow-Origin": "*",
         "Cache-Control": "public, max-age=300",
       },
     });

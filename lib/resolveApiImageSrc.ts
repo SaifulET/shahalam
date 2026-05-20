@@ -1,5 +1,9 @@
 const FALLBACK_API_BASE_URL = "https://api.ur-wsl.com";
 
+function getApiBaseUrl() {
+  return (process.env.NEXT_PUBLIC_API_URL || FALLBACK_API_BASE_URL).replace(/\/+$/, "");
+}
+
 export function resolveApiImageSrc(imagePath?: string | null) {
   if (!imagePath) return null;
 
@@ -8,13 +12,9 @@ export function resolveApiImageSrc(imagePath?: string | null) {
 
   if (value.startsWith("data:") || value.startsWith("blob:")) return value;
   if (/^https?:\/\//i.test(value)) return value;
-  if (value.startsWith("/")) return value;
+  if (value.startsWith("/")) return `${getApiBaseUrl()}${value}`;
 
-  const apiBaseUrl = (
-    process.env.NEXT_PUBLIC_API_URL || FALLBACK_API_BASE_URL
-  ).replace(/\/+$/, "");
-
-  return `${apiBaseUrl}/${value.replace(/^\/+/, "")}`;
+  return `${getApiBaseUrl()}/${value.replace(/^\/+/, "")}`;
 }
 
 export function resolveExportImageSrc(imagePath?: string | null) {
@@ -37,7 +37,7 @@ export function resolveExportImageSrc(imagePath?: string | null) {
       return absoluteUrl.toString();
     }
 
-    return `/api/image-proxy?src=${encodeURIComponent(absoluteUrl.toString())}`;
+    return `${baseOrigin}/api/image-proxy?src=${encodeURIComponent(absoluteUrl.toString())}`;
   } catch {
     return resolvedSrc;
   }
