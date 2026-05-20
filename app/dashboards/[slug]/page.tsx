@@ -3,7 +3,7 @@
 import ThemeToggle from '@/component/ThemeToggle/ThemeToggle';
 import { Trash2, Pencil, X, Check } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useEffect, useMemo } from 'react';
 import { useApiStore, Model, Floor, Unit, UnitStatus } from '@/store/editProjectStore';
@@ -21,11 +21,16 @@ export default function Home() {
   const isArabic = locale === 'ar';
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const projectId = params?.slug as string; // Get project ID from URL slug
+  const folderIdFromUrl = searchParams.get('folder');
   
   // Get user from auth store
   const { user } = useAuthStore();
   const folderId = useProjectStore((state) => state.folderId);
+  const setFolderId = useProjectStore((state) => state.setFolderId);
+  const clearFolderId = useProjectStore((state) => state.clearFolderId);
+  const effectiveFolderId = folderIdFromUrl ?? '';
   
   // Get store state and actions
   const {
@@ -171,14 +176,27 @@ export default function Home() {
 };
   // Load data when component mounts and projectId is available
   useEffect(() => {
+    if (folderIdFromUrl) {
+      if (folderId !== folderIdFromUrl) {
+        setFolderId(folderIdFromUrl);
+      }
+      return;
+    }
+
+    if (folderId) {
+      clearFolderId();
+    }
+  }, [folderId, folderIdFromUrl, setFolderId, clearFolderId]);
+
+  useEffect(() => {
     if (user?.id) {
-      if (folderId) {
-        fetchfolderProject(folderId);
+      if (effectiveFolderId) {
+        fetchfolderProject(effectiveFolderId);
         return;
       }
       getRecentProjects(user.id);
     }
-  }, [user?.id, folderId, getRecentProjects, fetchfolderProject]);
+  }, [user?.id, effectiveFolderId, getRecentProjects, fetchfolderProject]);
 
   useEffect(() => {
     if (projectId) {
@@ -231,8 +249,14 @@ export default function Home() {
     setShowAddUnitModal(true);
   };
 
+  const dashboardParams = new URLSearchParams({ project: projectId });
+  if (effectiveFolderId) {
+    dashboardParams.set('folder', effectiveFolderId);
+  }
+  const dashboardHref = `/dashboards?${dashboardParams.toString()}`;
+
   const handleSave = () => {
-    router.push("/dashboards");
+    router.push(dashboardHref);
   };
 
   const handleAddFloor = () => {
@@ -389,8 +413,8 @@ export default function Home() {
       });
 
       if (user?.id) {
-        if (folderId) {
-          await fetchfolderProject(folderId);
+        if (effectiveFolderId) {
+          await fetchfolderProject(effectiveFolderId);
         } else {
           await getRecentProjects(user.id);
         }
@@ -432,7 +456,13 @@ export default function Home() {
               {projects.map((project) => (
                 <button
                   key={project._id}
-                  onClick={() => router.push(`/dashboards/${project._id}`)}
+                  onClick={() =>
+                    router.push(
+                      effectiveFolderId
+                        ? `/dashboards/${project._id}?folder=${encodeURIComponent(effectiveFolderId)}`
+                        : `/dashboards/${project._id}`
+                    )
+                  }
                   className={`w-full dark:text-[#FFFFFF] text-[#000000] px-3 py-2.5 rounded text-sm flex items-center gap-2 transition-colors ${
                     isArabic ? 'text-right flex-row-reverse' : 'text-left'
                   } ${
@@ -532,7 +562,7 @@ export default function Home() {
           {/* Header with Theme Toggle */}
           <div className="flex items-center justify-end px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-              <Link href="/dashboards">
+              <Link href={dashboardHref}>
                 <button className="w-full rounded-lg px-4 py-2 text-sm text-gray-700 hover:text-gray-900 dark:border-1 dark:border-gray-500 dark:text-gray-50 dark:hover:text-gray-300 sm:w-auto">
                   {t('cancel')}
                 </button>

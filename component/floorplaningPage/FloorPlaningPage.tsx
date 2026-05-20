@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Poppins } from "next/font/google";
 import { Download, ImageDown } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { resolveApiImageSrc, resolveExportImageSrc } from "@/lib/resolveApiImageSrc";
 import { useAuthStore } from "@/store/authStore";
@@ -57,6 +57,9 @@ export default function RealEstateProject() {
   const exportRef = useRef<HTMLDivElement | null>(null);
   const exportContentRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const projectIdFromUrl = searchParams.get("project");
 
   const user = useAuthStore().user;
   
@@ -70,38 +73,101 @@ export default function RealEstateProject() {
     models,
     folderId,
     selectedProjectId,
+    hasHydrated,
     fetchRecentProjects,
     fetchfolderProject,
     fetchFloors,
     fetchModels,
     setSelectedProject,
+    setFolderId,
+    clearFolderId,
   } = useProjectStore();
+  const folderIdFromUrl = searchParams.get("folder");
+  const effectiveFolderId = folderIdFromUrl ?? "";
 
   const localizeDynamicText = (value?: string | null) => {
     if (!value) return "";
     return value;
   };
 
+  const updateDashboardProjectParam = useCallback((projectId: string | null) => {
+    const nextParams = new URLSearchParams(searchParams.toString());
+    if (projectId) {
+      nextParams.set("project", projectId);
+    } else {
+      nextParams.delete("project");
+    }
+
+    const nextQueryString = nextParams.toString();
+    router.replace(nextQueryString ? `${pathname}?${nextQueryString}` : pathname, {
+      scroll: false,
+    });
+  }, [pathname, router, searchParams]);
+
+  const selectProject = useCallback((projectId: string) => {
+    setSelectedProject(projectId);
+    updateDashboardProjectParam(projectId);
+  }, [setSelectedProject, updateDashboardProjectParam]);
+
+  useEffect(() => {
+    if (!hasHydrated) return;
+
+    if (folderIdFromUrl) {
+      if (folderId !== folderIdFromUrl) {
+        setFolderId(folderIdFromUrl);
+      }
+      return;
+    }
+
+    if (folderId) {
+      clearFolderId();
+    }
+  }, [folderId, folderIdFromUrl, hasHydrated, setFolderId, clearFolderId]);
+
   // Fetch projects
   useEffect(() => {
-    if (user?.id) {
-      if (folderId) {
-        fetchfolderProject(folderId);
-        return;
-      }
-      fetchRecentProjects(user.id);
+    if (!hasHydrated || !user?.id) return;
+
+    if (effectiveFolderId) {
+      fetchfolderProject(effectiveFolderId);
+      return;
     }
-  }, [user?.id, folderId, fetchRecentProjects, fetchfolderProject]);
+    fetchRecentProjects(user.id);
+  }, [user?.id, effectiveFolderId, hasHydrated, fetchRecentProjects, fetchfolderProject]);
 
   // Auto select first project
   useEffect(() => {
-    if (projects.length > 0 && !selectedProjectId) {
-      setSelectedProject(projects[0]._id);
+    if (!hasHydrated) return;
+
+    if (projects.length === 0) {
+      return;
     }
-    if (projects.length === 0 && selectedProjectId) {
-      setSelectedProject(null);
+
+    const projectFromUrl =
+      projectIdFromUrl && projects.some((project) => project._id === projectIdFromUrl)
+        ? projectIdFromUrl
+        : null;
+    const projectFromStore =
+      selectedProjectId && projects.some((project) => project._id === selectedProjectId)
+        ? selectedProjectId
+        : null;
+    const nextSelectedProjectId = projectFromUrl ?? projectFromStore ?? projects[0]._id;
+
+    if (selectedProjectId !== nextSelectedProjectId) {
+      setSelectedProject(nextSelectedProjectId);
     }
-  }, [projects, selectedProjectId, setSelectedProject]);
+
+    if (projectIdFromUrl !== nextSelectedProjectId) {
+      updateDashboardProjectParam(nextSelectedProjectId);
+    }
+  }, [
+    projects,
+    selectedProjectId,
+    projectIdFromUrl,
+    hasHydrated,
+    setSelectedProject,
+    updateDashboardProjectParam,
+  ]);
 
   // Fetch floors & models when project changes
   useEffect(() => {
@@ -213,7 +279,10 @@ const unitsPanel = (
   const handleEdit = () => {
     const selectedProject = projects.find(p => p._id === selectedProjectId);
     if (selectedProject) {
-      router.push(`/dashboards/${selectedProjectId}`);
+      const folderQuery = effectiveFolderId
+        ? `?folder=${encodeURIComponent(effectiveFolderId)}`
+        : "";
+      router.push(`/dashboards/${selectedProjectId}${folderQuery}`);
     }
   };
 
@@ -489,7 +558,7 @@ const unitsPanel = (
               {projects.map((project) => (
                 <button
                   key={project._id}
-                  onClick={() => setSelectedProject(project._id)}
+                  onClick={() => selectProject(project._id)}
                   className={[
                     "w-full rounded-xl px-3 py-2 text-left text-[#1F2937] dark:text-white/70 transition",
                     project._id === selectedProjectId

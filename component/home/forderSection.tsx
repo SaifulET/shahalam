@@ -111,7 +111,7 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
 
   const handleFolderClick = (folderId: string) => {
     setFolderId(folderId);
-    router.push('/dashboards');
+    router.push(`/dashboards?folder=${encodeURIComponent(folderId)}`);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
