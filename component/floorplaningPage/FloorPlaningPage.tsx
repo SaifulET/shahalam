@@ -210,6 +210,23 @@ export default function RealEstateProject() {
     });
   };
 
+  const loadImageAsDataUrl = async (src: string | null) => {
+    if (!src || src.startsWith("data:") || src.startsWith("blob:")) return src;
+
+    const response = await fetch(src, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Failed to load export image: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
+  };
+
   // Transform floors data to match the unitRows structure
   const unitRows = floorsInDisplayOrder.map((floor: FloorData) => ({
     units: [...floor.units].reverse().map((unit) => ({
@@ -328,11 +345,16 @@ const unitsPanel = (
       const originalProjectSrc = projectImageNode?.getAttribute("src") ?? null;
       const originalProfileSrc = profileImageNode?.getAttribute("src") ?? null;
 
-      if (projectImageNode && exportProjectImage) {
-        projectImageNode.src = exportProjectImage;
+      const [exportProjectDataUrl, exportProfileDataUrl] = await Promise.all([
+        loadImageAsDataUrl(exportProjectImage ?? currentProjectImage),
+        loadImageAsDataUrl(exportProfileImage ?? currentProfileImage),
+      ]);
+
+      if (projectImageNode && exportProjectDataUrl) {
+        projectImageNode.src = exportProjectDataUrl;
       }
-      if (profileImageNode && exportProfileImage) {
-        profileImageNode.src = exportProfileImage;
+      if (profileImageNode && exportProfileDataUrl) {
+        profileImageNode.src = exportProfileDataUrl;
       }
 
       await Promise.all([

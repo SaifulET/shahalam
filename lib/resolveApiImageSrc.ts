@@ -1,4 +1,4 @@
-const FALLBACK_API_BASE_URL = "http://localhost:5001";
+const FALLBACK_API_BASE_URL = "https://api.ur-wsl.com";
 
 export function resolveApiImageSrc(imagePath?: string | null) {
   if (!imagePath) return null;
