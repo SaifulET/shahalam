@@ -269,6 +269,55 @@ export default function RealEstateProject() {
     return null;
   };
 
+  const loadDataUrlImage = async (src: string) => {
+    const image = document.createElement("img");
+    image.src = src;
+    await waitForImageLoad(image);
+    return image;
+  };
+
+  const drawCoverImage = (
+    context: CanvasRenderingContext2D,
+    image: HTMLImageElement,
+    width: number,
+    height: number
+  ) => {
+    const imageRatio = image.naturalWidth / image.naturalHeight;
+    const canvasRatio = width / height;
+    const drawWidth = imageRatio > canvasRatio ? height * imageRatio : width;
+    const drawHeight = imageRatio > canvasRatio ? height : width / imageRatio;
+    const drawX = (width - drawWidth) / 2;
+    const drawY = (height - drawHeight) / 2;
+
+    context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+  };
+
+  const composeExportWithBackground = async (
+    foregroundDataUrl: string,
+    backgroundDataUrl: string,
+    width: number,
+    height: number
+  ) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext("2d");
+    if (!context) return foregroundDataUrl;
+
+    const [backgroundImage, foregroundImage] = await Promise.all([
+      loadDataUrlImage(backgroundDataUrl),
+      loadDataUrlImage(foregroundDataUrl),
+    ]);
+
+    context.globalAlpha = 0.4;
+    drawCoverImage(context, backgroundImage, width, height);
+    context.globalAlpha = 1;
+    context.drawImage(foregroundImage, 0, 0, width, height);
+
+    return canvas.toDataURL("image/png");
+  };
+
   const setNextImageCandidate = (
     failedSrc: string | null,
     candidates: string[],
@@ -394,11 +443,24 @@ const unitsPanel = (
       const projectImageNode = exportNode.querySelector<HTMLImageElement>(
         "[data-export-project-image]"
       );
+      const projectImageBackgroundNode = exportNode.querySelector<HTMLDivElement>(
+        "[data-export-project-image-background]"
+      );
       const profileImageNode = exportNode.querySelector<HTMLImageElement>(
         "[data-export-profile-image]"
       );
       const originalProjectSrc = projectImageNode?.getAttribute("src") ?? null;
       const originalProfileSrc = profileImageNode?.getAttribute("src") ?? null;
+      const originalBackgroundImage =
+        projectImageBackgroundNode?.style.backgroundImage ?? "";
+      const originalBackgroundSize =
+        projectImageBackgroundNode?.style.backgroundSize ?? "";
+      const originalBackgroundPosition =
+        projectImageBackgroundNode?.style.backgroundPosition ?? "";
+      const originalBackgroundRepeat =
+        projectImageBackgroundNode?.style.backgroundRepeat ?? "";
+      const originalProjectVisibility = projectImageNode?.style.visibility ?? "";
+      const originalProfileVisibility = profileImageNode?.style.visibility ?? "";
 
       const [exportProjectDataUrl, exportProfileDataUrl] = await Promise.all([
         loadFirstImageAsDataUrl([
@@ -415,6 +477,12 @@ const unitsPanel = (
 
       if (projectImageNode && exportProjectDataUrl) {
         projectImageNode.src = exportProjectDataUrl;
+      }
+      if (projectImageBackgroundNode && exportProjectDataUrl) {
+        projectImageBackgroundNode.style.backgroundImage = "none";
+        if (projectImageNode) {
+          projectImageNode.style.visibility = "hidden";
+        }
       }
       if (projectImageNode && !exportProjectDataUrl) {
         projectImageNode.style.visibility = "hidden";
@@ -444,18 +512,33 @@ const unitsPanel = (
             outline: "0",
           },
         });
+
+        if (exportProjectDataUrl) {
+          imageDataUrl = await composeExportWithBackground(
+            imageDataUrl,
+            exportProjectDataUrl,
+            exportNode.scrollWidth,
+            exportNode.scrollHeight
+          );
+        }
       } finally {
         if (projectImageNode && originalProjectSrc) {
           projectImageNode.src = originalProjectSrc;
         }
         if (projectImageNode) {
-          projectImageNode.style.visibility = "";
+          projectImageNode.style.visibility = originalProjectVisibility;
+        }
+        if (projectImageBackgroundNode) {
+          projectImageBackgroundNode.style.backgroundImage = originalBackgroundImage;
+          projectImageBackgroundNode.style.backgroundSize = originalBackgroundSize;
+          projectImageBackgroundNode.style.backgroundPosition = originalBackgroundPosition;
+          projectImageBackgroundNode.style.backgroundRepeat = originalBackgroundRepeat;
         }
         if (profileImageNode && originalProfileSrc) {
           profileImageNode.src = originalProfileSrc;
         }
         if (profileImageNode) {
-          profileImageNode.style.visibility = "";
+          profileImageNode.style.visibility = originalProfileVisibility;
         }
       }
 
@@ -709,7 +792,10 @@ const unitsPanel = (
                 className="relative min-w-[680px] sm:min-w-[760px] lg:min-w-0"
                 ref={exportContentRef}
               >
-              <div className="print-bg absolute inset-0 opacity-40">
+              <div
+                className="print-bg absolute inset-0 opacity-40"
+                data-export-project-image-background="true"
+              >
                 {projectImageSrc && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img

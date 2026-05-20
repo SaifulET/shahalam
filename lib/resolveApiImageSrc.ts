@@ -4,6 +4,10 @@ export function getApiBaseUrl() {
   return (process.env.NEXT_PUBLIC_API_URL || FALLBACK_API_BASE_URL).replace(/\/+$/, "");
 }
 
+function getCurrentOrigin() {
+  return typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+}
+
 function uniqueValues(values: Array<string | null | undefined>) {
   return Array.from(new Set(values.filter(Boolean))) as string[];
 }
@@ -54,51 +58,41 @@ export function resolveApiImageSrc(imagePath?: string | null) {
 }
 
 export function resolveExportImageSrc(imagePath?: string | null) {
-  const resolvedSrc = resolveApiImageSrc(imagePath);
-  if (!resolvedSrc) return null;
+  return resolveExportImageSrcCandidates(imagePath)[0] ?? null;
+}
 
-  if (
-    resolvedSrc.startsWith("data:") ||
-    resolvedSrc.startsWith("blob:")
-  ) {
-    return resolvedSrc;
+function resolveExportCandidatesForSrc(src: string) {
+  if (src.startsWith("data:") || src.startsWith("blob:")) {
+    return [src];
   }
 
   try {
-    const baseOrigin =
-      typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
-    const absoluteUrl = new URL(resolvedSrc, baseOrigin);
+    const baseOrigin = getCurrentOrigin();
+    const apiBaseUrl = getApiBaseUrl();
+    const absoluteUrl = new URL(src, baseOrigin);
+    const nextProxyUrl = `${baseOrigin}/api/image-proxy?src=${encodeURIComponent(
+      absoluteUrl.toString()
+    )}`;
+    const backendProxyUrl = `${apiBaseUrl}/image-proxy?src=${encodeURIComponent(
+      absoluteUrl.toString()
+    )}`;
 
     if (absoluteUrl.origin === baseOrigin) {
-      return absoluteUrl.toString();
+      return [absoluteUrl.toString()];
     }
 
-    return `${baseOrigin}/api/image-proxy?src=${encodeURIComponent(absoluteUrl.toString())}`;
+    return uniqueValues([
+      nextProxyUrl,
+      backendProxyUrl,
+      absoluteUrl.toString(),
+    ]);
   } catch {
-    return resolvedSrc;
+    return [src];
   }
 }
 
 export function resolveExportImageSrcCandidates(imagePath?: string | null) {
   return uniqueValues(
-    resolveApiImageSrcCandidates(imagePath).map((src) => {
-      if (src.startsWith("data:") || src.startsWith("blob:")) {
-        return src;
-      }
-
-      try {
-        const baseOrigin =
-          typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
-        const absoluteUrl = new URL(src, baseOrigin);
-
-        if (absoluteUrl.origin === baseOrigin) {
-          return absoluteUrl.toString();
-        }
-
-        return `${baseOrigin}/api/image-proxy?src=${encodeURIComponent(absoluteUrl.toString())}`;
-      } catch {
-        return src;
-      }
-    })
+    resolveApiImageSrcCandidates(imagePath).flatMap(resolveExportCandidatesForSrc)
   );
 }
