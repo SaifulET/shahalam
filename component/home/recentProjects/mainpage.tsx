@@ -108,7 +108,7 @@ export default function RecentProjectsComponent() {
       />
 
       {loading && <p className="px-6 text-gray-500">{t('loading')}</p>}
-      {error && <p className="px-6 text-red-500">{error}</p>}
+      
 
       <RecentProjects 
         projects={projects} 
