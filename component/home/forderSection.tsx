@@ -178,9 +178,9 @@ const FoldersComponent: React.FC<FoldersComponentProps> = ({ onProjectDropped })
           </button>
         </div>
 
-        {/* Error / Loading */}
+        {/* Loading */}
         {loading && <p className="text-gray-500 mb-3">{t('loading')}</p>}
-        {error && <p className="text-red-500 mb-3">{error}</p>}
+        
 
         {/* Folders Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4 lg:gap-6 xl:gap-8">
