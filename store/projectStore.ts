@@ -31,6 +31,8 @@ interface Model {
   name: string;
   area: string;
   face: string;
+  model_price?: number | string;
+  rooms_number?: number | string;
 }
 
 interface ProjectState {

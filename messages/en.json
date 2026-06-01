@@ -69,7 +69,11 @@
     "totalAreaPlaceholder": "Enter total area",
     "squareMeters": "sq m",
     "face": "Face",
-    "facePlaceholder": "Enter face direction"
+    "facePlaceholder": "Enter face direction",
+    "modelPrice": "Model Price",
+    "modelPricePlaceholder": "Enter model price",
+    "roomsNumber": "Rooms Number",
+    "roomsNumberPlaceholder": "Enter rooms number"
   },
   "addUnitForm": {
     "title": "Unit Type",
@@ -93,6 +97,8 @@
     "areaLabel": "Area:",
     "squareMeters": "sq m",
     "faceLabel": "Face:",
+    "priceLabel": "Price:",
+    "roomsLabel": "Rooms:",
     "floors": "Floors",
     "addFloor": "Add Floor",
     "noFloors": "No floors added yet. Click Add Floor to get started.",
@@ -218,6 +224,8 @@
     "buildingBackgroundAlt": "Building background",
     "logoAlt": "WSL logo",
     "squareMeters": "sq m",
+    "price": "Price",
+    "rooms": "Rooms",
     "status": {
       "available": "Available",
       "reserved": "Reserved",
@@ -232,6 +240,8 @@
     "sqft": "sqft",
     "squareMeters": "sq m",
     "faceValue": "Face: {face}",
+    "priceValue": "Price: {price}",
+    "roomsValue": "Rooms: {rooms}",
     "editModel": "Edit model",
     "deleteModel": "Delete model",
     "noModelsAdded": "No models added yet",
@@ -277,14 +287,22 @@
       "totalArea": "Total Area (sqft)",
       "totalAreaPlaceholder": "e.g., 1200",
       "faceOptional": "Face (Optional)",
-      "facePlaceholder": "e.g., North, South, East, West"
+      "facePlaceholder": "e.g., North, South, East, West",
+      "modelPrice": "Model Price",
+      "modelPricePlaceholder": "e.g., 5000000",
+      "roomsNumber": "Rooms Number",
+      "roomsNumberPlaceholder": "e.g., 3"
     },
     "editModelModal": {
       "title": "Edit Model",
       "modelName": "Model Name",
       "totalArea": "Total Area (sqft)",
       "faceOptional": "Face (Optional)",
-      "facePlaceholder": "e.g., North, South, East, West"
+      "facePlaceholder": "e.g., North, South, East, West",
+      "modelPrice": "Model Price",
+      "modelPricePlaceholder": "e.g., 5000000",
+      "roomsNumber": "Rooms Number",
+      "roomsNumberPlaceholder": "e.g., 3"
     }
   }
 }

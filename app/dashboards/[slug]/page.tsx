@@ -78,11 +78,15 @@ export default function Home() {
   const [newModelName, setNewModelName] = useState('');
   const [newModelArea, setNewModelArea] = useState('');
   const [newModelFace, setNewModelFace] = useState('');
+  const [newModelPrice, setNewModelPrice] = useState('');
+  const [newModelRooms, setNewModelRooms] = useState('');
   const [showEditModelModal, setShowEditModelModal] = useState(false);
   const [editingModelData, setEditingModelData] = useState<Model | null>(null);
   const [tempModelName, setTempModelName] = useState('');
   const [tempModelArea, setTempModelArea] = useState('');
   const [tempModelFace, setTempModelFace] = useState('');
+  const [tempModelPrice, setTempModelPrice] = useState('');
+  const [tempModelRooms, setTempModelRooms] = useState('');
   const [saving, setSaving] = useState(false);
   const [isEditingProjectName, setIsEditingProjectName] = useState(false);
   const [projectNameInput, setProjectNameInput] = useState('');
@@ -344,6 +348,8 @@ export default function Home() {
     setNewModelName('');
     setNewModelArea('');
     setNewModelFace('');
+    setNewModelPrice('');
+    setNewModelRooms('');
     setShowAddModelModal(true);
   };
 
@@ -355,13 +361,17 @@ export default function Home() {
       projectId,
       name: sanitizedModelName,
       area: parseFloat(newModelArea) || undefined,
-      face: sanitizeValue(newModelFace) || undefined
+      face: sanitizeValue(newModelFace) || undefined,
+      model_price: newModelPrice.trim() ? parseFloat(newModelPrice) : undefined,
+      rooms_number: newModelRooms.trim() ? parseInt(newModelRooms, 10) : undefined
     });
     
     setShowAddModelModal(false);
     setNewModelName('');
     setNewModelArea('');
     setNewModelFace('');
+    setNewModelPrice('');
+    setNewModelRooms('');
   };
 
   const openEditModelModal = (modelId: string) => {
@@ -371,6 +381,8 @@ export default function Home() {
       setTempModelName(modelToEdit.name);
       setTempModelArea(modelToEdit.area?.toString() || '');
       setTempModelFace(modelToEdit.face || '');
+      setTempModelPrice(modelToEdit.model_price?.toString() || '');
+      setTempModelRooms(modelToEdit.rooms_number?.toString() || '');
       setShowEditModelModal(true);
     }
   };
@@ -382,7 +394,9 @@ export default function Home() {
     await updateModel(editingModelData._id, {
       name: sanitizedModelName,
       area: parseFloat(tempModelArea) || undefined,
-      face: sanitizeValue(tempModelFace) || undefined
+      face: sanitizeValue(tempModelFace) || undefined,
+      model_price: tempModelPrice.trim() ? parseFloat(tempModelPrice) : undefined,
+      rooms_number: tempModelRooms.trim() ? parseInt(tempModelRooms, 10) : undefined
     });
 
     setShowEditModelModal(false);
@@ -390,6 +404,8 @@ export default function Home() {
     setTempModelName('');
     setTempModelArea('');
     setTempModelFace('');
+    setTempModelPrice('');
+    setTempModelRooms('');
   };
 
   const handleDeleteModel = async (modelId: string) => {
@@ -502,6 +518,12 @@ export default function Home() {
                     </div>
                     {model.face && (
                       <div className="text-xs text-gray-500 dark:text-gray-400">{t('faceValue', { face: localizeDynamicText(model.face) })}</div>
+                    )}
+                    {model.model_price !== undefined && model.model_price !== null && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{t('priceValue', { price: localizeDynamicText(model.model_price) })}</div>
+                    )}
+                    {model.rooms_number !== undefined && model.rooms_number !== null && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{t('roomsValue', { rooms: localizeDynamicText(model.rooms_number) })}</div>
                     )}
                   </div>
                   <div className="flex items-center gap-1 self-end sm:self-auto">
@@ -961,7 +983,7 @@ export default function Home() {
         {/* Add Model Modal */}
         {showAddModelModal && (
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
                 {t('addModelModal.title')}
               </h3>
@@ -1006,6 +1028,37 @@ export default function Home() {
                     className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('addModelModal.modelPrice')}
+                    </label>
+                    <input
+                      type="number"
+                      value={newModelPrice}
+                      onChange={(e) => setNewModelPrice(e.target.value)}
+                      placeholder={t('addModelModal.modelPricePlaceholder')}
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      min="0"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('addModelModal.roomsNumber')}
+                    </label>
+                    <input
+                      type="number"
+                      value={newModelRooms}
+                      onChange={(e) => setNewModelRooms(e.target.value)}
+                      placeholder={t('addModelModal.roomsNumberPlaceholder')}
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      min="0"
+                      step="1"
+                    />
+                  </div>
+                </div>
               </div>
               
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -1015,6 +1068,8 @@ export default function Home() {
                     setNewModelName('');
                     setNewModelArea('');
                     setNewModelFace('');
+                    setNewModelPrice('');
+                    setNewModelRooms('');
                   }}
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                 >
@@ -1035,7 +1090,7 @@ export default function Home() {
         {/* Edit Model Modal */}
         {showEditModelModal && editingModelData && (
           <div className="fixed inset-0 backdrop-blur-xl flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
                 {t('editModelModal.title')}
               </h3>
@@ -1077,6 +1132,37 @@ export default function Home() {
                     className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('editModelModal.modelPrice')}
+                    </label>
+                    <input
+                      type="number"
+                      value={tempModelPrice}
+                      onChange={(e) => setTempModelPrice(e.target.value)}
+                      placeholder={t('editModelModal.modelPricePlaceholder')}
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      min="0"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('editModelModal.roomsNumber')}
+                    </label>
+                    <input
+                      type="number"
+                      value={tempModelRooms}
+                      onChange={(e) => setTempModelRooms(e.target.value)}
+                      placeholder={t('editModelModal.roomsNumberPlaceholder')}
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      min="0"
+                      step="1"
+                    />
+                  </div>
+                </div>
               </div>
               
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -1087,6 +1173,8 @@ export default function Home() {
                     setTempModelName('');
                     setTempModelArea('');
                     setTempModelFace('');
+                    setTempModelPrice('');
+                    setTempModelRooms('');
                   }}
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                 >

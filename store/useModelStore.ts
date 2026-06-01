@@ -1,10 +1,12 @@
 import { create } from "zustand";
 
 export interface ModelPayload {
-    id: string;
+  id: string;
   name: string;
   area: number;
   face: string;
+  model_price: number;
+  rooms_number: number;
 }
 
 interface ModelStore {

@@ -46,6 +46,8 @@ interface ModelData {
   name: string;
   area: string;
   face: string;
+  model_price?: number | string;
+  rooms_number?: number | string;
 }
 
 export default function RealEstateProject() {
@@ -90,9 +92,9 @@ export default function RealEstateProject() {
   const folderIdFromUrl = searchParams.get("folder");
   const effectiveFolderId = folderIdFromUrl ?? "";
 
-  const localizeDynamicText = (value?: string | null) => {
-    if (!value) return "";
-    return value;
+  const localizeDynamicText = (value?: string | number | null) => {
+    if (value === null || value === undefined) return "";
+    return String(value);
   };
 
   const updateDashboardProjectParam = useCallback((projectId: string | null) => {
@@ -854,7 +856,7 @@ const unitsPanel = (
                 </div>
 
                 <div className="print-models mt-8 border-t border-white/10 pt-6">
-                  <div className="grid grid-cols-2 gap-4 text-center text-sm uppercase tracking-[0.16em] text-white/60 sm:grid-cols-5">
+                  <div className="grid grid-cols-2 gap-4 text-center text-sm uppercase tracking-[0.16em] text-white/60 sm:grid-cols-3 lg:grid-cols-5">
                     {models.map((model: ModelData) => (
                       <div key={model._id} className="space-y-2">
                         <div className="print-pill inline-flex px-3 py-1 text-base bg-amber-100/70 rounded-full text-[#1B1B1F] sf-pro">
@@ -866,6 +868,16 @@ const unitsPanel = (
                         <div className="text-white/40">
                           {localizeDynamicText(model.face)}
                         </div>
+                        {model.model_price !== undefined && model.model_price !== null && (
+                          <div className="text-white/70">
+                            {t("price")}: {localizeDynamicText(model.model_price)}
+                          </div>
+                        )}
+                        {model.rooms_number !== undefined && model.rooms_number !== null && (
+                          <div className="text-white/70">
+                            {t("rooms")}: {localizeDynamicText(model.rooms_number)}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

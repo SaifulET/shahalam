@@ -21,6 +21,8 @@ export interface Model {
   name: string;
   area?: number;
   face?: string;
+  model_price?: number;
+  rooms_number?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -111,9 +113,9 @@ interface ApiStoreState {
   modelsLoading: boolean;
   modelsError: string | null;
 
-  addModel: (data: { projectId: string; name: string; area?: number; face?: string }) => Promise<void>;
+  addModel: (data: { projectId: string; name: string; area?: number; face?: string; model_price?: number; rooms_number?: number }) => Promise<void>;
   getModels: (projectId: string) => Promise<void>;
-  updateModel: (modelId: string, data: { name: string; area?: number; face?: string }) => Promise<void>;
+  updateModel: (modelId: string, data: { name: string; area?: number; face?: string; model_price?: number; rooms_number?: number }) => Promise<void>;
   deleteModel: (modelId: string) => Promise<void>;
 
   // ---------- Floors ----------
@@ -226,7 +228,7 @@ export const useApiStore = create<ApiStoreState>((set, get) => ({
   modelsLoading: false,
   modelsError: null,
   
-  addModel: async (data: { projectId: string; name: string; area?: number; face?: string }) => {
+  addModel: async (data: { projectId: string; name: string; area?: number; face?: string; model_price?: number; rooms_number?: number }) => {
     set({ modelsLoading: true, modelsError: null });
     try {
       const response = await api.post<ModelResponse>("/models", data);
@@ -261,7 +263,7 @@ export const useApiStore = create<ApiStoreState>((set, get) => ({
     }
   },
   
-  updateModel: async (modelId: string, data: { name: string; area?: number; face?: string }) => {
+  updateModel: async (modelId: string, data: { name: string; area?: number; face?: string; model_price?: number; rooms_number?: number }) => {
     set({ modelsLoading: true, modelsError: null });
     try {
       await api.patch(`/models/${modelId}`, data);

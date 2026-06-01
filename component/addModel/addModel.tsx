@@ -16,6 +16,8 @@ export default function AddModelModal({ onClose, modelToEdit = null }: AddModelM
   const [modelName, setModelName] = useState('');
   const [totalArea, setTotalArea] = useState('');
   const [face, setFace] = useState('');
+  const [modelPrice, setModelPrice] = useState('');
+  const [roomsNumber, setRoomsNumber] = useState('');
   const isEditing = Boolean(modelToEdit);
   const addModel = useModelStore((state) => state.addModel);
   const updateModel = useModelStore((state) => state.updateModel);
@@ -24,14 +26,18 @@ export default function AddModelModal({ onClose, modelToEdit = null }: AddModelM
     setModelName(modelToEdit?.name ?? '');
     setTotalArea(modelToEdit?.area?.toString() ?? '');
     setFace(modelToEdit?.face ?? '');
+    setModelPrice(modelToEdit?.model_price?.toString() ?? '');
+    setRoomsNumber(modelToEdit?.rooms_number?.toString() ?? '');
   }, [modelToEdit]);
 
   const handleSave = () => {
     const sanitizedModelName = modelName.trim();
     const sanitizedFace = face.trim();
     const sanitizedArea = totalArea.trim();
+    const sanitizedModelPrice = modelPrice.trim();
+    const sanitizedRoomsNumber = roomsNumber.trim();
 
-    if (!sanitizedModelName || !sanitizedArea || !sanitizedFace) {
+    if (!sanitizedModelName || !sanitizedArea || !sanitizedFace || !sanitizedModelPrice || !sanitizedRoomsNumber) {
       alert(t('allFieldsRequired'));
       return;
     }
@@ -41,6 +47,8 @@ export default function AddModelModal({ onClose, modelToEdit = null }: AddModelM
         name: sanitizedModelName,
         area: Number(sanitizedArea),
         face: sanitizedFace,
+        model_price: Number(sanitizedModelPrice),
+        rooms_number: Number(sanitizedRoomsNumber),
       });
       onClose();
       return;
@@ -51,6 +59,8 @@ export default function AddModelModal({ onClose, modelToEdit = null }: AddModelM
       name: sanitizedModelName,
       area: Number(sanitizedArea),
       face: sanitizedFace,
+      model_price: Number(sanitizedModelPrice),
+      rooms_number: Number(sanitizedRoomsNumber),
     };
 
     addModel(newModel);
@@ -146,6 +156,39 @@ export default function AddModelModal({ onClose, modelToEdit = null }: AddModelM
                 onChange={(e) => setFace(e.target.value)}
                 className="w-full px-4 py-2.5 dark:text-[#FFFFFF] dark:bg-[#28272A] text-sm text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder={t('facePlaceholder')}
+              />
+            </div>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <label htmlFor="modelPrice" className="block dark:text-[#FFFFFF] text-sm font-medium text-gray-700 mb-2">
+                {t('modelPrice')} <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                id="modelPrice"
+                value={modelPrice}
+                onChange={(e) => setModelPrice(e.target.value)}
+                className="w-full px-4 py-2.5 dark:text-[#FFFFFF] dark:bg-[#28272A] text-sm text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder={t('modelPricePlaceholder')}
+                min="0"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="roomsNumber" className="block dark:text-[#FFFFFF] text-sm font-medium text-gray-700 mb-2">
+                {t('roomsNumber')} <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                id="roomsNumber"
+                value={roomsNumber}
+                onChange={(e) => setRoomsNumber(e.target.value)}
+                className="w-full px-4 py-2.5 dark:text-[#FFFFFF] dark:bg-[#28272A] text-sm text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder={t('roomsNumberPlaceholder')}
+                min="0"
+                step="1"
               />
             </div>
           </div>

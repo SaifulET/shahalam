@@ -184,6 +184,8 @@ export default function PropertyUnitForm() {
         name: model.name,
         area: model.area,
         face: model.face,
+        model_price: model.model_price,
+        rooms_number: model.rooms_number,
       })),folderId
     );
 
@@ -303,6 +305,14 @@ export default function PropertyUnitForm() {
                         <div className="flex justify-between">
                           <span className="text-gray-500 dark:text-gray-400">{t('faceLabel')}</span>
                           <span className="text-gray-900 dark:text-[#FFFFFF] font-medium">{model.face}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-500 dark:text-gray-400">{t('priceLabel')}</span>
+                          <span className="text-gray-900 dark:text-[#FFFFFF] font-medium">{model.model_price}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-500 dark:text-gray-400">{t('roomsLabel')}</span>
+                          <span className="text-gray-900 dark:text-[#FFFFFF] font-medium">{model.rooms_number}</span>
                         </div>
                       </div>
                     </div>

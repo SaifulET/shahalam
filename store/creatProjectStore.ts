@@ -11,6 +11,8 @@ interface ModelPayload {
   name: string;
   area: number;
   face: string;
+  model_price?: number;
+  rooms_number?: number;
 }
 
 interface ProjectState {
@@ -84,6 +86,8 @@ else{
           name: model.name,
           area: model.area,
           face: model.face,
+          model_price: model.model_price,
+          rooms_number: model.rooms_number,
         });
       }
 

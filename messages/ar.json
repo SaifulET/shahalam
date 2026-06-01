@@ -69,7 +69,11 @@
     "totalAreaPlaceholder": "أدخل المساحة الإجمالية",
     "squareMeters": "م²",
     "face": "الواجهة",
-    "facePlaceholder": "أدخل اتجاه الواجهة"
+    "facePlaceholder": "أدخل اتجاه الواجهة",
+    "modelPrice": "سعر النموذج",
+    "modelPricePlaceholder": "أدخل سعر النموذج",
+    "roomsNumber": "عدد الغرف",
+    "roomsNumberPlaceholder": "أدخل عدد الغرف"
   },
   "addUnitForm": {
     "title": "نوع الوحدة",
@@ -120,7 +124,9 @@
       "maxFileSize": "يجب أن يكون حجم الملف أقل من 10MB",
       "fillPropertyNameAndLocation": "يرجى إدخال اسم العقار والموقع",
       "createPropertyFailed": "فشل إنشاء العقار"
-    }
+    },
+    "priceLabel": "السعر:",
+    "roomsLabel": "الغرف:"
   },
   "companyProfile": {
     "title": "الملف التعريفي للشركة",
@@ -222,7 +228,9 @@
       "available": "متاح",
       "reserved": "محجوز",
       "sold": "مباع"
-    }
+    },
+    "price": "السعر",
+    "rooms": "الغرف"
   },
   "dashboardEditor": {
     "loadingProjectData": "جاري تحميل بيانات المشروع...",
@@ -277,14 +285,24 @@
       "totalArea": "المساحة الإجمالية (قدم²)",
       "totalAreaPlaceholder": "مثال: 1200",
       "faceOptional": "الواجهة (اختياري)",
-      "facePlaceholder": "مثال: شمال، جنوب، شرق، غرب"
+      "facePlaceholder": "مثال: شمال، جنوب، شرق، غرب",
+      "modelPrice": "سعر النموذج",
+      "modelPricePlaceholder": "مثال: 5000000",
+      "roomsNumber": "عدد الغرف",
+      "roomsNumberPlaceholder": "مثال: 3"
     },
     "editModelModal": {
       "title": "تعديل النموذج",
       "modelName": "اسم النموذج",
       "totalArea": "المساحة الإجمالية (قدم²)",
       "faceOptional": "الواجهة (اختياري)",
-      "facePlaceholder": "مثال: شمال، جنوب، شرق، غرب"
-    }
+      "facePlaceholder": "مثال: شمال، جنوب، شرق، غرب",
+      "modelPrice": "سعر النموذج",
+      "modelPricePlaceholder": "مثال: 5000000",
+      "roomsNumber": "عدد الغرف",
+      "roomsNumberPlaceholder": "مثال: 3"
+    },
+    "priceValue": "السعر: {price}",
+    "roomsValue": "الغرف: {rooms}"
   }
 }
