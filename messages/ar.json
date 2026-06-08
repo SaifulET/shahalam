@@ -94,6 +94,13 @@
     "modelsAddedCount": "تمت إضافة {count} نموذج",
     "editModel": "تعديل النموذج",
     "removeModel": "حذف النموذج",
+    "modelSelection": {
+      "title": "اختر النموذج",
+      "label": "خيار النموذج",
+      "newModel": "نموذج جديد",
+      "loading": "جاري تحميل النماذج المحفوظة...",
+      "continue": "متابعة"
+    },
     "areaLabel": "المساحة:",
     "squareMeters": "م²",
     "faceLabel": "الواجهة:",
@@ -123,6 +130,7 @@
       "invalidImageFile": "يرجى اختيار ملف صورة صالح (PNG أو JPG)",
       "maxFileSize": "يجب أن يكون حجم الملف أقل من 10MB",
       "fillPropertyNameAndLocation": "يرجى إدخال اسم العقار والموقع",
+      "fetchModelsFailed": "فشل تحميل النماذج المحفوظة",
       "createPropertyFailed": "فشل إنشاء العقار"
     },
     "priceLabel": "السعر:",

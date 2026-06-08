@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useCreatProjectStore } from '@/store/creatProjectStore';
 import { useAuthStore } from '@/store/authStore';
 import { useModelStore } from '@/store/useModelStore';
+import api from '@/lib/api';
 import AddModelModal from '../addModel/addModel';
 import { useProjectStore } from '@/store/projectStore';
 
@@ -14,6 +15,15 @@ interface Floor {
   id: string;
   name: string;
   units: string[];
+}
+
+interface CompanyModel {
+  _id: string;
+  name: string;
+  area?: number;
+  face?: string;
+  model_price?: number;
+  rooms_number?: number;
 }
 
 function sanitizeUnitName(value: string) {
@@ -29,8 +39,14 @@ export default function PropertyUnitForm() {
   const [address, setAddress] = useState('');
   const [floors, setFloors] = useState<Floor[]>([]);
   const [showUnitModal, setShowUnitModal] = useState(false);
+  const [showModelSelectionModal, setShowModelSelectionModal] = useState(false);
   const [showModelModal, setShowModelModal] = useState(false);
   const [editingModelId, setEditingModelId] = useState<string | null>(null);
+  const [modelPrefill, setModelPrefill] = useState<Omit<CompanyModel, "_id"> | null>(null);
+  const [companyModels, setCompanyModels] = useState<CompanyModel[]>([]);
+  const [selectedCompanyModelId, setSelectedCompanyModelId] = useState('new');
+  const [companyModelsLoading, setCompanyModelsLoading] = useState(false);
+  const [companyModelsError, setCompanyModelsError] = useState<string | null>(null);
   const [currentFloorId, setCurrentFloorId] = useState<string>('');
   const [newUnitName, setNewUnitName] = useState('');
   const [coverImage, setCoverImage] = useState<string | null>(null);
@@ -69,14 +85,68 @@ export default function PropertyUnitForm() {
     setNewUnitName('');
   };
 
+  const fetchCompanyModels = async () => {
+    if (!user?.id) {
+      setCompanyModels([]);
+      return;
+    }
+
+    try {
+      setCompanyModelsLoading(true);
+      setCompanyModelsError(null);
+      const response = await api.get(`/models/company/${user.id}`);
+      setCompanyModels(response.data.data ?? []);
+    } catch (error) {
+      setCompanyModelsError(error instanceof Error ? error.message : t('alerts.fetchModelsFailed'));
+      setCompanyModels([]);
+    } finally {
+      setCompanyModelsLoading(false);
+    }
+  };
+
+  const openModelSelectionModal = () => {
+    setSelectedCompanyModelId('new');
+    setShowModelSelectionModal(true);
+    void fetchCompanyModels();
+  };
+
   const openModelModal = (modelId?: string) => {
     setEditingModelId(modelId ?? null);
+    setModelPrefill(null);
     setShowModelModal(true);
   };
 
   const closeModelModal = () => {
     setShowModelModal(false);
     setEditingModelId(null);
+    setModelPrefill(null);
+  };
+
+  const continueModelSelection = () => {
+    if (selectedCompanyModelId === 'new') {
+      setShowModelSelectionModal(false);
+      setModelPrefill(null);
+      openModelModal();
+      return;
+    }
+
+    const selectedModel = companyModels.find((model) => model._id === selectedCompanyModelId);
+
+    if (!selectedModel) {
+      return;
+    }
+
+    const prefillData = {
+      name: selectedModel.name,
+      area: selectedModel.area,
+      face: selectedModel.face,
+      model_price: selectedModel.model_price,
+      rooms_number: selectedModel.rooms_number,
+    };
+    setEditingModelId(null);
+    setModelPrefill(prefillData);
+    setShowModelSelectionModal(false);
+    setShowModelModal(true);
   };
 
   const saveNewUnit = () => {
@@ -250,7 +320,7 @@ export default function PropertyUnitForm() {
             </div>
 
             <button 
-              onClick={() => openModelModal()}
+              onClick={openModelSelectionModal}
               className="w-full gap-1 px-3 py-3 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-100 transition-colors text-center mt-2"
             >
               {t('addModel')}
@@ -524,11 +594,84 @@ export default function PropertyUnitForm() {
         </div>
       )}
 
+      {/* Model Selection Modal */}
+      {showModelSelectionModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-[#1A1A1A] rounded-lg shadow-xl w-full max-w-md">
+            <div className="flex items-center justify-between border-b border-gray-200 p-5 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {t('modelSelection.title')}
+              </h2>
+              <button
+                onClick={() => setShowModelSelectionModal(false)}
+                type="button"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+              >
+                <X className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+              </button>
+            </div>
+
+            <div className="p-5">
+              <label htmlFor="modelSelector" className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200">
+                {t('modelSelection.label')}
+              </label>
+              <select
+                id="modelSelector"
+                value={selectedCompanyModelId}
+                onChange={(event) => setSelectedCompanyModelId(event.target.value)}
+                disabled={companyModelsLoading}
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-wait disabled:opacity-70 dark:border-gray-600 dark:bg-[#111827] dark:text-white"
+              >
+                <option value="new">{t('modelSelection.newModel')}</option>
+                {companyModels.map((model) => (
+                  <option key={model._id} value={model._id}>
+                    {model.name}
+                  </option>
+                ))}
+              </select>
+
+              {companyModelsLoading && (
+                <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                  {t('modelSelection.loading')}
+                </p>
+              )}
+              {companyModelsError && (
+                <p className="mt-3 text-sm text-red-600 dark:text-red-400">
+                  {companyModelsError}
+                </p>
+              )}
+
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => setShowModelSelectionModal(false)}
+                  type="button"
+                  className="flex-1 rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                >
+                  {t('cancel')}
+                </button>
+                <button
+                  onClick={continueModelSelection}
+                  type="button"
+                  disabled={companyModelsLoading}
+                  className="flex-1 rounded-lg bg-blue-500 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {t('modelSelection.continue')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Model Modal */}
       {showModelModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white dark:bg-black rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <AddModelModal onClose={closeModelModal} modelToEdit={editingModel} />
+            <AddModelModal
+              onClose={closeModelModal}
+              modelToEdit={editingModel}
+              initialModel={modelPrefill}
+            />
           </div>
         </div>
       )}
