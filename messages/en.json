@@ -94,6 +94,13 @@
     "modelsAddedCount": "{count} models added",
     "editModel": "Edit model",
     "removeModel": "Remove model",
+    "modelSelection": {
+      "title": "Choose Model",
+      "label": "Model option",
+      "newModel": "New model",
+      "loading": "Loading saved models...",
+      "continue": "Continue"
+    },
     "areaLabel": "Area:",
     "squareMeters": "sq m",
     "faceLabel": "Face:",
@@ -125,6 +132,7 @@
       "invalidImageFile": "Please select a valid image file (PNG or JPG)",
       "maxFileSize": "File size must be less than 10MB",
       "fillPropertyNameAndLocation": "Please fill property name and location",
+      "fetchModelsFailed": "Failed to load saved models",
       "createPropertyFailed": "Failed to create property"
     }
   },

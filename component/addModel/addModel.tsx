@@ -9,9 +9,10 @@ import { useTranslations } from 'next-intl';
 interface AddModelModalProps {
   onClose: () => void;
   modelToEdit?: ModelPayload | null;
+  initialModel?: Partial<Omit<ModelPayload, "id">> | null;
 }
 
-export default function AddModelModal({ onClose, modelToEdit = null }: AddModelModalProps) {
+export default function AddModelModal({ onClose, modelToEdit = null, initialModel = null }: AddModelModalProps) {
   const t = useTranslations('addModelModal');
   const [modelName, setModelName] = useState('');
   const [totalArea, setTotalArea] = useState('');
@@ -23,12 +24,14 @@ export default function AddModelModal({ onClose, modelToEdit = null }: AddModelM
   const updateModel = useModelStore((state) => state.updateModel);
 
   useEffect(() => {
-    setModelName(modelToEdit?.name ?? '');
-    setTotalArea(modelToEdit?.area?.toString() ?? '');
-    setFace(modelToEdit?.face ?? '');
-    setModelPrice(modelToEdit?.model_price?.toString() ?? '');
-    setRoomsNumber(modelToEdit?.rooms_number?.toString() ?? '');
-  }, [modelToEdit]);
+    const model = modelToEdit ?? initialModel;
+
+    setModelName(model?.name ?? '');
+    setTotalArea(model?.area?.toString() ?? '');
+    setFace(model?.face ?? '');
+    setModelPrice(model?.model_price?.toString() ?? '');
+    setRoomsNumber(model?.rooms_number?.toString() ?? '');
+  }, [initialModel, modelToEdit]);
 
   const handleSave = () => {
     const sanitizedModelName = modelName.trim();
